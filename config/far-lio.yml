@@ -1,0 +1,187 @@
+# =======================================================================================
+# State Estimation Node
+# =======================================================================================
+/core/state:
+  StateEstimation:
+    ros__parameters:
+      use_sim_time: true
+      # Enable parameters
+      enable:
+        measurement_covariance_adaptation: true
+        mahalanobis_outlier_rejection: true
+        initialize_from_measurements: true
+        track_angle_measurement: false
+        reference_angle_measurement: true
+
+      # State Machine
+      state_machine:
+        min_valid_imus: 1
+        overwrite_pose_covariance_threshold: 0.05
+
+      # hard outlier rejection for linear velocities and imus
+      hard_outlier_rejection:
+        treshold:
+          linear_velocity_mps: 10.0
+          angular_velocity_radps: 1.0
+          accelerometer_mps2: 1000.0
+        max_consecutive_outlier:
+          linear_velocity: 250
+          imu: 50
+
+      # track handler parameter
+      track_handler:
+        max_s_global_z_matching_distance: 100.0
+        d_track_matching_margin: 2.0
+        orientation:
+          R_init: [0.002, 0.003, 1.0e+9]
+          outlier_bounds: [0.3, 0.3, 0.3]
+        overwrite_acceleration_z: false
+
+      # reference orientation based on IMU inputs
+      reference_angles:
+        v_dot_filter_coefficients: [0.0044, 0.0212, 0.0617, 0.1186, 0.1732, 0.1965, 0.1732, 0.1186, 0.0617, 0.0212, 0.0044]
+        orientation:
+          R_init: [0.05, 0.1, 1.0e+9]
+          outlier_bounds: [0.3, 0.3, 0.3]
+
+      # measurements to use in the extended kalman filter
+      measurements:
+        lidar_gicp:
+          message:
+            topic: /core/state/lidar_odometry
+            type: nav_msgs/msg/Odometry
+            timeout_ms: 500
+            additional_dealy_ms: 0
+          status:
+            topic: /core/state/lidar_odometry_status
+            timeout_ms: 500
+          position_m:
+            R_init: [0.05, 0.05, 0.07]
+            outlier_bounds: [5.0, 1.0, 4.0]
+          orientation_rad:
+            R_init: [0.3, 0.3, 0.0002]
+            outlier_bounds: [0.3, 0.3, 0.3]
+          linear_velocity_mps:
+            R_init: [0.6, 1.0, 0.5]
+            outlier_bounds: [2.0, 1.0, 2.0]
+      inputs:
+        bias_init: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        average_delay_ms: 10
+        imus:
+          primary:
+            message:
+              topic: /vehicle/sensor/imu
+              type: sensor_msgs/msg/Imu
+              timeout_ms: 500
+            filter_coefficients: [0.07722183762197628, 0.24522338986219644, 0.34256086202951863, 0.24522338986219644, 0.07722183762197628]
+
+      # Process noise covariance matrix - structure of the matrix follows lib_cpp/constants/state_estimation_constants
+      kalman_filter:
+        Q: [0.00035, 0.0003, 0.003, 1.0, 2.4, 4.0]
+        covariance_adaption:
+          limit: 0.60
+          decay: 0.00150
+          virtual_scale: 10.0
+
+      vehicle_model:
+        linear_velocity_mps:
+          R_init: [0.1, 1.2, 0.1]
+          outlier_bounds: [2.0, 1.0, 2.0]
+        parameter:
+          tyreradius_front_m: 0.3085
+          tyreradius_rear_m: 0.3088
+          rr_vel_scale_vel_points_mps: [0.0, 100.0]
+          rr_vel_scale_scale_factors: [1.00, 1.00]
+          l_WheelbaseF_m: 1.733
+          l_WheelbaseR_m: 1.382
+
+# =======================================================================================
+# Odometry Node
+# =======================================================================================
+/core/state:
+  LidarOdometry:
+    ros__parameters:
+      use_sim_time: true
+      # Node:
+      node:
+        odom_frame: "local_cartesian"
+        child_frame: "base_link"
+        cloud_frame: ""
+        wait_tf: false
+        input_pointcloud: "" # Namespace set globally
+        input_pointcloud_status: ""
+        output_odom: "lidar_odometry" # Namespace set globally
+        input_map: "" # Path to folder containing "map.pcd" and "origin.yml"
+      # Pipeline
+      pipeline:
+        update_map: true
+        undistort: true
+        preprocess: true
+        downsample: false
+        buffer_z: false
+        debug_mode: false
+        num_threads: 1
+      # Covariance
+      covariance:
+        min_cov_x: 0.01
+        min_cov_y: 0.01
+        min_cov_z: 0.01
+        min_cov_roll: 0.02
+        min_cov_pitch: 0.02
+        min_cov_yaw: 0.0001
+      # Diagnostic
+      diagnostic:
+        check_input_status: false
+        frame_outdated: 100.0 # [ms]
+        check_forward: false
+        min_motion_threshold: 0.5
+        check_ellipsis: true
+        ellipsis_size_s: 5.0 # [m]
+        ellipsis_size_d: 2.5 # [m]
+        check_time_diff: true
+        max_time_diff: 50.0 # [ms]
+        enable_vel: true
+        check_vel: true
+        vel_motion_threshold: 0.0 # [m]
+      distortion:
+        max_time_diff: 50.0
+        vel_threshold: 3.0
+      # Map
+      map:
+        frame_map: false
+        voxel_size: 4.0 # [m]
+        max_distance: 1000.0 # [m]
+        cov_regularization: "FROBENIUS" # Options: "SVD", "MIN_EIGENVALUE", "FROBENIUS"
+      # Model
+      model:
+        initial_pos_x: 0.0 # [m]
+        initial_pos_y: 0.0 # [m]
+        initial_pos_z: 0.0 # [m]
+        initial_rot_x: 0.0 # [quat]
+        initial_rot_y: 0.0 # [quat]
+        initial_rot_z: 0.0 # [quat]
+        initial_rot_w: 1.0 # [quat]
+      # Preprocessing
+      preprocessing:
+        # Crop points by range from origin
+        crop_range:  # Size == 2: [min, max] in meters - otherwise disabled
+        - 0.0
+        # Vehicle footprint filtering (exclude points within vehicle body)
+        crop_footprint:  # Size == 2: [longitudinal, lateral] in meters - otherwise disabled
+        - 0.0
+      # Registration
+      registration:
+        solver_type: "GaussNewton" # Options: "GaussNewton", "LevenbergMarquardt"
+        max_iter: 500
+        max_inner_iter: 10
+        max_time: 200.0 # [ms]
+        convergence_criterion: 5.0e-3
+        damping_factor: 1.0e-9
+        damping_scale: 2.0 # Only used for "LevenbergMarquardt"
+      # Threshold
+      threshold:
+        initial_threshold: 1.0
+        min_motion_threshold: 0.25
+        max_correspondence_range: 100.0
+      # Velocity
+      velocity: {}
