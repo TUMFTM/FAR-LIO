@@ -12,9 +12,6 @@
 
 [project]
 site_name = "FAR-LIO"
-# Emit explicit *.html links instead of pretty directory URLs, so navigation
-# works when the site is opened directly (file://) or served without automatic
-# index.html resolution.
 use_directory_urls = false
 site_description = "A highly efficient, CUDA-accelerated framework for Fast, Accurate, and Robust LiDAR-Inertial Odometry."
 site_author = "TUM Autonomous Motorsport"
@@ -72,7 +69,8 @@ extra_javascript = [
 # -----------------------------------------------------------------------------
 [project.theme]
 language = "en"
-logo = "assets/tum.svg"
+logo = "assets/farlio-favicon.svg"
+favicon = "assets/farlio-favicon.svg"
 features = [
   "content.code.copy",
   "content.tooltips",

@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/farlio-banner.png" alt="FAR-LIO" width="660">
+</p>
+
 # TAM State Estimation
 
 Welcome to the TAM State Estimation documentation.  
