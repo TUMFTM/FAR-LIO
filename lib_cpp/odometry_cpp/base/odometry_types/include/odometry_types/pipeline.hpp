@@ -15,15 +15,13 @@
  */
 #pragma once
 
-#include "preprocessing.hpp"
 #include <vector>
-namespace tam::core::state::types
-{
+
+namespace tam::core::state::types {
 /**
  * @brief Configuration for the pipeline
  */
-struct PipelineConfig
-{
+struct PipelineConfig {
   bool update_map{false};
   bool undistort{true};
   bool preprocess{true};
@@ -32,11 +30,11 @@ struct PipelineConfig
   bool debug_mode{false};
   std::int64_t num_threads{1};
 };
+
 /**
  * @brief Debug signals for the pipeline
  */
-struct PipelineDebug
-{
+struct PipelineDebug {
   double downsample_time{0.0};
   double pipeline_time{0.0};
   std::int64_t num_points_frame{0};

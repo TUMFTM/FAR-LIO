@@ -20,86 +20,77 @@
 #include <string>
 #include <utility>
 
-#include "tum_types_cpp/common.hpp"
-namespace tam::core::state::types
-{
+namespace tam::core::state::types {
 /**
  * @brief Linear system for Optimization
  */
-struct LinearSystem
-{
+struct LinearSystem {
   LinearSystem() = default;
-  LinearSystem(const Eigen::Matrix<float, 6, 6> & JTJ_, const Eigen::Matrix<float, 6, 1> & JTr_)
-  : JTJ(JTJ_), JTr(JTr_)
-  {
-  }
+
+  LinearSystem(const Eigen::Matrix<float, 6, 6>& JTJ_, const Eigen::Matrix<float, 6, 1>& JTr_) : JTJ(JTJ_), JTr(JTr_) {}
+
   Eigen::Matrix<float, 6, 6> JTJ{Eigen::Matrix<float, 6, 6>::Zero()};
   Eigen::Matrix<float, 6, 1> JTr{Eigen::Matrix<float, 6, 1>::Zero()};
 };
 /**
  * @brief ENUM for different diagnostic levels
  */
-enum class DiagnosticLevel : std::uint8_t {
-  OK = 0,
-  WARN = 1,
-  ERROR = 2,
-  STALE = 3
-};
+enum class DiagnosticLevel : std::uint8_t { OK = 0, WARN = 1, ERROR = 2, STALE = 3 };
+
 /**
  * @brief Diagnostic status with level, message and key-value pairs
  */
-struct DiagnosticStatus
-{
+struct DiagnosticStatus {
   DiagnosticLevel level{DiagnosticLevel::STALE};
   std::string message{""};
   std::map<std::string, double> key_values;
 };
+
 /**
  * @brief Registration status
  */
-struct RegistrationStatus
-{
+struct RegistrationStatus {
   bool converged{false};
   double duration{0.0};
   std::uint64_t num_iter{0};
 };
+
 /**
  * @brief Pose with time stamp (internal use for motion model, diagnostics)
  */
-struct PoseStamped
-{
+struct PoseStamped {
   Sophus::SE3f pose{};
   std::uint64_t stamp{0};
 };
+
 /**
  * @brief Tangent (twist) with time stamp (internal use for distortion handling)
  */
-struct TangentStamped
-{
+struct TangentStamped {
   Sophus::SE3f::Tangent tangent{};
   std::uint64_t stamp{0};
 };
+
 /**
  * @brief Pose with covariance (matches geometry_msgs::msg::PoseWithCovariance layout)
  */
-struct PoseWithCovariance
-{
+struct PoseWithCovariance {
   Sophus::SE3f pose{};
   std::array<float, 36> covariance{};
 };
+
 /**
  * @brief Tangent with covariance (matches geometry_msgs::msg::TwistWithCovariance layout)
  */
-struct TangentWithCovariance
-{
+struct TangentWithCovariance {
   Sophus::SE3f::Tangent tangent{};
   std::array<float, 36> covariance{};
 };
+
 /**
  * @brief Odometry output (matches nav_msgs::msg::Odometry layout)
  */
-struct Odometry
-{
+struct Odometry {
   std::uint64_t stamp{0};
   PoseWithCovariance pose{};
   TangentWithCovariance tangent{};

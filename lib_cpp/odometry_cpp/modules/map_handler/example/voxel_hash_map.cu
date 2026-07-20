@@ -22,7 +22,8 @@
 #include "odometry_utils/utils.hpp"
 #include "param_management_cpp/param_reference_manager.hpp"
 #include "tsl_logger_cpp/reference_logger.hpp"
-int main(int argc, char * argv[])
+
+int main(int argc, char* argv[])
 {
   // Check the number of arguments
   if (argc < 5) {

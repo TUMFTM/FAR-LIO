@@ -17,10 +17,11 @@
 #include <gtest/gtest.h>
 
 #include <iostream>
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "test_icp_parameterized.hpp"
+
 /**
  * @brief Test construction of ICP from param manager and logger
  */
@@ -34,12 +35,12 @@ TEST(ICP, BuildPmgLogger)
   auto registration_ = tam::core::state::ICP<tam::core::state::types::ICP_EXT>::from_config(pmg_.get(), logger_.get()); // NOLINT
   // clang-format on
 
-  tam::pmg::MgmtInterface * pmg_raw = pmg_.get();
+  tam::pmg::MgmtInterface* pmg_raw = pmg_.get();
   pmg_raw->set_value("registration.max_iter", 100);
 
-  EXPECT_EQ(registration_->get_config().max_iter, 100)
-    << "Failed to construct ICP from param manager and logger";
+  EXPECT_EQ(registration_->get_config().max_iter, 100) << "Failed to construct ICP from param manager and logger";
 }
+
 /**
  * @brief Test construction of ICP from config and debug object
  */
@@ -54,13 +55,12 @@ TEST(ICP, BuildConfigDebug)
   config.convergence_criterion = 5e-3;
   auto registration_ = tam::core::state::ICP<tam::core::state::types::ICP_EXT>::from_config(config, debug); // NOLINT
   // clang-format on
-  EXPECT_EQ(registration_->get_config().max_iter, 500)
-    << "Failed to construct ICP from config and debug objects";
+  EXPECT_EQ(registration_->get_config().max_iter, 500) << "Failed to construct ICP from config and debug objects";
 }
+
 /**
  * @brief Instantiate tests with various parameter combinations
  */
-INSTANTIATE_TEST_SUITE_P(
-  ICPCombinations, ICPParameterizedTest,
+INSTANTIATE_TEST_SUITE_P(ICPCombinations, ICPParameterizedTest,
   ::testing::Values(TestParams{"SVD", "GaussNewton"}, TestParams{"SVD", "LevenbergMarquardt"}),
-  [](const ::testing::TestParamInfo<TestParams> & info) { return info.param.string(); });
+  [](const ::testing::TestParamInfo<TestParams>& info) { return info.param.string(); });

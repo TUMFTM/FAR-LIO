@@ -20,6 +20,7 @@
 #include <thrust/device_vector.h>
 #include <thrust/remove.h>
 
+#include <algorithm>
 #include <cuda/stream_ref>
 #include <iostream>
 #include <sophus/se3.hpp>
@@ -37,8 +38,8 @@
   if (error != cudaSuccess || deviceCount == 0) {           \
     GTEST_SKIP() << "No CUDA devices found, skipping test"; \
   }
-namespace tam::core::state::cuda::utils
-{
+
+namespace tam::core::state::cuda::utils {
 /**
  * @brief Transform points with a given transformation
  * @param [in] T                  Transformation
@@ -46,12 +47,10 @@ namespace tam::core::state::cuda::utils
  */
 template <typename TConfig>
 void __host__ transform_points(
-  const Sophus::SE3f & T, thrust::device_vector<types::Point<TConfig>> & points,
-  ::cuda::stream_ref stream = {})
+  const Sophus::SE3f& T, thrust::device_vector<types::Point<TConfig>>& points, ::cuda::stream_ref stream = {})
 {
-  thrust::transform(
-    thrust::cuda::par.on(stream.get()), points.begin(), points.end(), points.begin(),
-    [T] __device__(const types::Point<TConfig> & point) {
+  thrust::transform(thrust::cuda::par.on(stream.get()), points.begin(), points.end(), points.begin(),
+    [T] __device__(const types::Point<TConfig>& point) {
       types::Point<TConfig> pt = point;
       pt.pos = T * point.pos;
       // Transform normals and covariances if they exist
@@ -64,12 +63,13 @@ void __host__ transform_points(
       return pt;
     });
 }
+
 /**
  * @brief Copy function for different point types
  * @param [in] src                  Point to convert to different format
  */
 template <typename TConfigSrc, typename TConfigDst>
-__device__ types::Point<TConfigDst> convert_point(const types::Point<TConfigSrc> & src)
+__device__ types::Point<TConfigDst> convert_point(const types::Point<TConfigSrc>& src)
 {
   types::Point<TConfigDst> dst;
   // Unconditional members of types::Point.
@@ -90,13 +90,14 @@ __device__ types::Point<TConfigDst> convert_point(const types::Point<TConfigSrc>
   CONDITIONAL_COPY(SENSOR_ID, sensor_id);
   return dst;
 }
+
 /**
  * @brief Check if a matrix has NaN values
  * @param [in] mat Matrix to check
  * @return True if the matrix has NaN values, false otherwise
  */
-template<int N, int M>
-__inline__ __device__ bool hasNaN(const Eigen::Matrix<float, N, M> & mat)
+template <int N, int M>
+__inline__ __device__ bool hasNaN(const Eigen::Matrix<float, N, M>& mat)
 {
 #pragma unroll
   for (int i = 0; i < N; ++i) {
@@ -109,12 +110,13 @@ __inline__ __device__ bool hasNaN(const Eigen::Matrix<float, N, M> & mat)
   }
   return false;
 }
+
 /**
  * @brief Warp-level reduction for 42 floats
  * @param [in] vals 42 floats to reduce
  */
 template <int BLOCK_PARTIAL_SIZE>
-__inline__ __device__ void warp_reduce_sum(float * vals)
+__inline__ __device__ void warp_reduce_sum(float* vals)
 {
 // Standard "shuffle-down" pattern
 #pragma unroll
@@ -126,6 +128,7 @@ __inline__ __device__ void warp_reduce_sum(float * vals)
     }
   }
 }
+
 /**
  * @brief Set the CUDA device and print its properties
  * @param [in] device_id ID of the device to set
@@ -143,18 +146,19 @@ cudaDeviceProp __host__ set_device(int device_id)
   std::cout << "\033[1;33mMultiprocessors: " << prop.multiProcessorCount << "\033[0m" << std::endl;
   return prop;
 }
+
 /**
  * @brief Allocate a thrust device vector with error handling
  * @param [in] vec  Vector to allocate
  * @param [in] size Size of the vector
  */
 template <typename T>
-void __host__ allocate_vector(thrust::device_vector<T> & vec, size_t size)
+void __host__ allocate_vector(thrust::device_vector<T>& vec, size_t size)
 {
   try {
     vec.reserve(size);
     vec.resize(size);
-  } catch (const thrust::system_error & e) {
+  } catch (const thrust::system_error& e) {
     std::cerr << "Thrust error: " << e.what() << std::endl;
   }
 }

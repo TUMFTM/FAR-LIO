@@ -16,6 +16,7 @@
 
 #include <iostream>
 #include <sophus/se3.hpp>
+#include <vector>
 
 #include "map_handler/voxel_hash_map.cuh"
 #include "odometry_utils/utils.hpp"
@@ -23,12 +24,12 @@
 #include "registration_handler/icp.cuh"
 #include "tsl_logger_cpp/reference_logger.hpp"
 #include "voxel_tools/voxel_tools.cuh"
-int main(int argc, char * argv[])
+
+int main(int argc, char* argv[])
 {
   // Check the number of arguments
   if (argc < 4) {
-    std::cerr << "Usage: " << argv[0] << " <map_path> <frame_path> <initial_guess_path>"
-              << std::endl;
+    std::cerr << "Usage: " << argv[0] << " <map_path> <frame_path> <initial_guess_path>" << std::endl;
     return 1;
   }
   for (int i = 0; i < argc; ++i) {
@@ -50,7 +51,7 @@ int main(int argc, char * argv[])
   // clang-format on
 
   // init cuda and set parameter
-  tam::pmg::MgmtInterface * pmg_raw = pmg_.get();
+  tam::pmg::MgmtInterface* pmg_raw = pmg_.get();
   pmg_raw->set_value("map.max_distance", 1000.0);
   pmg_raw->set_value("registration.solver_type", "GaussNewton");
   pmg_raw->set_value("registration.max_iter", std::int64_t{1000});
@@ -67,17 +68,19 @@ int main(int argc, char * argv[])
   cudaStreamCreate(&stream);
 
   // Load the map
-  std::vector<tam::core::state::types::Point<tam::core::state::types::Point_XYZ>> map = tam::core::state::utils::load_pointcloud_bin<tam::core::state::types::Point_XYZ>(argv[1]); // NOLINT
+  std::vector<tam::core::state::types::Point<tam::core::state::types::Point_XYZ>> map =
+    tam::core::state::utils::load_pointcloud_bin<tam::core::state::types::Point_XYZ>(argv[1]);  // NOLINT
   std::cout << "Loaded " << map.size() << " points from " << argv[1] << std::endl;
   // Add points to the map
-  map_->add_points(map, tam::core::state::types::POINT_NORMAL::MAX_POINTS_PER_VOXEL, 1, tam::core::state::types::CUDA_ICP_EXT::NUM_NEIGHBORS, stream);  // NOLINT
+  map_->add_points(map, tam::core::state::types::POINT_NORMAL::MAX_POINTS_PER_VOXEL, 1,
+    tam::core::state::types::CUDA_ICP_EXT::NUM_NEIGHBORS, stream);  // NOLINT
 
   size_t free_mem, total_mem;
   cudaError_t err = cudaMemGetInfo(&free_mem, &total_mem);
 
   if (err != cudaSuccess) {
-      std::cerr << "cudaMemGetInfo failed: " << cudaGetErrorString(err) << std::endl;
-      return 1;
+    std::cerr << "cudaMemGetInfo failed: " << cudaGetErrorString(err) << std::endl;
+    return 1;
   }
 
   size_t used_mem = total_mem - free_mem;
@@ -88,15 +91,21 @@ int main(int argc, char * argv[])
   std::cout << "Free memory: " << free_mem / (1024 * 1024) << " MB" << std::endl;
   std::cout << "Used memory: " << used_mem / (1024 * 1024) << " MB" << std::endl;
 
-  std::vector<tam::core::state::types::Point<tam::core::state::types::CUDA_ICP_EXT>> frame = tam::core::state::utils::load_pointcloud_bin<tam::core::state::types::CUDA_ICP_EXT>(argv[2]); // NOLINT
+  std::vector<tam::core::state::types::Point<tam::core::state::types::CUDA_ICP_EXT>> frame =
+    tam::core::state::utils::load_pointcloud_bin<tam::core::state::types::CUDA_ICP_EXT>(argv[2]);  // NOLINT
   std::cout << "Loaded " << frame.size() << " points from " << argv[2] << std::endl;
   // Load the initial guess
-  Sophus::SE3f init_guess = tam::core::state::utils::load_pose<tam::core::state::types::CUDA_ICP_EXT>(argv[3]);  // NOLINT
+  Sophus::SE3f init_guess =
+    tam::core::state::utils::load_pose<tam::core::state::types::CUDA_ICP_EXT>(argv[3]);  // NOLINT
 
-  const auto & [frame_registration, frame_map] = tam::core::state::cuda::voxel_doubledownsample<tam::core::state::types::CUDA_ICP_EXT>(frame, map_->get_config().voxel_size);  // NOLINT
+  const auto& [frame_registration, frame_map] =
+    tam::core::state::cuda::voxel_doubledownsample<tam::core::state::types::CUDA_ICP_EXT>(
+      frame, map_->get_config().voxel_size);  // NOLINT
   const float sigma = 6.0;
-  const Sophus::SE3f T_icp = registration_->register_frame(frame_registration, map_.get(), init_guess, 3.0 * sigma, sigma, stream);  // NOLINT
-  map_->update_points(frame_map, T_icp, tam::core::state::types::POINT_NORMAL::MAX_POINTS_PER_VOXEL, 1, tam::core::state::types::CUDA_ICP_EXT::NUM_NEIGHBORS, stream);  // NOLINT
+  const Sophus::SE3f T_icp =
+    registration_->register_frame(frame_registration, map_.get(), init_guess, 3.0 * sigma, sigma, stream);  // NOLINT
+  map_->update_points(frame_map, T_icp, tam::core::state::types::POINT_NORMAL::MAX_POINTS_PER_VOXEL, 1,
+    tam::core::state::types::CUDA_ICP_EXT::NUM_NEIGHBORS, stream);  // NOLINT
 
   // clang-format on
 
@@ -114,16 +123,13 @@ int main(int argc, char * argv[])
   std::cout << "Initial guess: " << std::endl << init_guess.matrix() << std::endl;
   std::cout << "Transformation from frame to map: " << std::endl << T_icp.matrix() << std::endl;
   std::cout << "Converged: " << registration_->get_registration_status().converged << std::endl;
-  std::cout << "Registration time: " << registration_->get_debug().registration_time << " ms"
-            << std::endl;
+  std::cout << "Registration time: " << registration_->get_debug().registration_time << " ms" << std::endl;
   std::cout << "Damping Factor: " << registration_->get_debug().damping_factor << std::endl;
   std::cout << "Iterations: " << registration_->get_debug().num_iter << std::endl;
-if (registration_->get_config().solver_type == "LevenbergMarquardt") {
-  std::cout << "Error: " << std::get<double>(registration_->get_debug().conditional["error"])
-            << std::endl;
-  std::cout << "Inner Iterations: "
-            << std::get<std::int64_t>(registration_->get_debug().conditional["num_inner_iter"])
-            << std::endl;
-}
+  if (registration_->get_config().solver_type == "LevenbergMarquardt") {
+    std::cout << "Error: " << std::get<double>(registration_->get_debug().conditional["error"]) << std::endl;
+    std::cout << "Inner Iterations: "
+              << std::get<std::int64_t>(registration_->get_debug().conditional["num_inner_iter"]) << std::endl;
+  }
   return 0;
 }

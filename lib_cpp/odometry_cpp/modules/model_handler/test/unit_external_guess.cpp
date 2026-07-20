@@ -22,6 +22,7 @@
 #include "model_handler/external_guess.hpp"
 #include "param_management_cpp/param_reference_manager.hpp"
 #include "tsl_logger_cpp/reference_logger.hpp"
+
 /**
  * @brief Test construction of ExternalGuess from param manager and logger
  */
@@ -38,12 +39,12 @@ TEST(ExternalGuess, BuildPmgLogger)
   std::uint64_t stamp = std::chrono::system_clock::now().time_since_epoch().count();
   Sophus::SE3f pose = Sophus::SE3f();
   pose.translation().z() = 2.0;
-  model_->set_pose(
-    tam::core::state::types::PoseStamped{pose, stamp}, true);
+  model_->set_pose(tam::core::state::types::PoseStamped{pose, stamp}, true);
 
   EXPECT_EQ(model_->get_initial_guess(stamp).pose.translation().z(), 2.0)
     << "Failed to construct ExternalGuess from param manager and logger";
 }
+
 /**
  * @brief Test construction of ExternalGuess from config and debug object
  */

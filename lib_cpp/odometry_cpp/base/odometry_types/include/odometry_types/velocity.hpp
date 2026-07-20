@@ -20,14 +20,14 @@
 #include <unordered_map>
 #include <variant>
 #include <vector>
-namespace tam::core::state::types
-{
+
+namespace tam::core::state::types {
 enum class VelocityType : std::uint8_t { DERIVATIVE = 0, DCR = 1 };
+
 /**
  * @brief Single DCR hypothesis, i.e. a single aliasing wrap k for a single cluster
  */
-struct DCRHypothesis
-{
+struct DCRHypothesis {
   std::int16_t raw_cluster_idx{-1};
   std::int8_t k{0};
   std::vector<std::size_t> point_indices;
@@ -37,11 +37,11 @@ struct DCRHypothesis
   Eigen::Vector2f v{0.0f, 0.0f};
   std::size_t n_points{0};
 };
+
 /**
  * @brief DCR cluster (raw DBSCAN cluster on (az, vel))
  */
-struct DCRCluster
-{
+struct DCRCluster {
   std::int16_t raw_cluster_idx{-1};
   std::int8_t sensor_id{-1};
   std::vector<std::size_t> point_indices;
@@ -50,11 +50,11 @@ struct DCRCluster
   std::vector<float> vint;
   std::vector<std::int8_t> k_all;
 };
+
 /**
  * @brief Result of the hypothesis selection step in DCR
  */
-struct DCRHypothesisSelection
-{
+struct DCRHypothesisSelection {
   bool valid{false};
   float score{-std::numeric_limits<float>::infinity()};
   Eigen::Vector2f model_v{0.0f, 0.0f};
@@ -62,20 +62,20 @@ struct DCRHypothesisSelection
   std::size_t n_hits{0};
   std::size_t n_outliers{0};
 };
+
 /**
  * @brief Velocity fit result for a single candidate model in DCR RANSAC
  */
-struct DCRVelocityFit
-{
+struct DCRVelocityFit {
   Eigen::Vector2f v{0.0f, 0.0f};
   std::vector<std::uint32_t> inlier;
   std::size_t n_inliers{0};
 };
+
 /**
  * @brief DCR (Doppler Consensus Reconstruction) tunables.
  */
-struct DCRConfig
-{
+struct DCRConfig {
   // Cluster (DBSCAN on (az, vel))
   double cluster_az_scale{1.0};
   double cluster_vel_scale{5.0};
@@ -92,18 +92,18 @@ struct DCRConfig
   double selection_hit_threshold{2.6};
   std::int64_t min_window_points{10};
 };
+
 /**
  * @brief Configuration for the velocity handler.
  */
-struct VelocityConfig
-{
+struct VelocityConfig {
   DCRConfig dcr{};
 };
+
 /**
  * @brief Debug signals for the velocity handler.
  */
-struct VelocityDebug
-{
+struct VelocityDebug {
   double velocity_time{0.0};  // [ms]
   std::unordered_map<std::string, std::variant<std::int64_t, double>> conditional{};
 };

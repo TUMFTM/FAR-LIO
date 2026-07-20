@@ -22,6 +22,7 @@
 #include "model_handler/constant_velocity.hpp"
 #include "param_management_cpp/param_reference_manager.hpp"
 #include "tsl_logger_cpp/reference_logger.hpp"
+
 /**
  * @brief Test construction of ConstantVelocity from param manager and logger
  */
@@ -34,12 +35,13 @@ TEST(ConstantVelocity, BuildPmgLogger)
   std::unique_ptr<tam::core::state::ModelHandler<tam::core::state::types::ICP_CV>> model_ =
     tam::core::state::ConstantVelocity<tam::core::state::types::ICP_CV>::from_config(pmg_.get(), logger_.get()); // NOLINT
   // clang-format on
-  tam::pmg::MgmtInterface * pmg_raw = pmg_.get();
+  tam::pmg::MgmtInterface* pmg_raw = pmg_.get();
   pmg_raw->set_value("model.initial_pos_z", 2.0);
   model_->init_model_config();
   EXPECT_EQ(model_->get_initial_guess(std::uint64_t{0}).pose.translation().z(), 2.0)
     << "Failed to construct ConstantVelocity from param manager and logger";
 }
+
 /**
  * @brief Test construction of ConstantVelocity from config and debug object
  */
@@ -64,6 +66,7 @@ TEST(ConstantVelocity, BuildConfigDebug)
   EXPECT_EQ(model_->get_initial_guess(std::uint64_t{0}).pose.translation().z(), 2.0)
     << "Failed to construct ConstantVelocity from config and debug object";
 }
+
 /**
  * @brief Test prediction of ConstantVelocity
  */
@@ -81,9 +84,7 @@ TEST(ConstantVelocityPrediction, BuildConfigDebug)
   std::uint64_t stamp = std::chrono::system_clock::now().time_since_epoch().count();
   Sophus::SE3f pose = Sophus::SE3f();
   pose.translation() = Eigen::Vector3f(1.0, 2.0, 0.0);
-  model_->set_pose(
-    tam::core::state::types::PoseStamped{pose, stamp}, true);  // NOLINT
-  EXPECT_EQ(
-    model_->get_initial_guess(std::uint64_t{0}).pose.translation(), Eigen::Vector3f(2.0, 4.0, 0.0))
+  model_->set_pose(tam::core::state::types::PoseStamped{pose, stamp}, true);  // NOLINT
+  EXPECT_EQ(model_->get_initial_guess(std::uint64_t{0}).pose.translation(), Eigen::Vector3f(2.0, 4.0, 0.0))
     << "Failed to get correct prediction from constant velocity model from config and debug object";
 }

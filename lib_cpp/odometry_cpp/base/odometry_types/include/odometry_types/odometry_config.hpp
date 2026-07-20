@@ -25,8 +25,8 @@
 #include "registration.hpp"
 #include "threshold.hpp"
 #include "velocity.hpp"
-namespace tam::core::state::types
-{
+
+namespace tam::core::state::types {
 /**
  * @brief Vehicle speed constraints
  * @note Currently used within DCR to prune infeasible aliasing hypotheses based on the physical
@@ -45,11 +45,11 @@ static constexpr double MAX_LOAD_FACTOR = 0.3;        // Max load factor for has
  * @brief Degree for polynomial fitting of motion distortion
  */
 static constexpr uint8_t POLYNOM_DEGREE = 1;
+
 /**
  * @brief Configuration for the TAM-ICP algorithm with external initial guess
  */
-struct ICP_EXT
-{
+struct ICP_EXT {
   static constexpr bool SPHERICAL = false;
   static constexpr bool INTENSITY = false;
   static constexpr bool NORMALS = false;
@@ -74,11 +74,11 @@ struct ICP_EXT
   static constexpr ThresholdType THRESHOLD = ThresholdType::ADAPTIVETHRESHOLD;
   static constexpr VelocityType VELOCITY = VelocityType::DERIVATIVE;
 };
+
 /**
  * @brief Configuration for the TAM-ICP algorithm with constant velocity model
  */
-struct ICP_CV
-{
+struct ICP_CV {
   static constexpr bool SPHERICAL = false;
   static constexpr bool INTENSITY = false;
   static constexpr bool NORMALS = false;
@@ -103,12 +103,12 @@ struct ICP_CV
   static constexpr ThresholdType THRESHOLD = ThresholdType::ADAPTIVETHRESHOLD;
   static constexpr VelocityType VELOCITY = VelocityType::DERIVATIVE;
 };
+
 /**
  * @brief Configuration for radar-based KISS-ICP with external initial guess
  * @note Includes radar-specific attributes: RCS, SNR, Confidence, and velocity interval
  */
-struct RADAR_ICP_EXT
-{
+struct RADAR_ICP_EXT {
   static constexpr bool SPHERICAL = true;
   static constexpr bool INTENSITY = false;
   static constexpr bool NORMALS = false;
@@ -133,11 +133,11 @@ struct RADAR_ICP_EXT
   static constexpr ThresholdType THRESHOLD = ThresholdType::ADAPTIVETHRESHOLD;
   static constexpr VelocityType VELOCITY = VelocityType::DCR;
 };
+
 /**
  * @brief Configuration for the CUDA KISS-ICP algorithm
  */
-struct CUDA_ICP_EXT
-{
+struct CUDA_ICP_EXT {
   static constexpr bool SPHERICAL = false;
   static constexpr bool INTENSITY = false;
   static constexpr bool NORMALS = false;
@@ -162,11 +162,11 @@ struct CUDA_ICP_EXT
   static constexpr ThresholdType THRESHOLD = ThresholdType::ADAPTIVETHRESHOLD;
   static constexpr VelocityType VELOCITY = VelocityType::DERIVATIVE;
 };
+
 /**
  * @brief Configuration for the TAM-GICP algorithm with external initial guess
  */
-struct GICP_EXT
-{
+struct GICP_EXT {
   static constexpr bool SPHERICAL = false;
   static constexpr bool INTENSITY = false;
   static constexpr bool NORMALS = true;
@@ -191,11 +191,11 @@ struct GICP_EXT
   static constexpr ThresholdType THRESHOLD = ThresholdType::ADAPTIVETHRESHOLD;
   static constexpr VelocityType VELOCITY = VelocityType::DERIVATIVE;
 };
+
 /**
  * @brief Configuration for the TAM-CUDA-GICP algorithm with external initial guess
  */
-struct CUDA_GICP_EXT
-{
+struct CUDA_GICP_EXT {
   static constexpr bool SPHERICAL = false;
   static constexpr bool INTENSITY = false;
   static constexpr bool NORMALS = true;
@@ -220,11 +220,11 @@ struct CUDA_GICP_EXT
   static constexpr ThresholdType THRESHOLD = ThresholdType::ADAPTIVETHRESHOLD;
   static constexpr VelocityType VELOCITY = VelocityType::DERIVATIVE;
 };
+
 /**
  * @brief Configuration for an XYZ point type (i.e. from the offline map)
  */
-struct Point_XYZ
-{
+struct Point_XYZ {
   static constexpr bool SPHERICAL = false;
   static constexpr bool INTENSITY = false;
   static constexpr bool NORMALS = false;
@@ -237,12 +237,12 @@ struct Point_XYZ
   static constexpr bool VEL_INTERVAL = false;
   static constexpr bool SENSOR_ID = false;
 };
+
 /**
  * @brief Configuration for testing of map functionality
  * @note This configuration is used for testing purposes only and should not be used in production.
  */
-struct POINT_NORMAL
-{
+struct POINT_NORMAL {
   static constexpr bool SPHERICAL = false;
   static constexpr bool INTENSITY = false;
   static constexpr bool NORMALS = true;
@@ -258,6 +258,7 @@ struct POINT_NORMAL
   static constexpr int16_t NUM_NEIGHBORS = 5;
   static constexpr RobustKernelType KERNEL = RobustKernelType::GEMANMCCLURE;
 };
+
 /**
  * @brief Define concept for normal and covariance
  */
@@ -273,14 +274,14 @@ concept HASSEG = TConfig::SEG;
  * @brief Define concept for frame map instance
  */
 template <typename TConfig>
-concept FRAMEMAP = TConfig::REGISTRATION == RegistrationType::GICP ||
-                   TConfig::REGISTRATION == RegistrationType::CUDA_GICP;
+concept FRAMEMAP =
+  TConfig::REGISTRATION == RegistrationType::GICP || TConfig::REGISTRATION == RegistrationType::CUDA_GICP;
 /**
  * @brief Define concept for radar configurations with radar-specific attributes
  */
 template <typename TConfig>
-concept HASRADAR = (TConfig::VEL) && (TConfig::RCS) && (TConfig::SNR) && (TConfig::CONFIDENCE) &&
-                   (TConfig::VEL_INTERVAL);
+concept HASRADAR =
+  (TConfig::VEL) && (TConfig::RCS) && (TConfig::SNR) && (TConfig::CONFIDENCE) && (TConfig::VEL_INTERVAL);
 /**
  * @brief Define concept for the DCR velocity handler. DCR needs per-point Doppler
  *        (VEL), velocity interval (VEL_INTERVAL) and the original sensor-frame

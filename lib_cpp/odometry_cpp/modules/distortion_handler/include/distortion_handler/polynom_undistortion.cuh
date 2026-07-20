@@ -20,8 +20,8 @@
 #include <memory>
 
 #include "distortion_handler/distortion_handler_base.hpp"
-namespace tam::core::state::cuda
-{
+
+namespace tam::core::state::cuda {
 template <typename TConfig>
 class PolynomUndistortion : public DistortionHandler<TConfig>
 {
@@ -30,28 +30,28 @@ public:
    * @brief Constructor for param manager and logger
    */
   static std::unique_ptr<DistortionHandler<TConfig>> from_config(
-    tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
+    tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
   {
     std::unique_ptr<PolynomUndistortion<TConfig>> dh =
       std::unique_ptr<PolynomUndistortion<TConfig>>(new PolynomUndistortion<TConfig>(pmg, logger));
     return dh;
   }
+
   /**
    * @brief Constructor for config and debug objects
    */
   static std::unique_ptr<DistortionHandler<TConfig>> from_config(
-    const types::DistortionConfig & config, const types::DistortionDebug & debug)
+    const types::DistortionConfig& config, const types::DistortionDebug& debug)
   {
     std::unique_ptr<PolynomUndistortion<TConfig>> dh =
-      std::unique_ptr<PolynomUndistortion<TConfig>>(
-        new PolynomUndistortion<TConfig>(config, debug));
+      std::unique_ptr<PolynomUndistortion<TConfig>>(new PolynomUndistortion<TConfig>(config, debug));
     return dh;
   }
+
   /**
    * @brief Undistort a frame of points
    */
-  __host__ void undistort(
-    thrust::device_vector<types::Point<TConfig>> & frame, const std::uint64_t frame_stamp,
+  __host__ void undistort(thrust::device_vector<types::Point<TConfig>>& frame, const std::uint64_t frame_stamp,
     ::cuda::stream_ref stream = {}) override
   {
     // Return early if no pose history is available or the velocity is below the threshold
@@ -83,34 +83,28 @@ public:
     }
 
     // Copy variables to capture for device copy
-    const double min_pose_time =
-      static_cast<double>(this->pose_history_.front().stamp) * 1.0e-9;
-    const double max_pose_time =
-      static_cast<double>(this->pose_history_.back().stamp) * 1.0e-9;
+    const double min_pose_time = static_cast<double>(this->pose_history_.front().stamp) * 1.0e-9;
+    const double max_pose_time = static_cast<double>(this->pose_history_.back().stamp) * 1.0e-9;
     const double frame_stamp_s = static_cast<double>(frame_stamp) * 1.0e-9;
     const float max_diff = static_cast<float>(min_pose_time - frame_stamp_s);
     const float min_diff = static_cast<float>(max_pose_time - frame_stamp_s);
     int degree = types::POLYNOM_DEGREE;
     // Copy coefficients to device
-    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> poly_coeff_row_major =
-      poly_coeff;
-    float * raw_pointer_poly_coeff = thrust::raw_pointer_cast(this->poly_coeff_d_.data());
-    cudaMemcpy(
-      raw_pointer_poly_coeff, poly_coeff_row_major.data(),
-      6 * (types::POLYNOM_DEGREE + 1) * sizeof(float), cudaMemcpyHostToDevice);
+    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> poly_coeff_row_major = poly_coeff;
+    float* raw_pointer_poly_coeff = thrust::raw_pointer_cast(this->poly_coeff_d_.data());
+    cudaMemcpy(raw_pointer_poly_coeff, poly_coeff_row_major.data(), 6 * (types::POLYNOM_DEGREE + 1) * sizeof(float),
+      cudaMemcpyHostToDevice);
 
     // Setup counter
     unsigned int h_counter = 0;
     cudaMemset(this->counter_d_, 0, sizeof(unsigned int));
-    unsigned int * counter_ptr = this->counter_d_;
+    unsigned int* counter_ptr = this->counter_d_;
 
     // Iterate over frame
-    thrust::for_each(
-      thrust::cuda::par.on(stream.get()), frame.begin(), frame.end(),
-      [min_diff, max_diff, degree, raw_pointer_poly_coeff, timestamp_offset,
-       counter_ptr] __device__(auto & point) {
+    thrust::for_each(thrust::cuda::par.on(stream.get()), frame.begin(), frame.end(),
+      [min_diff, max_diff, degree, raw_pointer_poly_coeff, timestamp_offset, counter_ptr] __device__(auto& point) {
         // Restrict pointer access to coefficients
-        const float * __restrict__ coeff = raw_pointer_poly_coeff;
+        const float* __restrict__ coeff = raw_pointer_poly_coeff;
         // Extract and clamp timestamp to avoid extrapolation
         float timestamp = point.timestamp;
         timestamp = fmaxf(timestamp, max_diff);
@@ -159,8 +153,8 @@ public:
 
 protected:
   // Inherit constructor from ModelHandler for param manager and logger
-  PolynomUndistortion(tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
-  : DistortionHandler<TConfig>(pmg, logger)
+  PolynomUndistortion(tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
+      : DistortionHandler<TConfig>(pmg, logger)
   {
     // Allocate the counter on the device
     cudaMalloc(&counter_d_, sizeof(unsigned int));
@@ -168,9 +162,10 @@ protected:
     // Allocate the polynomial coefficients on the device
     utils::allocate_vector(this->poly_coeff_d_, 6 * (types::POLYNOM_DEGREE + 1));
   }
+
   // Inherit constructor from ModelHandler for config and debug object
-  PolynomUndistortion(const types::DistortionConfig & config, const types::DistortionDebug & debug)
-  : DistortionHandler<TConfig>(config, debug)
+  PolynomUndistortion(const types::DistortionConfig& config, const types::DistortionDebug& debug)
+      : DistortionHandler<TConfig>(config, debug)
   {
     // Allocate the counter on the device
     cudaMalloc(&counter_d_, sizeof(unsigned int));
@@ -179,7 +174,7 @@ protected:
   }
 
 private:
-  mutable unsigned int * counter_d_;
+  mutable unsigned int* counter_d_;
   mutable thrust::device_vector<float> poly_coeff_d_;
 };
 }  // namespace tam::core::state::cuda

@@ -1,9 +1,22 @@
+# Copyright 2026 Maximilian Leitenstern, Marcel Weinmann
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 cmake_minimum_required(VERSION 3.25.2)
 
 # CONFIGURE PKG HERE
 # ==========================================
 set(PROJECT_NAME tam_odometry)
-set(NODE_LIBRARY_PATHS src/tam_odometry.cpp)
+set(NODE_LIBRARY_PATHS components/tam_odometry.cpp)
 set(EXECUTABLE_NAMES tam_icp_ext tam_icp_cv tam_gicp_ext)
 set(EXECUTABLE_NAMES_CUDA tam_cuda_icp_ext tam_cuda_gicp_ext)
 set(COMPONENT_NAMES ICP_EXT ICP_CV GICP_EXT)

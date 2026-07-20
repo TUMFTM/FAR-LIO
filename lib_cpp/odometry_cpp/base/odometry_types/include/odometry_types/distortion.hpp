@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 #pragma once
-namespace tam::core::state::types
-{
+
+namespace tam::core::state::types {
 enum class DistortionType : std::uint8_t { POLYNOM = 0, CUDA_POLYNOM = 1 };
+
 /**
  * @brief Configuration for the distortion handler
  */
-struct DistortionConfig
-{
+struct DistortionConfig {
   double max_time_diff{30};    // ms, max time difference between frame and pose history
   double vel_threshold{10.0};  // m/s, threshold for velocity to enable distortion correction
 };
+
 /**
  * @brief Debug signals for the distortion handler
  */
-struct DistortionDebug
-{
+struct DistortionDebug {
   bool valid{false};
   double undistortion_time{0.0};
   double timestamp_offset{0.0};

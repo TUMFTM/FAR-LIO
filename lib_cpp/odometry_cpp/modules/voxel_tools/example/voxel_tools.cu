@@ -23,9 +23,9 @@
 #include "odometry_types/point_types.hpp"
 #include "voxel_tools/voxel_tools.cuh"
 #include "voxel_tools/voxel_tools.hpp"
+
 void generate_random_points(
-  std::vector<tam::core::state::types::Point<tam::core::state::types::CUDA_ICP_EXT>> & frame,
-  size_t num_points)
+  std::vector<tam::core::state::types::Point<tam::core::state::types::CUDA_ICP_EXT>>& frame, size_t num_points)
 {
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -37,6 +37,7 @@ void generate_random_points(
     frame.push_back(point);
   }
 }
+
 int main()
 {
   // Define a frame of points
@@ -46,9 +47,8 @@ int main()
 
   // Downsample the frame to a voxel grid and print the downsampled frame
   auto start_time = std::chrono::high_resolution_clock::now();
-  std::vector<tam::core::state::types::Point<tam::core::state::types::CUDA_ICP_EXT>>
-    frame_downsampled_cuda =
-      tam::core::state::cuda::voxel_downsample<tam::core::state::types::CUDA_ICP_EXT>(frame, 1.0);
+  std::vector<tam::core::state::types::Point<tam::core::state::types::CUDA_ICP_EXT>> frame_downsampled_cuda =
+    tam::core::state::cuda::voxel_downsample<tam::core::state::types::CUDA_ICP_EXT>(frame, 1.0);
   auto end_time = std::chrono::high_resolution_clock::now();
 
   // Calculate the duration
@@ -57,20 +57,16 @@ int main()
 
   for (int i = 0; i < 10; i++) {
     start_time = std::chrono::high_resolution_clock::now();
-    std::vector<tam::core::state::types::Point<tam::core::state::types::CUDA_ICP_EXT>>
-      frame_downsampled_cuda =
-        tam::core::state::cuda::voxel_downsample<tam::core::state::types::CUDA_ICP_EXT>(
-          frame, 1.0);
+    std::vector<tam::core::state::types::Point<tam::core::state::types::CUDA_ICP_EXT>> frame_downsampled_cuda =
+      tam::core::state::cuda::voxel_downsample<tam::core::state::types::CUDA_ICP_EXT>(frame, 1.0);
     end_time = std::chrono::high_resolution_clock::now();
     duration = end_time - start_time;
-    std::cout << "Time taken for voxel_downsample cuda: " << duration.count() << " ms."
-              << std::endl;
+    std::cout << "Time taken for voxel_downsample cuda: " << duration.count() << " ms." << std::endl;
   }
   // Downsample the frame to a voxel grid and print the downsampled frame
   start_time = std::chrono::high_resolution_clock::now();
-  std::vector<tam::core::state::types::Point<tam::core::state::types::CUDA_ICP_EXT>>
-    frame_downsampled =
-      tam::core::state::voxel_downsample<tam::core::state::types::CUDA_ICP_EXT>(frame, 1.0);
+  std::vector<tam::core::state::types::Point<tam::core::state::types::CUDA_ICP_EXT>> frame_downsampled =
+    tam::core::state::voxel_downsample<tam::core::state::types::CUDA_ICP_EXT>(frame, 1.0);
   end_time = std::chrono::high_resolution_clock::now();
 
   // Calculate the duration
@@ -79,8 +75,7 @@ int main()
 
   // check if both methods output the same vector
   if (frame_downsampled.size() != frame_downsampled_cuda.size())
-    std::cout << "Output of the CPU can CUDA version are not equal:\nSize CPU voxel Grid "
-              << frame_downsampled.size() << "\nSize GPU voxel Grid "
-              << frame_downsampled_cuda.size() << std::endl;
+    std::cout << "Output of the CPU can CUDA version are not equal:\nSize CPU voxel Grid " << frame_downsampled.size()
+              << "\nSize GPU voxel Grid " << frame_downsampled_cuda.size() << std::endl;
   return 0;
 }

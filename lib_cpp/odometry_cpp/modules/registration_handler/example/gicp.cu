@@ -23,12 +23,12 @@
 #include "registration_handler/gicp.cuh"
 #include "tsl_logger_cpp/reference_logger.hpp"
 #include "voxel_tools/voxel_tools.cuh"
-int main(int argc, char * argv[])
+
+int main(int argc, char* argv[])
 {
   // Check the number of arguments
   if (argc < 4) {
-    std::cerr << "Usage: " << argv[0] << " <map_path> <frame_path> <initial_guess_path>"
-              << std::endl;
+    std::cerr << "Usage: " << argv[0] << " <map_path> <frame_path> <initial_guess_path>" << std::endl;
     return 1;
   }
   for (int i = 0; i < argc; ++i) {
@@ -50,7 +50,7 @@ int main(int argc, char * argv[])
   // clang-format on
 
   // init cuda and set parameter
-  tam::pmg::MgmtInterface * pmg_raw = pmg_.get();
+  tam::pmg::MgmtInterface* pmg_raw = pmg_.get();
   pmg_raw->set_value("map.cov_regularization", "FROBENIUS");
   pmg_raw->set_value("map.voxel_size", 4.0);
   pmg_raw->set_value("registration.solver_type", "GaussNewton");
@@ -101,7 +101,7 @@ int main(int argc, char * argv[])
   const Sophus::SE3f T_icp = registration_->register_frame(frame_map, map_.get(), init_guess, 3.0 * sigma, sigma, stream);  // NOLINT
   map_->update_points(frame_map, T_icp, tam::core::state::types::POINT_NORMAL::MAX_POINTS_PER_VOXEL, 1, tam::core::state::types::CUDA_GICP_EXT::NUM_NEIGHBORS, stream);  // NOLINT
 
-   // clang-format on
+  // clang-format on
   // clang-format on
 
   // synchronize the stream
@@ -115,22 +115,18 @@ int main(int argc, char * argv[])
   std::cout << "Voxels removed: " << map_->get_debug().voxel_removed << std::endl;
   std::cout << "Points removed: " << map_->get_debug().points_removed << std::endl;
   std::cout << "Update time: " << map_->get_debug().update_time << " ms" << std::endl;
-  std::cout << "Normal covariance time: " << map_->get_debug().normal_cov_time << " ms"
-            << std::endl;
+  std::cout << "Normal covariance time: " << map_->get_debug().normal_cov_time << " ms" << std::endl;
   std::cout << "Points in the frame: " << registration_->get_debug().num_points_frame << std::endl;
   std::cout << "Initial guess: " << std::endl << init_guess.matrix() << std::endl;
   std::cout << "Transformation from frame to map: " << std::endl << T_icp.matrix() << std::endl;
   std::cout << "Converged: " << registration_->get_registration_status().converged << std::endl;
-  std::cout << "Registration time: " << registration_->get_debug().registration_time << " ms"
-            << std::endl;
+  std::cout << "Registration time: " << registration_->get_debug().registration_time << " ms" << std::endl;
   std::cout << "Damping Factor: " << registration_->get_debug().damping_factor << std::endl;
   std::cout << "Iterations: " << registration_->get_debug().num_iter << std::endl;
-if (registration_->get_config().solver_type == "LevenbergMarquardt") {
-  std::cout << "Error: " << std::get<double>(registration_->get_debug().conditional["error"])
-            << std::endl;
-  std::cout << "Inner Iterations: "
-            << std::get<std::int64_t>(registration_->get_debug().conditional["num_inner_iter"])
-            << std::endl;
-}
+  if (registration_->get_config().solver_type == "LevenbergMarquardt") {
+    std::cout << "Error: " << std::get<double>(registration_->get_debug().conditional["error"]) << std::endl;
+    std::cout << "Inner Iterations: "
+              << std::get<std::int64_t>(registration_->get_debug().conditional["num_inner_iter"]) << std::endl;
+  }
   return 0;
 }

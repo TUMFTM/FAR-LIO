@@ -21,6 +21,7 @@
 
 #include "odometry_types/odometry_config.hpp"
 #include "odometry_types/point_types.hpp"
+
 int main()
 {
   // Define a frame of points
@@ -30,8 +31,7 @@ int main()
   point_2.pos = Eigen::Vector3f(5.8, 2.5, 3.9);
   tam::core::state::types::Point<tam::core::state::types::ICP_EXT> point_3;
   point_3.pos = Eigen::Vector3f(5.9, 2.9, 3.9);
-  std::vector<tam::core::state::types::Point<tam::core::state::types::ICP_EXT>> frame{
-    point_1, point_2, point_3};
+  std::vector<tam::core::state::types::Point<tam::core::state::types::ICP_EXT>> frame{point_1, point_2, point_3};
 
   // Downsample the frame to a voxel grid and print the downsampled frame
   // clang-format off
@@ -40,8 +40,7 @@ int main()
   // clang-format on
 
   // Check point to voxel function and print voxel
-  tam::core::state::Voxel vox =
-    tam::core::state::point_to_voxel<tam::core::state::types::ICP_EXT>(point_1, 1.0);
+  tam::core::state::Voxel vox = tam::core::state::point_to_voxel<tam::core::state::types::ICP_EXT>(point_1, 1.0);
   // clang-format off
   std::cout << "Voxel of Point at (" << point_1.pos.x() << ", " << point_1.pos.y() << ", " << point_1.pos.z() << "): (" // NOLINT
             << vox.x() << ", " << vox.y() << ", " << vox.z() << ")" << std::endl;
@@ -51,13 +50,13 @@ int main()
   std::vector<tam::core::state::types::Point<tam::core::state::types::ICP_EXT>> frame_downsampled =
     tam::core::state::voxel_downsample<tam::core::state::types::ICP_EXT>(frame, 1.0);
   std::cout << "Original Frame:" << std::endl;
-  for (const auto & point : frame) {
+  for (const auto& point : frame) {
     // clang-format off
     std::cout << "Point at (" << point.pos.x() << ", " << point.pos.y() << ", " << point.pos.z() << ")" << std::endl; // NOLINT
     // clang-format on
   }
   std::cout << "Downsampled Frame:" << std::endl;
-  for (const auto & point : frame_downsampled) {
+  for (const auto& point : frame_downsampled) {
     // clang-format off
     std::cout << "Point at (" << point.pos.x() << ", " << point.pos.y() << ", " << point.pos.z() << ")" << std::endl; // NOLINT
     // clang-format on

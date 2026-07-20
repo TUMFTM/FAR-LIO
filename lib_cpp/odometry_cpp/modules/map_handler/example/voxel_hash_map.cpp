@@ -25,7 +25,8 @@
 #include "odometry_utils/utils.hpp"
 #include "param_management_cpp/param_reference_manager.hpp"
 #include "tsl_logger_cpp/reference_logger.hpp"
-int main(int argc, char * argv[])
+
+int main(int argc, char* argv[])
 {
   // Check the number of arguments
   if (argc < 5) {
@@ -59,8 +60,7 @@ int main(int argc, char * argv[])
 
   // Load the pointcloud
   std::vector<tam::core::state::types::Point<tam::core::state::types::Point_XYZ>> frame =
-    tam::core::state::utils::load_pointcloud_bin<tam::core::state::types::Point_XYZ>(
-      argv[1]);  // NOLINT
+    tam::core::state::utils::load_pointcloud_bin<tam::core::state::types::Point_XYZ>(argv[1]);  // NOLINT
   std::cout << "Loaded " << frame.size() << " points from " << argv[1] << std::endl;
   // Add points to the map
   map_->add_points(frame);
@@ -72,10 +72,10 @@ int main(int argc, char * argv[])
 
   // Search for the closest neighbor
   auto start = std::chrono::high_resolution_clock::now();
-  const auto & correspondence = map_->search_closest_neighbor(query, 1);
+  const auto& correspondence = map_->search_closest_neighbor(query, 1);
   auto time = (std::chrono::high_resolution_clock::now() - start).count();
-  std::cout << "Closest neighbor: " << correspondence.map.pos.transpose()
-            << " at distance: " << correspondence.distance << std::endl
+  std::cout << "Closest neighbor: " << correspondence.map.pos.transpose() << " at distance: " << correspondence.distance
+            << std::endl
             << "Time: " << time << " ns" << std::endl;
 
 #ifdef USE_VISUALIZATION
@@ -83,17 +83,12 @@ int main(int argc, char * argv[])
   rerun::RecordingStream rec = tam::core::state::utils::spawn_rerun_stream("VoxelHashMap");
 
   // Get positions and normals
-  const std::tuple<
-    std::vector<rerun::Position3D>, std::vector<rerun::Color>, std::vector<rerun::Vector3D>>
+  const std::tuple<std::vector<rerun::Position3D>, std::vector<rerun::Color>, std::vector<rerun::Vector3D>>
     rerun_points = tam::core::state::utils::points_normals2rerun(map_->get_cloud(), "Blue");
 
   rec.log(
-    "points", rerun::Points3D(std::get<0>(rerun_points))
-                .with_colors(std::get<1>(rerun_points))
-                .with_radii({0.1f}));
-  rec.log(
-    "normals", rerun::Arrows3D::from_vectors(std::get<2>(rerun_points))
-                 .with_origins(std::get<0>(rerun_points)));
+    "points", rerun::Points3D(std::get<0>(rerun_points)).with_colors(std::get<1>(rerun_points)).with_radii({0.1f}));
+  rec.log("normals", rerun::Arrows3D::from_vectors(std::get<2>(rerun_points)).with_origins(std::get<0>(rerun_points)));
 #endif
   return 0;
 }

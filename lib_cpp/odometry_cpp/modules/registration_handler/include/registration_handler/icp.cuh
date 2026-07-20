@@ -31,8 +31,8 @@
 
 #include "registration_handler/registration_handler_base.hpp"
 #include "robust_kernel/robust_kernel.cuh"
-namespace tam::core::state::cuda
-{
+
+namespace tam::core::state::cuda {
 /**
  * @brief ICP factor
  * @param [in] correspondence Correspondence
@@ -43,10 +43,8 @@ namespace tam::core::state::cuda
  * @details The kernel scale and correspondence threshold are set before calling this
  */
 template <typename TConfig>
-struct ICPFactor : public FactorBase<TConfig>
-{
-  __device__ void operator()(
-    types::Correspondence<TConfig> & correspondence, float * ls_flattened) const override
+struct ICPFactor : public FactorBase<TConfig> {
+  __device__ void operator()(types::Correspondence<TConfig>& correspondence, float* ls_flattened) const override
   {
     if (correspondence.distance < this->correspondence_threshold_) {
       Eigen::Vector3f residual = correspondence.frame.pos - correspondence.map.pos;
@@ -65,6 +63,7 @@ struct ICPFactor : public FactorBase<TConfig>
     return;
   }
 };
+
 /**
  * @brief Compute the error of a correspondence for a given transformation
  * @param [in] correspondence Correspondence
@@ -74,10 +73,8 @@ struct ICPFactor : public FactorBase<TConfig>
  * https://github.com/koide3/small_gicp/blob/master/include/small_gicp/factors/icp_factor.hpp
  */
 template <typename TConfig>
-struct ICPError : public ErrorBase<TConfig>
-{
-  __device__ void operator()(
-    const types::Correspondence<TConfig> & correspondence, float * sum) const override
+struct ICPError : public ErrorBase<TConfig> {
+  __device__ void operator()(const types::Correspondence<TConfig>& correspondence, float* sum) const override
   {
     if (correspondence.distance < this->correspondence_threshold_) {
       // Compute residual with double precision
@@ -88,6 +85,7 @@ struct ICPError : public ErrorBase<TConfig>
     return;
   }
 };
+
 template <typename TConfig>
 class ICP : public RegistrationHandler<TConfig>
 {
@@ -96,21 +94,22 @@ public:
    * @brief Constructor for param manager and logger
    */
   static std::unique_ptr<RegistrationHandler<TConfig>> from_config(
-    tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
+    tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
   {
     std::unique_ptr<ICP<TConfig>> rh = std::unique_ptr<ICP<TConfig>>(new ICP<TConfig>(pmg, logger));
     return rh;
   }
+
   /**
    * @brief Constructor for config and debug objects
    */
   static std::unique_ptr<RegistrationHandler<TConfig>> from_config(
-    const types::RegistrationConfig & config, const types::RegistrationDebug & debug)
+    const types::RegistrationConfig& config, const types::RegistrationDebug& debug)
   {
-    std::unique_ptr<ICP<TConfig>> rh =
-      std::unique_ptr<ICP<TConfig>>(new ICP<TConfig>(config, debug));
+    std::unique_ptr<ICP<TConfig>> rh = std::unique_ptr<ICP<TConfig>>(new ICP<TConfig>(config, debug));
     return rh;
   }
+
   /**
    * @brief Register a frame to the map
    * @param [in] frame                    Frame to register
@@ -120,9 +119,8 @@ public:
    * @param [in] kernel_scale             Scale of the robust kernel
    * @return                              Transformation from frame to map
    */
-  __host__ Sophus::SE3f register_frame(
-    const thrust::device_vector<types::Point<TConfig>> & frame, const MapHandler<TConfig> * map,
-    const Sophus::SE3f & initial_guess, const float correspondence_threshold,
+  __host__ Sophus::SE3f register_frame(const thrust::device_vector<types::Point<TConfig>>& frame,
+    const MapHandler<TConfig>* map, const Sophus::SE3f& initial_guess, const float correspondence_threshold,
     const float kernel_scale, ::cuda::stream_ref stream = {}) override
   {
     if (map->empty()) return initial_guess;
@@ -132,12 +130,12 @@ public:
     utils::transform_points(initial_guess, source, stream);
 
     // Call the solver
-    const Sophus::SE3f T = this->solve(
-      source, map, this->icp_factor_, this->icp_error_, correspondence_threshold, kernel_scale,
-      stream);
+    const Sophus::SE3f T =
+      this->solve(source, map, this->icp_factor_, this->icp_error_, correspondence_threshold, kernel_scale, stream);
     // Spit the final transformation
     return T * initial_guess;
   }
+
   /**
    * @brief Get correspondences between map and frame for given pose
    * @param [in] points                     Frame with points
@@ -147,9 +145,8 @@ public:
    * @return vector of correspondences
    */
   __host__ std::vector<types::Correspondence<TConfig>> get_correspondences(
-    const thrust::device_vector<types::Point<TConfig>> & points, const MapHandler<TConfig> * map,
-    const Sophus::SE3f & pose, const float correspondence_threshold,
-    ::cuda::stream_ref stream = {}) const override
+    const thrust::device_vector<types::Point<TConfig>>& points, const MapHandler<TConfig>* map,
+    const Sophus::SE3f& pose, const float correspondence_threshold, ::cuda::stream_ref stream = {}) const override
   {
     return utils::get_correspondences(
       points, this->correspondences_device_, map, pose, correspondence_threshold, stream);
@@ -157,13 +154,14 @@ public:
 
 protected:
   // Inherit constructor from ModelHandler for param manager and logger
-  ICP(tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
-  : RegistrationHandler<TConfig>(pmg, logger)
+  ICP(tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
+      : RegistrationHandler<TConfig>(pmg, logger)
   {
   }
+
   // Inherit constructor from ModelHandler for config and debug object
-  ICP(const types::RegistrationConfig & config, const types::RegistrationDebug & debug)
-  : RegistrationHandler<TConfig>(config, debug)
+  ICP(const types::RegistrationConfig& config, const types::RegistrationDebug& debug)
+      : RegistrationHandler<TConfig>(config, debug)
   {
   }
 

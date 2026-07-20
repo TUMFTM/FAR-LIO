@@ -18,16 +18,13 @@
 #include <memory>
 #include <string>
 #include <vector>
-
-#include "odometry_types/odometry_types.hpp"
-namespace tam::core::state::types
-{
+namespace tam::core::state::types {
 enum class InitStatus : std::uint8_t { WAITING_FOR_MAP = 0, WAITING_FOR_EKF = 1, READY = 2 };
+
 /**
  * @brief Configuration for the node
  */
-struct NodeConfig
-{
+struct NodeConfig {
   std::string odom_frame{};
   std::string child_frame{};
   std::string cloud_frame{};
@@ -37,25 +34,25 @@ struct NodeConfig
   std::string input_map{};
   std::string update_map_srv{};
 };
+
 /**
  * @brief Debug signals for the node
  */
-struct NodeDebug
-{
+struct NodeDebug {
   bool map_update{false};
   double callback_time{0.0};
 };
+
 /**
  * @brief Configuration for the odometry node
  */
-struct OdometryNodeConfig : public NodeConfig
-{
+struct OdometryNodeConfig : public NodeConfig {
   bool wait_tf{true};
 };
+
 /**
  * @brief Debug signals for the odometry node
  */
-struct OdometryNodeDebug : public NodeDebug
-{
+struct OdometryNodeDebug : public NodeDebug {
 };
 }  // namespace tam::core::state::types

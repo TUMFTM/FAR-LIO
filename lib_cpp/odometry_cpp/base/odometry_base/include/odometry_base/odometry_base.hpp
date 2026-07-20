@@ -22,11 +22,11 @@
 #include <vector>
 
 #include "odometry_types/odometry_config.hpp"
-#include "tum_types_cpp/common.hpp"
+#include "odometry_types/odometry_types.hpp"
 #include "param_management_cpp/param_reference_manager.hpp"
 #include "tsl_logger_cpp/reference_logger.hpp"
-namespace tam::core::state
-{
+
+namespace tam::core::state {
 template <typename TConfig, typename CONFIG, typename DEBUG>
 class OdometryBase
 {
@@ -51,7 +51,8 @@ public:
   /**
    * @brief Get the param object
    */
-  CONFIG & get_config() { return config_; }
+  CONFIG& get_config() { return config_; }
+
   /**
    * @brief Get the debug object
    */
@@ -61,7 +62,7 @@ protected:
   /**
    * @brief Constructor from param manager and logger
    */
-  OdometryBase(tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
+  OdometryBase(tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
   {
     // Inherit this constructor and call the set functions for params and logging
     // e.g.
@@ -75,10 +76,11 @@ protected:
     (void)pmg;
     (void)logger;
   }
+
   /**
    * @brief Constructor for config and debug object
    */
-  OdometryBase(const CONFIG & config, const DEBUG & debug) : config_(config), debug_(debug)
+  OdometryBase(const CONFIG& config, const DEBUG& debug) : config_(config), debug_(debug)
   {
     // Inherit this constructor and call the set functions for params and logging
     // e.g.
@@ -88,8 +90,9 @@ protected:
     //   // Additional initialization
     // }
   }
-  virtual void set_config(tam::pmg::ParamReferenceManager * pmg) = 0;
-  virtual void set_logging(tam::tsl::ReferenceLogger * logger) const = 0;
+
+  virtual void set_config(tam::pmg::ParamReferenceManager* pmg) = 0;
+  virtual void set_logging(tam::tsl::ReferenceLogger* logger) const = 0;
   CONFIG config_;
   DEBUG debug_;
 };

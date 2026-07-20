@@ -21,33 +21,34 @@
 
 #include "odometry_base/odometry_base.hpp"
 #include "odometry_types/odometry_types.hpp"
-namespace tam::core::state
-{
+
+namespace tam::core::state {
 template <typename TConfig>
-class DiagnosticHandler
-: public OdometryBase<TConfig, types::DiagnosticConfig, types::DiagnosticDebug>
+class DiagnosticHandler : public OdometryBase<TConfig, types::DiagnosticConfig, types::DiagnosticDebug>
 {
 public:
   /**
    * @brief Constructor for param manager and logger
    */
   static std::unique_ptr<DiagnosticHandler<TConfig>> from_config(
-    tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
+    tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
   {
     std::unique_ptr<DiagnosticHandler<TConfig>> dh =
       std::unique_ptr<DiagnosticHandler<TConfig>>(new DiagnosticHandler<TConfig>(pmg, logger));
     return dh;
   }
+
   /**
    * @brief Constructor for config and debug objects
    */
   static std::unique_ptr<DiagnosticHandler<TConfig>> from_config(
-    const types::DiagnosticConfig & config, const types::DiagnosticDebug & debug)
+    const types::DiagnosticConfig& config, const types::DiagnosticDebug& debug)
   {
     std::unique_ptr<DiagnosticHandler<TConfig>> dh =
       std::unique_ptr<DiagnosticHandler<TConfig>>(new DiagnosticHandler<TConfig>(config, debug));
     return dh;
   }
+
   /**
    * @brief Get the diagnostic status
    * @param [in] pose               Pose to check
@@ -56,9 +57,8 @@ public:
    * @param [in] reg_status         Registration status
    * @return Diagnostic status
    */
-  types::DiagnosticStatus get_diagnostic_status(
-    const types::PoseStamped & pose, const types::TangentStamped & tangent,
-    const types::PoseStamped & init_guess, const types::RegistrationStatus & reg_status)
+  types::DiagnosticStatus get_diagnostic_status(const types::PoseStamped& pose, const types::TangentStamped& tangent,
+    const types::PoseStamped& init_guess, const types::RegistrationStatus& reg_status)
   {
     types::DiagnosticStatus diag_status;
     // Check registration status
@@ -79,32 +79,35 @@ public:
     this->debug_.overall_status = static_cast<std::int64_t>(diag_status.level);
     return diag_status;
   }
+
   /**
    * @brief Set the status of the input pointcloud
    * @param [in] status             Status to set
    */
-  void set_input_status(const types::DiagnosticStatus & status) { this->input_status_ = status; }
+  void set_input_status(const types::DiagnosticStatus& status) { this->input_status_ = status; }
 
 protected:
   // Inherit constructor from OdometryBase for param manager and logger
-  DiagnosticHandler(tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
-  : OdometryBase<TConfig, types::DiagnosticConfig, types::DiagnosticDebug>(pmg, logger)
+  DiagnosticHandler(tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
+      : OdometryBase<TConfig, types::DiagnosticConfig, types::DiagnosticDebug>(pmg, logger)
   {
     this->set_config(pmg);
     this->set_logging(logger);
     // Additional initialization
   }
+
   // Inherit constructor from OdometryBase for config and debug object
-  DiagnosticHandler(const types::DiagnosticConfig & config, const types::DiagnosticDebug & debug)
-  : OdometryBase<TConfig, types::DiagnosticConfig, types::DiagnosticDebug>(config, debug)
+  DiagnosticHandler(const types::DiagnosticConfig& config, const types::DiagnosticDebug& debug)
+      : OdometryBase<TConfig, types::DiagnosticConfig, types::DiagnosticDebug>(config, debug)
   {
     // Additional initialization
   }
+
   /**
    * @brief Set the configuration of the diagnostic handler from the param manager
    * @param [in] pmg                Param manager
    */
-  void set_config(tam::pmg::ParamReferenceManager * pmg) override
+  void set_config(tam::pmg::ParamReferenceManager* pmg) override
   {
     // clang-format off
     pmg->declare_parameter("diagnostic.check_input_status", &this->config_.check_input_status, true, tam::pmg::ParameterType::BOOL, "Check status of the input pointcloud");  // NOLINT
@@ -121,11 +124,12 @@ protected:
     pmg->declare_parameter("diagnostic.vel_motion_threshold", &this->config_.vel_motion_threshold, 0.25, tam::pmg::ParameterType::DOUBLE, "Min motion / velocity norm for the velocity check"); // NOLINT
     // clang-format on
   }
+
   /**
    * @brief Register the debug variables with the logger
    * @param [in] logger             Logger
    */
-  void set_logging(tam::tsl::ReferenceLogger * logger) const override
+  void set_logging(tam::tsl::ReferenceLogger* logger) const override
   {
     logger->log("diagnostic/overall_status", &this->debug_.overall_status);
     logger->log("diagnostic/registration/status", &this->debug_.registration.status);
@@ -142,8 +146,7 @@ protected:
    * @param [in] reg_status         Registration status
    * @param [out] diag_status       Diagnostic status to update
    */
-  void check_registration(
-    const types::RegistrationStatus & reg_status, types::DiagnosticStatus & diag_status)
+  void check_registration(const types::RegistrationStatus& reg_status, types::DiagnosticStatus& diag_status)
   {
     // Set diagnostic status according to convergence of san registration
     if (!reg_status.converged) {
@@ -162,11 +165,12 @@ protected:
     diag_status.key_values["registration_time"] = reg_status.duration;
     diag_status.key_values["iterations"] = static_cast<double>(reg_status.num_iter);
   }
+
   /**
    * @brief Check status of incoming pointcloud
    * @param [out] diag_status       Diagnostic status to update
    */
-  void check_input_status(types::DiagnosticStatus & diag_status)
+  void check_input_status(types::DiagnosticStatus& diag_status)
   {
     if (!this->config_.check_input_status) {
       return;
@@ -191,6 +195,7 @@ protected:
     }
     return;
   }
+
   /**
    * @brief Check if the pose is valid
    * @param [in] pose               Pose to check
@@ -198,9 +203,8 @@ protected:
    * @param [in] init_guess         Initial guess
    * @param [out] status            Diagnostic status to update
    */
-  void check_pose(
-    const types::PoseStamped & pose, const types::TangentStamped & tangent,
-    const types::PoseStamped & init_guess, types::DiagnosticStatus & status)
+  void check_pose(const types::PoseStamped& pose, const types::TangentStamped& tangent,
+    const types::PoseStamped& init_guess, types::DiagnosticStatus& status)
   {
     // Check if pose is in front of previous pose
     if (this->config_.check_forward && !forward_check(pose.pose, init_guess.pose, status)) {
@@ -222,6 +226,7 @@ protected:
     status.message += " | pose valid";
     return;
   }
+
   /**
    * @brief Check if the pose is in front of the previous pose
    * @param [in] pose               Pose to check
@@ -229,13 +234,11 @@ protected:
    * @param [out] status            Diagnostic status to write the message to
    * @return True if the pose is in front of the previous pose
    */
-  bool forward_check(
-    const Sophus::SE3f & pose, const Sophus::SE3f & init_guess, types::DiagnosticStatus & status)
+  bool forward_check(const Sophus::SE3f& pose, const Sophus::SE3f& init_guess, types::DiagnosticStatus& status)
   {
     if (this->init_previous_) {
       // Check if vehicle has moved
-      if (
-        (this->previous_init_guess_.inverse() * init_guess).translation().norm() >
+      if ((this->previous_init_guess_.inverse() * init_guess).translation().norm() >
         this->config_.min_motion_threshold) {
         if ((this->previous_pose_.inverse() * pose).translation().x() <= 0.0) {
           status.level = types::DiagnosticLevel::ERROR;
@@ -248,6 +251,7 @@ protected:
     this->debug_.pose.status = static_cast<std::int64_t>(types::DiagnosticLevel::OK);
     return true;
   }
+
   /**
    * @brief Check if the pose is within the ellipsis around the initial guess
    * @param [in] pose               Pose to check
@@ -255,15 +259,13 @@ protected:
    * @param [out] status            Diagnostic status to write the message to
    * @return True if the pose is within the ellipsis around the initial guess
    */
-  bool ellipsis_check(
-    const Sophus::SE3f & pose, const Sophus::SE3f & init_guess, types::DiagnosticStatus & status)
+  bool ellipsis_check(const Sophus::SE3f& pose, const Sophus::SE3f& init_guess, types::DiagnosticStatus& status)
   {
     const Sophus::SE3f pose_diff = init_guess.inverse() * pose;
     this->debug_.pose.diff_initial_guess_s = pose_diff.translation().x();
     this->debug_.pose.diff_initial_guess_d = pose_diff.translation().y();
     // Check if point is within ellipsis in s and d
-    if (
-      pow(pose_diff.translation().x() / this->config_.ellipsis_size_s, 2) +
+    if (pow(pose_diff.translation().x() / this->config_.ellipsis_size_s, 2) +
         pow(pose_diff.translation().y() / this->config_.ellipsis_size_d, 2) <
       1.0) {
       this->debug_.pose.status = static_cast<std::int64_t>(types::DiagnosticLevel::OK);
@@ -275,6 +277,7 @@ protected:
       return false;
     }
   }
+
   /**
    * @brief Check if the time difference between pose and initial guess is within bounds
    * @param [in] pose_stamp         Timestamp of the pose
@@ -283,11 +286,10 @@ protected:
    * @return True if the time difference between pose and initial guess is within bounds
    */
   bool time_diff_check(
-    const std::uint64_t pose_stamp, const std::uint64_t init_guess_stamp,
-    types::DiagnosticStatus & status)
+    const std::uint64_t pose_stamp, const std::uint64_t init_guess_stamp, types::DiagnosticStatus& status)
   {
-    std::uint64_t time_diff_ns = (pose_stamp > init_guess_stamp) ? (pose_stamp - init_guess_stamp)
-                                                                 : (init_guess_stamp - pose_stamp);
+    std::uint64_t time_diff_ns =
+      (pose_stamp > init_guess_stamp) ? (pose_stamp - init_guess_stamp) : (init_guess_stamp - pose_stamp);
     this->debug_.pose.diff_time = time_diff_ns * 1.0e-6;
     if (this->debug_.pose.diff_time < this->config_.max_time_diff) {
       this->debug_.pose.status = static_cast<std::int64_t>(types::DiagnosticLevel::OK);
@@ -299,6 +301,7 @@ protected:
       return false;
     }
   }
+
   /**
    * @brief Check if the computed velocity is reasonable based on the initial guess
    * @param [in] tangent            Tangent (twist) to check
@@ -306,9 +309,7 @@ protected:
    * @param [out] status            Diagnostic status to write the message to
    * @return True if the velocity is valid
    */
-  bool vel_check(
-    const Sophus::SE3f::Tangent & tangent, const Sophus::SE3f & init_guess,
-    types::DiagnosticStatus & status)
+  bool vel_check(const Sophus::SE3f::Tangent& tangent, const Sophus::SE3f& init_guess, types::DiagnosticStatus& status)
   {
     // clang-format off
     if (this->init_previous_) {
@@ -343,6 +344,7 @@ protected:
     return true;
     // clang-format on
   }
+
   // Member variables
   bool init_previous_{false};
   types::DiagnosticStatus input_status_{};

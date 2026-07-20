@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 #pragma once
-namespace tam::core::state::types
-{
+
+namespace tam::core::state::types {
 enum class DiagnosticType : std::uint8_t { BASE = 0 };
+
 /**
  * @brief Configuration for the diagnostics
  */
-struct DiagnosticConfig
-{
+struct DiagnosticConfig {
   // Check for input diagnostic status
   bool check_input_status{true};
   // Outdated frame warning
@@ -41,22 +41,22 @@ struct DiagnosticConfig
   bool check_vel{true};
   double vel_motion_threshold{0.25};
 };
+
 /**
  * @brief Debug signals for the diagnostics
  */
-struct DiagnosticDebug
-{
+struct DiagnosticDebug {
   std::int64_t overall_status{0};
-  struct registration
-  {
+
+  struct registration {
     std::int64_t status{0};
   } registration{};
-  struct input
-  {
+
+  struct input {
     std::int64_t status{0};
   } input{};
-  struct pose
-  {
+
+  struct pose {
     std::int64_t status{0};
     double diff_initial_guess_s{0.0};
     double diff_initial_guess_d{0.0};

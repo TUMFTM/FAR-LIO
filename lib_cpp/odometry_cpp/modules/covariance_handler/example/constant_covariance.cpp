@@ -22,6 +22,7 @@
 
 #include "param_management_cpp/param_reference_manager.hpp"
 #include "tsl_logger_cpp/reference_logger.hpp"
+
 int main()
 {
   // clang-format off
@@ -32,7 +33,7 @@ int main()
     tam::core::state::ConstantCovariance<tam::core::state::types::ICP_EXT>::from_config(pmg_.get(), logger_.get()); // NOLINT
   // clang-format on
 
-  tam::pmg::MgmtInterface * pmg_raw = pmg_.get();
+  tam::pmg::MgmtInterface* pmg_raw = pmg_.get();
   pmg_raw->set_value("covariance.min_cov_translation", std::vector<double>{0.05, 0.05, 0.05});
 
   std::cout << cov_->get_config().min_cov_translation[0] << std::endl;

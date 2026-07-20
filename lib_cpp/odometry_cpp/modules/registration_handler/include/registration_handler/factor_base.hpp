@@ -24,8 +24,8 @@
 #include <vector>
 
 #include "odometry_types/point_types.hpp"
-namespace tam::core::state
-{
+
+namespace tam::core::state {
 /**
  * @brief Base functor for building the linear system for the registration algorithm
  * @param [in] correspondence         Correspondence
@@ -34,8 +34,7 @@ namespace tam::core::state
  *                                     reduction in the build_linear_system function
  */
 template <typename TConfig>
-struct FactorBase
-{
+struct FactorBase {
 public:
   /**
    * @brief Function to compute linear system for a given correspondence
@@ -44,21 +43,22 @@ public:
    * @return                    Linear system (CPU only)
    */
 #ifdef __CUDACC__
-  __device__ virtual void operator()(
-    types::Correspondence<TConfig> & correspondence, float * ls_flattened) const = 0;
+  __device__ virtual void operator()(types::Correspondence<TConfig>& correspondence, float* ls_flattened) const = 0;
 #else
-  virtual types::LinearSystem operator()(types::Correspondence<TConfig> & correspondence) const = 0;
+  virtual types::LinearSystem operator()(types::Correspondence<TConfig>& correspondence) const = 0;
 #endif
   /**
    * @brief Set the kernel scale
    * @param [in] kernel_scale Scale of the robust kernel
    */
   void set_kernel_scale(const float kernel_scale) { kernel_scale_ = kernel_scale; }
+
   /**
    * @brief Get the kernel scale
    * @return Scale of the robust kernel
    */
   float get_kernel_scale() const { return kernel_scale_; }
+
   /**
    * @brief Set correspondence threshold
    * @param [in] correspondence_threshold Threshold for correspondences
@@ -67,6 +67,7 @@ public:
   {
     correspondence_threshold_ = correspondence_threshold;
   }
+
   /**
    * @brief Get the correspondence threshold
    * @return Correspondence threshold
@@ -77,6 +78,7 @@ protected:
   float kernel_scale_{0.0f};
   float correspondence_threshold_{0.0f};
 };
+
 /**
  * @brief Base functor for computing the error of a correspondence for a given transformation
  * @param [in] correspondence Correspondence
@@ -84,8 +86,7 @@ protected:
  * @return                    Error of the correspondence
  */
 template <typename TConfig>
-struct ErrorBase
-{
+struct ErrorBase {
 public:
   /**
    * @brief Function to compute error for a given correspondence
@@ -94,21 +95,22 @@ public:
    * @return                    Error of the correspondence (CPU only)
    */
 #ifdef __CUDACC__
-  __device__ virtual void operator()(
-    const types::Correspondence<TConfig> & correspondence, float * sum) const = 0;
+  __device__ virtual void operator()(const types::Correspondence<TConfig>& correspondence, float* sum) const = 0;
 #else
-  virtual float operator()(const types::Correspondence<TConfig> & correspondence) const = 0;
+  virtual float operator()(const types::Correspondence<TConfig>& correspondence) const = 0;
 #endif
   /**
    * @brief Set transformation
    * @param [in] T Transformation to apply
    */
-  void set_transform(const Sophus::SE3f & T) { T_ = T; }
+  void set_transform(const Sophus::SE3f& T) { T_ = T; }
+
   /**
    * @brief Get the transformation
    * @return Transformation to apply
    */
   Sophus::SE3f get_transform() const { return T_; }
+
   /**
    * @brief Set correspondence threshold
    * @param [in] correspondence_threshold Threshold for correspondences
@@ -117,6 +119,7 @@ public:
   {
     correspondence_threshold_ = correspondence_threshold;
   }
+
   /**
    * @brief Get the correspondence threshold
    * @return Correspondence threshold

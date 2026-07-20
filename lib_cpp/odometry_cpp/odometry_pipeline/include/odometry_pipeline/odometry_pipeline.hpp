@@ -33,8 +33,8 @@
 #include "registration_handler/registration_handler_base.hpp"
 #include "threshold_handler/threshold_handler_base.hpp"
 #include "velocity_handler/velocity_handler_base.hpp"
-namespace tam::core::state
-{
+
+namespace tam::core::state {
 template <typename TConfig>
 class OdometryPipeline : public OdometryBase<TConfig, types::PipelineConfig, types::PipelineDebug>
 {
@@ -43,12 +43,12 @@ public:
    * @brief Constructor for param manager and logger
    */
   static std::unique_ptr<OdometryPipeline<TConfig>> from_config(
-    tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger);
+    tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger);
   /**
    * @brief Constructor for config and debug objects
    */
   static std::unique_ptr<OdometryPipeline<TConfig>> from_config(
-    const types::PipelineConfig & config, const types::PipelineDebug & debug);
+    const types::PipelineConfig& config, const types::PipelineDebug& debug);
 
 public:
   // Interface functions
@@ -58,8 +58,7 @@ public:
    * @param [in] frame_stamp              Timestamp of the frame (ns)
    * @return                              Odometry output with pose, twist, covariances, and status
    */
-  types::Odometry register_frame(
-    const std::vector<types::Point<TConfig>> & frame, const std::uint64_t frame_stamp);
+  types::Odometry register_frame(const std::vector<types::Point<TConfig>>& frame, const std::uint64_t frame_stamp);
   /**
    * @brief Initialize necessary submodules in member modules
    * -> needs to be done after param overrides
@@ -77,18 +76,18 @@ public:
    * @brief Set the status of the input pointcloud
    * @param [in] status                   Status to set
    */
-  void set_input_status(const types::DiagnosticStatus & status);
+  void set_input_status(const types::DiagnosticStatus& status);
   /**
    * @brief Set the pose from an external source
    * @param [in] pose                   Pose to set
    * @param [in] valid                  Whether the given pose is valid
    */
-  void set_pose_model(const types::PoseStamped & pose, const bool valid);
+  void set_pose_model(const types::PoseStamped& pose, const bool valid);
   /**
    * @brief Set a pose from an external source (e.g. sampled from tf) used for deskewing
    * @param [in] pose                   Pose to set
    */
-  void set_pose_undistortion(const types::PoseStamped & pose);
+  void set_pose_undistortion(const types::PoseStamped& pose);
   /**
    * @brief Get the current odometry estimate
    * @return                        Current odometry estimate
@@ -108,12 +107,9 @@ public:
    * @param [in] num_neighbors            Number of neighbors to consider for covariances
    * @param [in] use_active_map           Flag to indicate if the active or inactive map should be used
    */
-  void add_points(
-    const std::vector<types::Point<tam::core::state::types::Point_XYZ>> & points,
-    const std::variant<int16_t, types::AdaptiveMapDensity> & map_density =
-      TConfig::MAX_POINTS_PER_VOXEL,
-    const int adjacent_voxels = 1, const int num_neighbors = TConfig::NUM_NEIGHBORS,
-    const bool use_active_map = true);
+  void add_points(const std::vector<types::Point<tam::core::state::types::Point_XYZ>>& points,
+    const std::variant<int16_t, types::AdaptiveMapDensity>& map_density = TConfig::MAX_POINTS_PER_VOXEL,
+    const int adjacent_voxels = 1, const int num_neighbors = TConfig::NUM_NEIGHBORS, const bool use_active_map = true);
   /**
    * @brief Request a switch between active and inactive map
    */
@@ -121,7 +117,7 @@ public:
   /**
    * @brief Get mutex for the map handler for async map updates
    */
-  std::mutex & get_map_mutex();
+  std::mutex& get_map_mutex();
   /**
    * @brief Get the map resolution
    * @return                        Map resolution
@@ -139,15 +135,15 @@ public:
   /**
    * @brief Access module configs
    */
-  types::CovarianceConfig & get_covariance_config();
-  types::DiagnosticConfig & get_diagnostic_config();
-  types::DistortionConfig & get_distortion_config();
-  types::MapConfig & get_map_config();
-  types::ModelConfig & get_model_config();
-  types::PreprocessingConfig & get_preprocessing_config();
-  types::RegistrationConfig & get_registration_config();
-  types::ThresholdConfig & get_threshold_config();
-  types::VelocityConfig & get_velocity_config();
+  types::CovarianceConfig& get_covariance_config();
+  types::DiagnosticConfig& get_diagnostic_config();
+  types::DistortionConfig& get_distortion_config();
+  types::MapConfig& get_map_config();
+  types::ModelConfig& get_model_config();
+  types::PreprocessingConfig& get_preprocessing_config();
+  types::RegistrationConfig& get_registration_config();
+  types::ThresholdConfig& get_threshold_config();
+  types::VelocityConfig& get_velocity_config();
   /**
    * @brief Access module debugs
    */
@@ -163,19 +159,19 @@ public:
 
 protected:
   // Inherit constructor from OdometryBase for param manager and logger
-  OdometryPipeline(tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger);
+  OdometryPipeline(tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger);
   // Inherit constructor from OdometryBase for config and debug object
-  OdometryPipeline(const types::PipelineConfig & config, const types::PipelineDebug & debug);
+  OdometryPipeline(const types::PipelineConfig& config, const types::PipelineDebug& debug);
   /**
    * @brief Set the configuration of the pipeline from the param manager
    * @param [in] pmg                Param manager
    */
-  void set_config(tam::pmg::ParamReferenceManager * pmg) override;
+  void set_config(tam::pmg::ParamReferenceManager* pmg) override;
   /**
    * @brief Register the debug variables with the logger
    * @param [in] logger             Logger
    */
-  void set_logging(tam::tsl::ReferenceLogger * logger) const override;
+  void set_logging(tam::tsl::ReferenceLogger* logger) const override;
 
 protected:
   // Modules
@@ -198,10 +194,10 @@ public:
   // Destructor (needs to be public for unique_ptr)
   ~OdometryPipeline();
   // Define compiler-generated functions to follow rule of 5
-  OdometryPipeline(const OdometryPipeline & other) = default;
-  OdometryPipeline(OdometryPipeline && other) = default;
-  OdometryPipeline & operator=(const OdometryPipeline & other) = default;
-  OdometryPipeline & operator=(OdometryPipeline && other) = default;
+  OdometryPipeline(const OdometryPipeline& other) = default;
+  OdometryPipeline(OdometryPipeline&& other) = default;
+  OdometryPipeline& operator=(const OdometryPipeline& other) = default;
+  OdometryPipeline& operator=(OdometryPipeline&& other) = default;
 
 protected:
   // Don't enable public construction without initialization

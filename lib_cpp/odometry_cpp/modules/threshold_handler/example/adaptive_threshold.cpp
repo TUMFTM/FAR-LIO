@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
+#include "threshold_handler/adaptive_threshold.hpp"
+
 #include <iostream>
 #include <sophus/se3.hpp>
 
-#include "threshold_handler/adaptive_threshold.hpp"
 #include "param_management_cpp/param_reference_manager.hpp"
 #include "tsl_logger_cpp/reference_logger.hpp"
+
 int main()
 {
   // clang-format off
@@ -30,9 +32,8 @@ int main()
     tam::core::state::AdaptiveThreshold<tam::core::state::types::ICP_EXT>::from_config(pmg_.get(), logger_.get()); // NOLINT
   // clang-format on
 
-  const Sophus::SE3f model_deviation = Sophus::SE3f(
-    Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0),
-    Sophus::SE3f::Point(1.0, 2.0, 3.0));
+  const Sophus::SE3f model_deviation =
+    Sophus::SE3f(Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(1.0, 2.0, 3.0));
   threshold_->set_model_deviation(model_deviation, Sophus::SE3f());
 
   std::cout << "Threshold: " << threshold_->get_threshold() << std::endl;

@@ -43,30 +43,32 @@
 #include <vector>
 
 #include "odometry_pipeline/odometry_pipeline.hpp"
-namespace tam::core::state
-{
+
+namespace tam::core::state {
 /**
  * @brief Constructor for param manager and logger
  */
 template <typename TConfig>
 std::unique_ptr<OdometryPipeline<TConfig>> OdometryPipeline<TConfig>::from_config(
-  tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
+  tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
 {
   std::unique_ptr<OdometryPipeline<TConfig>> op =
     std::unique_ptr<OdometryPipeline<TConfig>>(new OdometryPipeline<TConfig>(pmg, logger));
   return op;
 }
+
 /**
  * @brief Constructor for config and debug objects
  */
 template <typename TConfig>
 std::unique_ptr<OdometryPipeline<TConfig>> OdometryPipeline<TConfig>::from_config(
-  const types::PipelineConfig & config, const types::PipelineDebug & debug)
+  const types::PipelineConfig& config, const types::PipelineDebug& debug)
 {
   std::unique_ptr<OdometryPipeline<TConfig>> op =
     std::unique_ptr<OdometryPipeline<TConfig>>(new OdometryPipeline<TConfig>(config, debug));
   return op;
 }
+
 // Interface functions
 /**
  * @brief Register a frame to the map
@@ -76,7 +78,7 @@ std::unique_ptr<OdometryPipeline<TConfig>> OdometryPipeline<TConfig>::from_confi
  */
 template <typename TConfig>
 types::Odometry OdometryPipeline<TConfig>::register_frame(
-  const std::vector<types::Point<TConfig>> & frame, const std::uint64_t frame_stamp)
+  const std::vector<types::Point<TConfig>>& frame, const std::uint64_t frame_stamp)
 {
   // If an async map update staged a replacement, use it
   this->map_->consume_map_switch();
@@ -107,9 +109,8 @@ types::Odometry OdometryPipeline<TConfig>::register_frame(
   nvtxRangePush("setup_frame");
   // Load the data to the GPU and double downsample frame
   frame_.resize(frame.size());
-  cudaMemcpy(
-    thrust::raw_pointer_cast(frame_.data()), frame.data(),
-    frame.size() * sizeof(types::Point<TConfig>), cudaMemcpyHostToDevice);
+  cudaMemcpy(thrust::raw_pointer_cast(frame_.data()), frame.data(), frame.size() * sizeof(types::Point<TConfig>),
+    cudaMemcpyHostToDevice);
   // Undistort frame if configured
   if (this->config_.undistort) {
     // Perform in-place undistortion
@@ -131,16 +132,14 @@ types::Odometry OdometryPipeline<TConfig>::register_frame(
   // Downsample frame
   if (this->config_.downsample) {
     cuda::voxel_doubledownsample_device(
-      frame_, frame_map_, frame_registration_, this->map_->get_config().voxel_size, 50000,
-      this->stream_);
+      frame_, frame_map_, frame_registration_, this->map_->get_config().voxel_size, 50000, this->stream_);
   } else {
     // Downsample the point cloud to match the map resulution to ensure a faster point insertion
     // This is necessary restict the number of threads that want to insert into the same voxel
     cuda::voxel_downsample(frame_, frame_map_, map_resolution, 50000, this->stream_);
     frame_registration_.resize(frame_map_.size());
     thrust::copy(
-      thrust::cuda::par.on(this->stream_), frame_map_.begin(), frame_map_.end(),
-      frame_registration_.begin());
+      thrust::cuda::par.on(this->stream_), frame_map_.begin(), frame_map_.end(), frame_registration_.begin());
   }
   nvtxRangePop();
 #else
@@ -184,8 +183,7 @@ types::Odometry OdometryPipeline<TConfig>::register_frame(
   // Register frame
 #ifdef __CUDACC__
   const Sophus::SE3f pose_registered = this->registration_->register_frame(
-    frame_registration_, this->map_.get(), init_guess.pose, 3.0 * sigma, sigma / 3.0,
-    this->stream_);
+    frame_registration_, this->map_.get(), init_guess.pose, 3.0 * sigma, sigma / 3.0, this->stream_);
 #else
   const Sophus::SE3f pose_registered = this->registration_->register_frame(
     frame_registration_, this->map_.get(), init_guess.pose, 3.0 * sigma, sigma / 3.0);
@@ -215,12 +213,11 @@ types::Odometry OdometryPipeline<TConfig>::register_frame(
     std::variant<int16_t, types::AdaptiveMapDensity> map_density = TConfig::MAX_POINTS_PER_VOXEL;
 #ifdef __CUDACC__
     if constexpr (types::FRAMEMAP<TConfig>) {
-      const types::AdaptiveMapDensity adaptive_density = this->registration_->get_frame_map_density(
-        20, pose_registered.translation(), this->stream_);
+      const types::AdaptiveMapDensity adaptive_density =
+        this->registration_->get_frame_map_density(20, pose_registered.translation(), this->stream_);
       if (adaptive_density.valid) map_density = adaptive_density;
     }
-    this->map_->update_points(
-      frame_map_, pose_registered, map_density, 1, TConfig::NUM_NEIGHBORS, this->stream_);
+    this->map_->update_points(frame_map_, pose_registered, map_density, 1, TConfig::NUM_NEIGHBORS, this->stream_);
 #else
     if constexpr (types::FRAMEMAP<TConfig>) {
       const types::AdaptiveMapDensity adaptive_density =
@@ -242,18 +239,17 @@ types::Odometry OdometryPipeline<TConfig>::register_frame(
   std::vector<types::Correspondence<TConfig>> correspondences{};
   if constexpr (TConfig::COVARIANCE != types::CovarianceType::CONSTANT) {
 #ifdef __CUDACC__
-    const auto & correspondences = this->registration_->get_correspondences(
+    const auto& correspondences = this->registration_->get_correspondences(
       frame_registration_, this->map_.get(), pose_registered, 3.0 * sigma, this->stream_);
     // Sync stream
     cudaStreamSynchronize(this->stream_);
 #else
-    const auto & correspondences = this->registration_->get_correspondences(
-      frame_registration_, this->map_.get(), pose_registered, 3.0 * sigma);
+    const auto& correspondences =
+      this->registration_->get_correspondences(frame_registration_, this->map_.get(), pose_registered, 3.0 * sigma);
 #endif
   }
   // Get covariances
-  odom.pose.covariance =
-    this->covariance_->get_pose_covariance(pose_registered, correspondences, sigma / 3.0);
+  odom.pose.covariance = this->covariance_->get_pose_covariance(pose_registered, correspondences, sigma / 3.0);
   odom.tangent.covariance = this->covariance_->get_tangent_covariance();
 
   // Buffer odometry
@@ -263,8 +259,7 @@ types::Odometry OdometryPipeline<TConfig>::register_frame(
   // Copy downsampled frame to host when in debug mode
   if (this->config_.debug_mode) {
     this->frame_downsampled_.resize(frame_registration_.size());
-    thrust::copy(
-      frame_registration_.begin(), frame_registration_.end(), this->frame_downsampled_.begin());
+    thrust::copy(frame_registration_.begin(), frame_registration_.end(), this->frame_downsampled_.begin());
   }
 #else
   this->frame_downsampled_ = frame_registration_;
@@ -275,6 +270,7 @@ types::Odometry OdometryPipeline<TConfig>::register_frame(
   // clang-format on
   return odom;
 }
+
 /**
  * @brief Init threading on CPU
  * -> needs to be done after param overrides
@@ -291,6 +287,7 @@ void OdometryPipeline<TConfig>::init()
     this->registration_->init_frame_map(this->map_->get_config());
   }
 }
+
 /**
  * @brief Cleans up all allocated memory and destroys the stream
  */
@@ -304,6 +301,7 @@ void OdometryPipeline<TConfig>::free()
   frame_.clear();
   frame_.shrink_to_fit();
 }
+
 /**
  * @brief Init model
  */
@@ -312,34 +310,38 @@ void OdometryPipeline<TConfig>::init_model_config()
 {
   this->model_->init_model_config();
 }
+
 /**
  * @brief Set the status of the input pointcloud
  * @param [in] status                   Status to set
  */
 template <typename TConfig>
-void OdometryPipeline<TConfig>::set_input_status(const types::DiagnosticStatus & status)
+void OdometryPipeline<TConfig>::set_input_status(const types::DiagnosticStatus& status)
 {
   this->diagnostic_->set_input_status(status);
 }
+
 /**
  * @brief Set the pose from an external source
  * @param [in] pose                   Pose to set
  * @param [in] valid                  Whether the given pose is valid
  */
 template <typename TConfig>
-void OdometryPipeline<TConfig>::set_pose_model(const types::PoseStamped & pose, const bool valid)
+void OdometryPipeline<TConfig>::set_pose_model(const types::PoseStamped& pose, const bool valid)
 {
   model_->set_pose(pose, valid);
 }
+
 /**
  * @brief Set a pose from an external source (e.g. sampled from tf) used for deskewing
  * @param [in] pose                   Pose to set
  */
 template <typename TConfig>
-void OdometryPipeline<TConfig>::set_pose_undistortion(const types::PoseStamped & pose)
+void OdometryPipeline<TConfig>::set_pose_undistortion(const types::PoseStamped& pose)
 {
   distortion_->set_pose(pose);
 }
+
 /**
  * @brief Get the current odometry estimate
  * @return                        Current odometry estimate
@@ -349,6 +351,7 @@ types::Odometry OdometryPipeline<TConfig>::get_odometry() const
 {
   return this->odometry_;
 }
+
 /**
  * @brief Access frame used for registration
  * @return                        Frame used for registration (after downsampling)
@@ -359,12 +362,12 @@ std::vector<types::Point<TConfig>> OdometryPipeline<TConfig>::get_frame() const
 #ifdef __CUDACC__
   // throw a error here
   if (!this->config_.debug_mode) {
-    throw std::runtime_error(
-      "get_frame() cannot be called in CUDA code when debug mode is disabled");
+    throw std::runtime_error("get_frame() cannot be called in CUDA code when debug mode is disabled");
   }
 #endif
   return this->frame_downsampled_;
 }
+
 /**
  * @brief Add points to map
  * @param [in] points                   Points to add
@@ -376,20 +379,19 @@ std::vector<types::Point<TConfig>> OdometryPipeline<TConfig>::get_frame() const
  * used for adding points
  */
 template <typename TConfig>
-void OdometryPipeline<TConfig>::add_points(
-  const std::vector<types::Point<tam::core::state::types::Point_XYZ>> & points,
-  const std::variant<int16_t, types::AdaptiveMapDensity> & map_density, const int adjacent_voxels,
+void OdometryPipeline<TConfig>::add_points(const std::vector<types::Point<tam::core::state::types::Point_XYZ>>& points,
+  const std::variant<int16_t, types::AdaptiveMapDensity>& map_density, const int adjacent_voxels,
   const int num_neighbors, const bool use_active_map)
 {
 #ifdef __CUDACC__
   // Add points to map
-  this->map_->add_points(
-    points, map_density, adjacent_voxels, num_neighbors, use_active_map, this->stream_);
+  this->map_->add_points(points, map_density, adjacent_voxels, num_neighbors, use_active_map, this->stream_);
   cudaStreamSynchronize(this->stream_);
 #else
   this->map_->add_points(points, map_density, adjacent_voxels, num_neighbors, use_active_map);
 #endif
 }
+
 /**
  * @brief Request a switch between active and inactive map
  */
@@ -398,16 +400,18 @@ void OdometryPipeline<TConfig>::request_map_switch()
 {
   this->map_->request_map_switch();
 }
+
 /**
  * @brief Expose the map handler's async-update mutex so the node can hold it
  *        across the full async add_points(inactive) + request_async_switch
  *        sequence.
  */
 template <typename TConfig>
-std::mutex & OdometryPipeline<TConfig>::get_map_mutex()
+std::mutex& OdometryPipeline<TConfig>::get_map_mutex()
 {
   return this->map_->get_mutex();
 }
+
 /**
  * @brief Get the map resolution
  * @return                        Map resolution
@@ -417,6 +421,7 @@ double OdometryPipeline<TConfig>::get_map_resolution() const
 {
   return this->map_->get_resolution();
 }
+
 /**
  * @brief Return the points in the map as vector
  * @return                        Vector of points in the map
@@ -435,6 +440,7 @@ std::vector<types::Point<TConfig>> OdometryPipeline<TConfig>::get_map() const
   return map_->get_cloud();
 #endif
 }
+
 /**
  * @brief Get the current registration status
  */
@@ -443,6 +449,7 @@ types::RegistrationStatus OdometryPipeline<TConfig>::get_registration_status() c
 {
   return this->registration_->get_registration_status();
 }
+
 /**
  * @brief Access module configs
  */
@@ -486,12 +493,13 @@ template <typename TConfig>
 types::ThresholdDebug OdometryPipeline<TConfig>::get_threshold_debug() const { return threshold_->get_debug(); } // NOLINT
 template <typename TConfig>
 types::VelocityDebug OdometryPipeline<TConfig>::get_velocity_debug() const { return velocity_->get_debug(); }  // NOLINT
+
 // clang-format on
 // Inherit constructor from OdometryBase for param manager and logger
+
 template <typename TConfig>
-OdometryPipeline<TConfig>::OdometryPipeline(
-  tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
-: OdometryBase<TConfig, types::PipelineConfig, types::PipelineDebug>(pmg, logger)
+OdometryPipeline<TConfig>::OdometryPipeline(tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
+    : OdometryBase<TConfig, types::PipelineConfig, types::PipelineDebug>(pmg, logger)
 {
   // Set pipelie parameters
   this->set_config(pmg);
@@ -539,11 +547,11 @@ OdometryPipeline<TConfig>::OdometryPipeline(
   // Additional initialization
   std::cout << "\033[1;36mInitialized odometry pipeline!\033[0m" << std::endl;
 }
+
 // Inherit constructor from OdometryBase for config and debug object
 template <typename TConfig>
-OdometryPipeline<TConfig>::OdometryPipeline(
-  const types::PipelineConfig & config, const types::PipelineDebug & debug)
-: OdometryBase<TConfig, types::PipelineConfig, types::PipelineDebug>(config, debug)
+OdometryPipeline<TConfig>::OdometryPipeline(const types::PipelineConfig& config, const types::PipelineDebug& debug)
+    : OdometryBase<TConfig, types::PipelineConfig, types::PipelineDebug>(config, debug)
 {
   // Initialize modules
   // -> add a new line here if you add a new module version
@@ -586,12 +594,13 @@ OdometryPipeline<TConfig>::OdometryPipeline(
   // Additional initialization
   std::cout << "\033[1;36mInitialized odometry pipeline!\033[0m" << std::endl;
 }
+
 /**
  * @brief Set the configuration of the pipeline from the param manager
  * @param [in] pmg                Param manager
  */
 template <typename TConfig>
-void OdometryPipeline<TConfig>::set_config(tam::pmg::ParamReferenceManager * pmg)
+void OdometryPipeline<TConfig>::set_config(tam::pmg::ParamReferenceManager* pmg)
 {
   // clang-format off
   pmg->declare_parameter("pipeline.update_map", &this->config_.update_map, false, tam::pmg::ParameterType::BOOL, "Update map with new points");  // NOLINT
@@ -603,17 +612,19 @@ void OdometryPipeline<TConfig>::set_config(tam::pmg::ParamReferenceManager * pmg
   pmg->declare_parameter("pipeline.num_threads", &this->config_.num_threads, static_cast<int64_t>(1), tam::pmg::ParameterType::INTEGER, "Number of TBB threads (CPU pipeline)");  // NOLINT
   // clang-format on
 }
+
 /**
  * @brief Register the debug variables with the logger
  * @param [in] logger             Logger
  */
 template <typename TConfig>
-void OdometryPipeline<TConfig>::set_logging(tam::tsl::ReferenceLogger * logger) const
+void OdometryPipeline<TConfig>::set_logging(tam::tsl::ReferenceLogger* logger) const
 {
   logger->log("pipeline/downsample_time", &this->debug_.downsample_time);
   logger->log("pipeline/pipeline_time", &this->debug_.pipeline_time);
   logger->log("pipeline/num_points_frame", &this->debug_.num_points_frame);
 }
+
 /**
  * @brief Define CUDA specific function to handle CUDA stream
  */
@@ -632,6 +643,7 @@ void OdometryPipeline<TConfig>::init_cuda()
   cuda::utils::allocate_vector(frame_registration_, 30000);
   cuda::utils::allocate_vector(frame_map_, 30000);
 }
+
 // Destructor
 template <typename TConfig>
 OdometryPipeline<TConfig>::~OdometryPipeline()

@@ -14,13 +14,7 @@
  * limitations under the License.
  */
 #pragma once
-namespace tam::core::state::types
-{
-enum class RobustKernelType : std::uint8_t {
-  NONE = 0,
-  HUBER = 1,
-  CAUCHY = 2,
-  GEMANMCCLURE = 3,
-  WELSCH = 4
-};
+
+namespace tam::core::state::types {
+enum class RobustKernelType : std::uint8_t { NONE = 0, HUBER = 1, CAUCHY = 2, GEMANMCCLURE = 3, WELSCH = 4 };
 }  // namespace tam::core::state::types

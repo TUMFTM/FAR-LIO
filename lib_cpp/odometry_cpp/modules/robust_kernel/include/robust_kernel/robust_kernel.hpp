@@ -18,16 +18,17 @@
 #include "odometry_types/odometry_config.hpp"
 #include "odometry_types/odometry_types.hpp"
 #include "odometry_types/point_types.hpp"
-namespace tam::core::state
-{
+
+namespace tam::core::state {
 inline float square(float x) { return x * x; }
+
 /**
  * @brief Calculate the Kernel weight
  * @param [in] residual       Square norm of the residual between the correspondences
  * @param [in] kernel_scale   Scale of the kernel
  */
 template <typename TConfig>
-inline float robust_kernel_weight(const Eigen::Vector3f & residual, const float kernel_scale)
+inline float robust_kernel_weight(const Eigen::Vector3f& residual, const float kernel_scale)
 {
   if constexpr (TConfig::KERNEL == tam::core::state::types::RobustKernelType::HUBER) {
     // Huber kernel weight from small_gicp

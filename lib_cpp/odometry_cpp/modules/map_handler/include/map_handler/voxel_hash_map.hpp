@@ -37,8 +37,8 @@
 
 // Required as tsl namespace collides with tam::tsl namespace
 using tsl::robin_map;
-namespace tam::core::state
-{
+
+namespace tam::core::state {
 template <typename TConfig>
 class VoxelHashMap : public MapHandler<TConfig>
 {
@@ -51,22 +51,23 @@ public:
    * @brief Constructor for param manager and logger
    */
   static std::unique_ptr<MapHandler<TConfig>> from_config(
-    tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
+    tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
   {
     std::unique_ptr<VoxelHashMap<TConfig>> mh =
       std::unique_ptr<VoxelHashMap<TConfig>>(new VoxelHashMap<TConfig>(pmg, logger));
     return mh;
   }
+
   /**
    * @brief Constructor for config and debug objects
    */
-  static std::unique_ptr<MapHandler<TConfig>> from_config(
-    const types::MapConfig & config, const types::MapDebug & debug)
+  static std::unique_ptr<MapHandler<TConfig>> from_config(const types::MapConfig& config, const types::MapDebug& debug)
   {
     std::unique_ptr<VoxelHashMap<TConfig>> mh =
       std::unique_ptr<VoxelHashMap<TConfig>>(new VoxelHashMap<TConfig>(config, debug));
     return mh;
   }
+
   /**
    * @brief Clear the map
    */
@@ -77,20 +78,22 @@ public:
     this->debug_.num_voxel = 0;
     this->debug_.num_points = 0;
   }
+
   /**
    * @brief Check if map is empty
    */
   bool empty() const override { return this->get_active_map().empty(); }
+
   /**
    * @brief Get the amount of points in the map
    * @return                        Number of points in the map
    */
   std::size_t num_points() const override
   {
-    return std::accumulate(
-      this->get_active_map().cbegin(), this->get_active_map().cend(), 0,
-      [](const size_t & sum, const auto & map_element) { return sum + map_element.second.size(); });
+    return std::accumulate(this->get_active_map().cbegin(), this->get_active_map().cend(), 0,
+      [](const size_t& sum, const auto& map_element) { return sum + map_element.second.size(); });
   }
+
   /**
    * @brief search for closest neighbor of a point
    * @param [in] point              Point to search for
@@ -98,23 +101,22 @@ public:
    * @return                        Closest point and distance
    */
   types::Correspondence<TConfig> search_closest_neighbor(
-    const types::Point<TConfig> & point, const int16_t adjacent_voxels = 1) const override
+    const types::Point<TConfig>& point, const int16_t adjacent_voxels = 1) const override
   {
     // Convert the point to voxel coordinates
-    const auto & voxel = point_to_voxel<TConfig>(point, this->config_.voxel_size);
+    const auto& voxel = point_to_voxel<TConfig>(point, this->config_.voxel_size);
     // Get nearby voxels on the map
-    const auto & neighbor_voxels = get_adjacent_voxels(voxel, adjacent_voxels);
+    const auto& neighbor_voxels = get_adjacent_voxels(voxel, adjacent_voxels);
     // Iterate over the neighbor voxels
     std::vector<types::Point<TConfig>> neighbors{};
-    int16_t num_neighbors =
-      (2 * adjacent_voxels + 1) * (2 * adjacent_voxels + 1) * (2 * adjacent_voxels + 1);
+    int16_t num_neighbors = (2 * adjacent_voxels + 1) * (2 * adjacent_voxels + 1) * (2 * adjacent_voxels + 1);
     neighbors.reserve(num_neighbors * TConfig::MAX_POINTS_PER_VOXEL);
-    std::for_each(neighbor_voxels.cbegin(), neighbor_voxels.cend(), [&](const auto & neighbor) {
+    std::for_each(neighbor_voxels.cbegin(), neighbor_voxels.cend(), [&](const auto& neighbor) {
       auto search = this->get_active_map().find(neighbor);
       if (search != this->get_active_map().end()) {
-        const auto & map_points = search.value();
+        const auto& map_points = search.value();
         if (!map_points.empty()) {
-          for (const auto & map_point : map_points) {
+          for (const auto& map_point : map_points) {
             neighbors.emplace_back(map_point);
           }
         }
@@ -125,7 +127,7 @@ public:
     correspondence.frame = point;
     correspondence.distance = std::numeric_limits<double>::max();
     if (!neighbors.empty()) {
-      std::for_each(neighbors.cbegin(), neighbors.cend(), [&](const auto & neighbor) {
+      std::for_each(neighbors.cbegin(), neighbors.cend(), [&](const auto& neighbor) {
         float distance = (neighbor.pos - point.pos).squaredNorm();
         if (distance < correspondence.distance) {
           correspondence.map = neighbor;
@@ -135,6 +137,7 @@ public:
     }
     return correspondence;
   }
+
   /**
    * @brief Add points to the map
    * @param [in] points             Points to add
@@ -146,16 +149,14 @@ public:
    * @note Callers using use_active_map = false are expected to hold the base class's
    * map_async_update_mutex during the call to ensure that no concurrent operations intervene.
    */
-  void add_points(
-    const std::vector<types::Point<types::Point_XYZ>> & points,
-    const std::variant<int16_t, types::AdaptiveMapDensity> & map_density =
-      TConfig::MAX_POINTS_PER_VOXEL,
+  void add_points(const std::vector<types::Point<types::Point_XYZ>>& points,
+    const std::variant<int16_t, types::AdaptiveMapDensity>& map_density = TConfig::MAX_POINTS_PER_VOXEL,
     const int16_t adjacent_voxels = 1, const int16_t num_neighbors = TConfig::NUM_NEIGHBORS,
     const bool use_active_map = true) override
   {
     // Get reference to the target map and the neighbors vector
-    MapType & target_map = use_active_map ? this->get_active_map() : this->get_inactive_map();
-    tbb::concurrent_vector<types::Neighbors<TConfig>> & target_neighbors =
+    MapType& target_map = use_active_map ? this->get_active_map() : this->get_inactive_map();
+    tbb::concurrent_vector<types::Neighbors<TConfig>>& target_neighbors =
       use_active_map ? this->get_active_neighbors() : this->get_inactive_neighbors();
 
     // Clear map if frame map is enabled or its the inactive map
@@ -168,11 +169,11 @@ public:
     target_neighbors.reserve(points.size());
     const double map_resolution = this->get_resolution();
     unsigned int counter = 0;
-    std::for_each(points.cbegin(), points.cend(), [&](const auto & point) {
+    std::for_each(points.cbegin(), points.cend(), [&](const auto& point) {
       const auto voxel = point_to_voxel<types::Point_XYZ>(point, this->config_.voxel_size);
       auto search = target_map.find(voxel);
       if (search != target_map.end()) {
-        std::vector<types::Point<TConfig>> & voxel_points = search.value();
+        std::vector<types::Point<TConfig>>& voxel_points = search.value();
         // Compute max number of points within this voxel
         int16_t max_points_per_voxel = TConfig::MAX_POINTS_PER_VOXEL;
         if (std::holds_alternative<types::AdaptiveMapDensity>(map_density)) {
@@ -190,11 +191,9 @@ public:
         } else {
           max_points_per_voxel = std::get<int16_t>(map_density);
         }
-        if (
-          voxel_points.size() >= static_cast<size_t>(max_points_per_voxel) ||
-          std::any_of(voxel_points.cbegin(), voxel_points.cend(), [&](const auto & voxel_point) {
-            return (voxel_point.pos - point.pos).norm() < map_resolution;
-          })) {
+        if (voxel_points.size() >= static_cast<size_t>(max_points_per_voxel) ||
+          std::any_of(voxel_points.cbegin(), voxel_points.cend(),
+            [&](const auto& voxel_point) { return (voxel_point.pos - point.pos).norm() < map_resolution; })) {
           // Voxel is already full
           return;
         }
@@ -220,8 +219,7 @@ public:
     // Set normals and covariances to points (only if enabled)
     if constexpr (types::HASNORMALCOV<TConfig>) {
       // Set normals and covariances to points
-      this->compute_normal_covariance(
-        adjacent_voxels, std::min(num_neighbors, TConfig::NUM_NEIGHBORS), use_active_map);
+      this->compute_normal_covariance(adjacent_voxels, std::min(num_neighbors, TConfig::NUM_NEIGHBORS), use_active_map);
     }
     // Update debug information (maintained only for active map)
     if (!use_active_map) return;
@@ -230,6 +228,7 @@ public:
     this->debug_.num_voxel = this->get_active_map().size();
     this->debug_.num_points = this->num_points();
   }
+
   /**
    * @brief Update the map with new points
    * @param [in] points             Points to update
@@ -239,23 +238,19 @@ public:
    * @param [in] adjacent_voxels    Number of adjacent voxels to search for
    * @param [in] num_neighbors      Number of neighbors to search for
    */
-  void update_points(
-    const std::vector<types::Point<TConfig>> & points, const Sophus::SE3f & pose,
-    const std::variant<int16_t, types::AdaptiveMapDensity> & map_density =
-      TConfig::MAX_POINTS_PER_VOXEL,
-    const int16_t adjacent_voxels = 1,
-    const int16_t num_neighbors = TConfig::NUM_NEIGHBORS) override
+  void update_points(const std::vector<types::Point<TConfig>>& points, const Sophus::SE3f& pose,
+    const std::variant<int16_t, types::AdaptiveMapDensity>& map_density = TConfig::MAX_POINTS_PER_VOXEL,
+    const int16_t adjacent_voxels = 1, const int16_t num_neighbors = TConfig::NUM_NEIGHBORS) override
   {
     // Start timer
     auto start = std::chrono::high_resolution_clock::now();
 
     // Transform points to map frame and map point type
     std::vector<types::Point<types::Point_XYZ>> points_transformed(points.size());
-    std::transform(
-      points.cbegin(), points.cend(), points_transformed.begin(),
-      [&](const auto & point) { return utils::convert_point<TConfig, types::Point_XYZ>(point); });
+    std::transform(points.cbegin(), points.cend(), points_transformed.begin(),
+      [&](const auto& point) { return utils::convert_point<TConfig, types::Point_XYZ>(point); });
     utils::transform_points(pose, points_transformed);
-    const Eigen::Vector3f & origin = pose.translation();
+    const Eigen::Vector3f& origin = pose.translation();
 
     // Add new points to the map
     this->add_points(points_transformed, map_density, adjacent_voxels, num_neighbors);
@@ -265,8 +260,7 @@ public:
     // become invalid
     if constexpr (types::HASNORMALCOV<TConfig>) {
       // Set normals and covariances to points
-      this->compute_normal_covariance(
-        adjacent_voxels, std::min(num_neighbors, TConfig::NUM_NEIGHBORS));
+      this->compute_normal_covariance(adjacent_voxels, std::min(num_neighbors, TConfig::NUM_NEIGHBORS));
     }
 
     // Remove far points from the map
@@ -279,6 +273,7 @@ public:
     // Update debug information
     this->debug_.update_time = time;
   }
+
   /**
    * @brief Get the map density
    * @param [in] range                Range to consider
@@ -290,8 +285,8 @@ public:
     unsigned int voxels = 0;
     unsigned int points = 0;
     for (auto it = this->get_active_map().cbegin(); it != this->get_active_map().cend();) {
-      const auto & [voxel, voxel_points] = *it;
-      const auto & pt = voxel_points.front();
+      const auto& [voxel, voxel_points] = *it;
+      const auto& pt = voxel_points.front();
       if (pt.pos.squaredNorm() < range2) {
         ++voxels;
         points += voxel_points.size();
@@ -310,6 +305,7 @@ public:
     // clang-format on
     return density;
   }
+
   /**
    * @brief Get the map as a point cloud
    * @return                        Point cloud of the map
@@ -317,15 +313,15 @@ public:
   std::vector<types::Point<TConfig>> get_cloud() const override
   {
     std::vector<types::Point<TConfig>> points;
-    points.reserve(
-      this->get_active_map().size() * static_cast<size_t>(TConfig::MAX_POINTS_PER_VOXEL));
+    points.reserve(this->get_active_map().size() * static_cast<size_t>(TConfig::MAX_POINTS_PER_VOXEL));
     for (auto it = this->get_active_map().cbegin(); it != this->get_active_map().cend(); ++it) {
-      const auto & voxel_points = it.value();
+      const auto& voxel_points = it.value();
       points.insert(points.end(), voxel_points.cbegin(), voxel_points.cend());
     }
     points.shrink_to_fit();
     return points;
   }
+
   /**
    * @brief Get the vector holding the neighbors of the points in the map
    * @return                        Neighbors of the points in the map
@@ -336,6 +332,7 @@ public:
     return std::vector<types::Neighbors<TConfig>>(
       this->get_active_neighbors().cbegin(), this->get_active_neighbors().cend());
   }
+
   /**
    * @brief Switch the active map
    */
@@ -352,17 +349,18 @@ public:
 
 protected:
   // Inherit constructor from MapHandler for param manager and logger
-  VoxelHashMap(tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
-  : MapHandler<TConfig>(pmg, logger)
+  VoxelHashMap(tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
+      : MapHandler<TConfig>(pmg, logger)
   {
     // Additional initialization
   }
+
   // Inherit constructor from MapHandler for config and debug object
-  VoxelHashMap(const types::MapConfig & config, const types::MapDebug & debug)
-  : MapHandler<TConfig>(config, debug)
+  VoxelHashMap(const types::MapConfig& config, const types::MapDebug& debug) : MapHandler<TConfig>(config, debug)
   {
     // Additional initialization
   }
+
   /**
    * @brief search for closest neighbors of a point
    * @param [in] point              Point to search for
@@ -372,33 +370,31 @@ protected:
    * @note The found neighbors are not sorted by distance
    * @note Function does not check whether num_neighbors exceeds TConfig::NUM_NEIGHBORS
    */
-  void search_closest_neighbors(
-    types::Neighbors<TConfig> & point, const int16_t adjacent_voxels, const int16_t num_neighbors,
-    const bool use_active_map = true) const override
+  void search_closest_neighbors(types::Neighbors<TConfig>& point, const int16_t adjacent_voxels,
+    const int16_t num_neighbors, const bool use_active_map = true) const override
   {
-    const MapType & target_map = use_active_map ? this->get_active_map() : this->get_inactive_map();
+    const MapType& target_map = use_active_map ? this->get_active_map() : this->get_inactive_map();
     // Convert the point to voxel coordinates
-    const auto & voxel = point_to_voxel<TConfig>(*(point.point), this->config_.voxel_size);
+    const auto& voxel = point_to_voxel<TConfig>(*(point.point), this->config_.voxel_size);
     // Get nearby voxels on the map
-    const auto & neighbor_voxels = get_adjacent_voxels(voxel, adjacent_voxels);
+    const auto& neighbor_voxels = get_adjacent_voxels(voxel, adjacent_voxels);
     // Iterate over the neighbor voxels
-    std::vector<types::Point<TConfig> *> neighbors{};
-    int16_t num_neighbor_voxels =
-      (2 * adjacent_voxels + 1) * (2 * adjacent_voxels + 1) * (2 * adjacent_voxels + 1);
+    std::vector<types::Point<TConfig>*> neighbors{};
+    int16_t num_neighbor_voxels = (2 * adjacent_voxels + 1) * (2 * adjacent_voxels + 1) * (2 * adjacent_voxels + 1);
     neighbors.reserve(num_neighbor_voxels * TConfig::MAX_POINTS_PER_VOXEL);
-    std::for_each(neighbor_voxels.cbegin(), neighbor_voxels.cend(), [&](const auto & neighbor) {
+    std::for_each(neighbor_voxels.cbegin(), neighbor_voxels.cend(), [&](const auto& neighbor) {
       auto search = target_map.find(neighbor);
       if (search != target_map.end()) {
-        const auto & map_points = search.value();
+        const auto& map_points = search.value();
         if (!map_points.empty()) {
-          for (const auto & map_point : map_points) {
-            neighbors.emplace_back(const_cast<types::Point<TConfig> *>(&map_point));
+          for (const auto& map_point : map_points) {
+            neighbors.emplace_back(const_cast<types::Point<TConfig>*>(&map_point));
           }
         }
       }
     });
     if (!neighbors.empty()) {
-      std::for_each(neighbors.cbegin(), neighbors.cend(), [&](const auto & neighbor) {
+      std::for_each(neighbors.cbegin(), neighbors.cend(), [&](const auto& neighbor) {
         float distance = (neighbor->pos - point.point->pos).norm();
         if (point.num_neighbors == num_neighbors) {
           // If we already have enough neighbors, check if the current one is closer
@@ -408,9 +404,7 @@ protected:
           for (int16_t neighbor_idx = 0; neighbor_idx < num_neighbors; ++neighbor_idx) {
             // if current distance is larger than maximal_distance and distance
             // update
-            if (
-              max_distance < point.distance[neighbor_idx] &&
-              distance < point.distance[neighbor_idx]) {
+            if (max_distance < point.distance[neighbor_idx] && distance < point.distance[neighbor_idx]) {
               max_distance = point.distance[neighbor_idx];
               largest_neighbor_index = neighbor_idx;
             }
@@ -442,17 +436,16 @@ private:
     const int16_t adjacent_voxels, const int16_t num_neighbors, const bool use_active_map = true)
     requires types::HASNORMALCOV<TConfig>
   {
-    tbb::concurrent_vector<types::Neighbors<TConfig>> & target_neighbors =
+    tbb::concurrent_vector<types::Neighbors<TConfig>>& target_neighbors =
       use_active_map ? this->get_active_neighbors() : this->get_inactive_neighbors();
     // Start timer
     auto start = std::chrono::high_resolution_clock::now();
 
     // Compute normals and covariances
     using neighbor_iterator = tbb::concurrent_vector<types::Neighbors<TConfig>>::iterator;
-    tbb::parallel_for(
-      tbb::blocked_range<neighbor_iterator>(target_neighbors.begin(), target_neighbors.end()),
-      [&](const tbb::blocked_range<neighbor_iterator> & r) {
-        std::for_each(r.begin(), r.end(), [&](auto & neighbor) {
+    tbb::parallel_for(tbb::blocked_range<neighbor_iterator>(target_neighbors.begin(), target_neighbors.end()),
+      [&](const tbb::blocked_range<neighbor_iterator>& r) {
+        std::for_each(r.begin(), r.end(), [&](auto& neighbor) {
           // Search for correspondences (= closest neighbors)
           this->search_closest_neighbors(neighbor, adjacent_voxels, num_neighbors, use_active_map);
           // Set normal and covariance to frame point (= map point)
@@ -466,17 +459,18 @@ private:
     // Update debug information
     if (use_active_map) this->debug_.normal_cov_time = time;
   }
+
   /**
    * @brief Remove points that are too far from the origin
    * @param [in] origin              current origin
    */
-  void remove_far_points(const Eigen::Vector3f & origin)
+  void remove_far_points(const Eigen::Vector3f& origin)
   {
     const double max_distance2 = this->config_.max_distance * this->config_.max_distance;
     unsigned int counter = 0;
     for (auto it = this->get_active_map().begin(); it != this->get_active_map().end();) {
-      const auto & [voxel, voxel_points] = *it;
-      const auto & pt = voxel_points.front();
+      const auto& [voxel, voxel_points] = *it;
+      const auto& pt = voxel_points.front();
       if ((pt.pos - origin).squaredNorm() >= max_distance2) {
         it = this->get_active_map().erase(it);
         counter++;
@@ -490,6 +484,7 @@ private:
     this->debug_.points_removed = this->num_points() - this->debug_.num_points;
     this->debug_.num_points = this->num_points();
   }
+
   /**
    * @brief Get active and inactive map references
    * @note Cannot be in base class as map types differs
@@ -505,16 +500,15 @@ private:
   size_t get_inactive_map_size() { return this->map_a_active_.load() ? map_b_.size() : map_a_.size(); }  // NOLINT
   tbb::concurrent_vector<types::Neighbors<TConfig>> & get_inactive_neighbors() { return this->map_a_active_.load() ? tbb_neighbors_b_ : tbb_neighbors_a_; }  // NOLINT
   const tbb::concurrent_vector<types::Neighbors<TConfig>> & get_inactive_neighbors() const { return this->map_a_active_.load() ? tbb_neighbors_b_ : tbb_neighbors_a_; }  // NOLINT
+
   // clang-format on
+
   /**
    * @brief Allocate map switching vectors
    * @param [in] update_map          Flag to indicate if the map is being updated
    * @param [in] size                Size to allocate
    */
-  void allocate_memory(
-    [[maybe_unused]] const bool update_map, [[maybe_unused]] const size_t size) override
-  {
-  }
+  void allocate_memory([[maybe_unused]] const bool update_map, [[maybe_unused]] const size_t size) override {}
 
 private:
   // Member variables

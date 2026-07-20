@@ -46,21 +46,21 @@
 // FLAG is the TConfig switch guarding the field, MEMBER the corresponding types::Point member.
 // Both are needed because they differ (e.g. NORMALS guards `normal`); naming them with a single
 // token silently skips the copy instead of failing to compile.
-#define CONDITIONAL_COPY(FLAG, MEMBER)                        \
-  if constexpr (TConfigSrc::FLAG && TConfigDst::FLAG) {       \
-    dst.MEMBER = src.MEMBER;                                  \
+#define CONDITIONAL_COPY(FLAG, MEMBER)                  \
+  if constexpr (TConfigSrc::FLAG && TConfigDst::FLAG) { \
+    dst.MEMBER = src.MEMBER;                            \
   }
-namespace tam::core::state::utils
-{
+
+namespace tam::core::state::utils {
 /**
  * @brief Transform points with a given transformation
  * @param [in] T                  Transformation
  * @param [in] points             Points to transform
  */
 template <typename TConfig>
-inline void transform_points(const Sophus::SE3f & T, std::vector<types::Point<TConfig>> & points)
+inline void transform_points(const Sophus::SE3f& T, std::vector<types::Point<TConfig>>& points)
 {
-  std::transform(points.cbegin(), points.cend(), points.begin(), [&](const auto & point) {
+  std::transform(points.cbegin(), points.cend(), points.begin(), [&](const auto& point) {
     types::Point<TConfig> pt = point;
     pt.pos = T * point.pos;
     // Transform normals and covariances if they exist
@@ -73,12 +73,13 @@ inline void transform_points(const Sophus::SE3f & T, std::vector<types::Point<TC
     return pt;
   });
 }
+
 /**
  * @brief Copy function for different point types
  * @param [in] src                  Point to convert to different format
  */
 template <typename TConfigSrc, typename TConfigDst>
-inline types::Point<TConfigDst> convert_point(const types::Point<TConfigSrc> & src)
+inline types::Point<TConfigDst> convert_point(const types::Point<TConfigSrc>& src)
 {
   types::Point<TConfigDst> dst;
   // Unconditional members of types::Point.
@@ -99,6 +100,7 @@ inline types::Point<TConfigDst> convert_point(const types::Point<TConfigSrc> & s
   CONDITIONAL_COPY(SENSOR_ID, sensor_id);
   return dst;
 }
+
 /**
  * @brief Load point cloud from binary file in KITTI format
  *
@@ -107,12 +109,12 @@ inline types::Point<TConfigDst> convert_point(const types::Point<TConfigSrc> & s
  * @return std::vector<types::Point<TConfig>>:
  */
 template <typename TConfig>
-inline std::vector<types::Point<TConfig>> load_pointcloud_bin(const std::string & path)
+inline std::vector<types::Point<TConfig>> load_pointcloud_bin(const std::string& path)
 {
   std::vector<types::Point<TConfig>> point_cloud;
 
   // Open file
-  FILE * stream = fopen(path.c_str(), "rb");
+  FILE* stream = fopen(path.c_str(), "rb");
   if (!stream) {
     throw std::logic_error("Failed to open file: " + path);
   }
@@ -149,6 +151,7 @@ inline std::vector<types::Point<TConfig>> load_pointcloud_bin(const std::string 
 
   return point_cloud;
 }
+
 /**
  * @brief Load pose from text file in format x y z qw qx qy qz x_stddev y_stddev z_stddev
  *
@@ -157,7 +160,7 @@ inline std::vector<types::Point<TConfig>> load_pointcloud_bin(const std::string 
  * @return Sophus::SE3f:          - pose
  */
 template <typename TConfig>
-inline Sophus::SE3f load_pose(const std::string & path)
+inline Sophus::SE3f load_pose(const std::string& path)
 {
   Sophus::SE3f pose;
   double x, y, z, qw, qx, qy, qz, x_stddev, y_stddev, z_stddev;
@@ -176,6 +179,7 @@ inline Sophus::SE3f load_pose(const std::string & path)
   }
   return pose;
 }
+
 // Rerun specific functions for visualization
 #ifdef USE_VISUALIZATION
 /**
@@ -184,12 +188,13 @@ inline Sophus::SE3f load_pose(const std::string & path)
  *                                 name of the recording stream
  * @return rerun::RecordingStream - recording stream
  */
-inline rerun::RecordingStream spawn_rerun_stream(const std::string & name)
+inline rerun::RecordingStream spawn_rerun_stream(const std::string& name)
 {
   rerun::RecordingStream rec = rerun::RecordingStream(name);
   rec.spawn().exit_on_failure();
   return rec;
 }
+
 /**
  * @brief Convert point cloud positions to rerun format
  * @param[in] points              - std::vector<types::Point<TConfig>>:
@@ -203,21 +208,21 @@ inline rerun::RecordingStream spawn_rerun_stream(const std::string & name)
  */
 template <typename TConfig>
 inline std::tuple<std::vector<rerun::Position3D>, std::vector<rerun::Color>> points2rerun(
-  const std::vector<types::Point<TConfig>> & points, const std::string & color,
-  const Sophus::SE3f & T = Sophus::SE3f())
+  const std::vector<types::Point<TConfig>>& points, const std::string& color, const Sophus::SE3f& T = Sophus::SE3f())
 {
   std::vector<rerun::Position3D> positions{};
   std::vector<rerun::Color> colors{};
   TUMcolor tum_color(color);
   positions.reserve(points.size());
   colors.reserve(points.size());
-  for (const auto & point : points) {
+  for (const auto& point : points) {
     Eigen::Vector3f pos = (T * point.pos).template cast<float>();
     positions.push_back(rerun::Position3D(pos.x(), pos.y(), pos.z()));
     colors.push_back(rerun::Color(tum_color.r, tum_color.g, tum_color.b, tum_color.a));
   }
   return std::make_tuple(positions, colors);
 }
+
 /**
  * @brief Convert point cloud positions with normals to rerun format
  * @param[in] points              - std::vector<types::Point<TConfig>>:
@@ -228,11 +233,9 @@ inline std::tuple<std::vector<rerun::Position3D>, std::vector<rerun::Color>> poi
  *        positions, colors
  */
 template <typename TConfig>
-inline std::tuple<
-  std::vector<rerun::Position3D>, std::vector<rerun::Color>, std::vector<rerun::Vector3D>>
-points_normals2rerun(
-  const std::vector<types::Point<TConfig>> & points,
-  const std::string & color) requires types::HASNORMALCOV<TConfig>
+inline std::tuple<std::vector<rerun::Position3D>, std::vector<rerun::Color>, std::vector<rerun::Vector3D>>
+points_normals2rerun(const std::vector<types::Point<TConfig>>& points, const std::string& color)
+  requires types::HASNORMALCOV<TConfig>
 {
   std::vector<rerun::Position3D> positions{};
   std::vector<rerun::Vector3D> normals{};
@@ -241,7 +244,7 @@ points_normals2rerun(
   positions.reserve(points.size());
   normals.reserve(points.size());
   colors.reserve(points.size());
-  for (const auto & point : points) {
+  for (const auto& point : points) {
     Eigen::Vector3f pos = point.pos.template cast<float>();
     Eigen::Vector3f normal = point.normal.template cast<float>();
     positions.push_back(rerun::Position3D(pos.x(), pos.y(), pos.z()));

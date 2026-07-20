@@ -21,6 +21,7 @@
 #include "odometry_types/odometry_types.hpp"
 #include "odometry_types/point_types.hpp"
 #include "robust_kernel/robust_kernel.hpp"
+
 /**
  * @brief Test Huber kernel
  */

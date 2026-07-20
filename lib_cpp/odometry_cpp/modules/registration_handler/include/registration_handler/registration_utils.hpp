@@ -16,12 +16,12 @@
 #pragma once
 
 #include <Eigen/Dense>
-#include <vector>
 #include <functional>
+#include <vector>
 
 #include "odometry_utils/utils.hpp"
-namespace tam::core::state::utils
-{
+
+namespace tam::core::state::utils {
 /**
  * @brief Reduce a factor over all correspondences in parallel
  * @param [in] correspondences         Correspondences
@@ -31,26 +31,25 @@ namespace tam::core::state::utils
  */
 template <typename TConfig, typename T, typename FactorType, typename ReduceType>
 T reduce_correspondences(
-  std::vector<types::Correspondence<TConfig>> & correspondences, const FactorType factor,
-  const ReduceType reduce)
+  std::vector<types::Correspondence<TConfig>>& correspondences, const FactorType factor, const ReduceType reduce)
 {
   using correspondence_iterator = std::vector<types::Correspondence<TConfig>>::iterator;
-  const auto & reduced = tbb::parallel_reduce(
+  const auto& reduced = tbb::parallel_reduce(
     // Range
     tbb::blocked_range<correspondence_iterator>{correspondences.begin(), correspondences.end()},
     // Default initialize output
     T{},
     // 1st Lambda: Parallel computation
-    [&](const tbb::blocked_range<correspondence_iterator> & r, T element) -> T {
-      return std::transform_reduce(
-        r.begin(), r.end(), element, reduce,
-        [&](types::Correspondence<TConfig> & correspondence) { return factor(correspondence); });
+    [&](const tbb::blocked_range<correspondence_iterator>& r, T element) -> T {
+      return std::transform_reduce(r.begin(), r.end(), element, reduce,
+        [&](types::Correspondence<TConfig>& correspondence) { return factor(correspondence); });
     },
     // 2nd Lambda: Parallel reduction of the private Jacboians
     reduce);
 
   return reduced;
 }
+
 /**
  * @brief Build the linear system for the ICP algorithm
  * @param [in] correspondences         Correspondences
@@ -59,17 +58,18 @@ T reduce_correspondences(
  */
 template <typename TConfig, typename FactorType>
 types::LinearSystem build_linear_system(
-  std::vector<types::Correspondence<TConfig>> & correspondences, const FactorType & factor)
+  std::vector<types::Correspondence<TConfig>>& correspondences, const FactorType& factor)
 {
-  auto sum_linear_systems = [](types::LinearSystem a, const types::LinearSystem & b) {
+  auto sum_linear_systems = [](types::LinearSystem a, const types::LinearSystem& b) {
     a.JTJ += b.JTJ;
     a.JTr += b.JTr;
     return a;
   };
-  const types::LinearSystem & ls = reduce_correspondences<TConfig, types::LinearSystem>(
-    correspondences, factor, sum_linear_systems);
+  const types::LinearSystem& ls =
+    reduce_correspondences<TConfig, types::LinearSystem>(correspondences, factor, sum_linear_systems);
   return ls;
 }
+
 /**
  * @brief Compute the error of a set of correspondences for a given transformation
  * @param [in] correspondences Correspondences
@@ -77,13 +77,12 @@ types::LinearSystem build_linear_system(
  * @return                     Transformation error
  */
 template <typename TConfig, typename ErrorType>
-float compute_error(
-  std::vector<types::Correspondence<TConfig>> & correspondences, const ErrorType & factor)
+float compute_error(std::vector<types::Correspondence<TConfig>>& correspondences, const ErrorType& factor)
 {
-  const float error =
-    reduce_correspondences<TConfig, float>(correspondences, factor, std::plus<float>{});
+  const float error = reduce_correspondences<TConfig, float>(correspondences, factor, std::plus<float>{});
   return error;
 }
+
 /**
  * @brief Get correspondences between points and map
  * @param [in] points                   Points to get correspondences for
@@ -92,9 +91,8 @@ float compute_error(
  * @return                        Correspondences
  */
 template <typename TConfig>
-std::vector<types::Correspondence<TConfig>> get_correspondences(
-  const std::vector<types::Point<TConfig>> & points, const MapHandler<TConfig> * map,
-  const float correspondence_threshold)
+std::vector<types::Correspondence<TConfig>> get_correspondences(const std::vector<types::Point<TConfig>>& points,
+  const MapHandler<TConfig>* map, const float correspondence_threshold)
 {
   using points_iterator = std::vector<types::Point<TConfig>>::const_iterator;
   tbb::concurrent_vector<types::Correspondence<TConfig>> tbb_correspondences{};
@@ -102,11 +100,10 @@ std::vector<types::Correspondence<TConfig>> get_correspondences(
   float correspondence_threshold2 = correspondence_threshold * correspondence_threshold;
 
   // calculate all closest neighbors in parallel
-  tbb::parallel_for(
-    tbb::blocked_range<points_iterator>{points.cbegin(), points.cend()},
-    [&](const tbb::blocked_range<points_iterator> & r) {
-      std::for_each(r.begin(), r.end(), [&](const auto & point) {
-        const auto & correspondence = map->search_closest_neighbor(point, 1);
+  tbb::parallel_for(tbb::blocked_range<points_iterator>{points.cbegin(), points.cend()},
+    [&](const tbb::blocked_range<points_iterator>& r) {
+      std::for_each(r.begin(), r.end(), [&](const auto& point) {
+        const auto& correspondence = map->search_closest_neighbor(point, 1);
         if (correspondence.distance < correspondence_threshold2) {
           tbb_correspondences.emplace_back(correspondence);
         }
@@ -114,8 +111,7 @@ std::vector<types::Correspondence<TConfig>> get_correspondences(
     });
 
   // Combine thread-local results into a single std::vector
-  std::vector<types::Correspondence<TConfig>> correspondences(
-    tbb_correspondences.begin(), tbb_correspondences.end());
+  std::vector<types::Correspondence<TConfig>> correspondences(tbb_correspondences.begin(), tbb_correspondences.end());
 
   return correspondences;
 }

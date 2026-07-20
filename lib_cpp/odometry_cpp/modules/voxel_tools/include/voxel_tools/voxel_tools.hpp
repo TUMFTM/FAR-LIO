@@ -28,30 +28,30 @@
 
 // Required as tsl namespace collides with tam::tsl namespace
 using tsl::robin_map;
-namespace tam::core::state
-{
+
+namespace tam::core::state {
 // Voxel definition as Eigen::Vector3i
 using Voxel = Eigen::Vector3i;
+
 /**
  * @brief Convert a point to a voxel
  * @param [in] point        Point to convert
  * @param [in] voxel_size   Size of the voxel
  */
 template <typename TConfig>
-inline Voxel point_to_voxel(const types::Point<TConfig> & point, const double voxel_size)
+inline Voxel point_to_voxel(const types::Point<TConfig>& point, const double voxel_size)
 {
-  return Voxel(
-    static_cast<int>(std::floor(point.pos.x() / voxel_size)),
-    static_cast<int>(std::floor(point.pos.y() / voxel_size)),
-    static_cast<int>(std::floor(point.pos.z() / voxel_size)));
+  return Voxel(static_cast<int>(std::floor(point.pos.x() / voxel_size)),
+    static_cast<int>(std::floor(point.pos.y() / voxel_size)), static_cast<int>(std::floor(point.pos.z() / voxel_size)));
 }
+
 /**
  * @brief Get the adjacent voxels of a voxel
  * @param [in] voxel               Voxel to get neighbors of
  * @param [in] adjacent_voxels     Number of adjacent voxels to get
  * @return                         Vector of adjacent voxels
  */
-inline std::vector<Voxel> get_adjacent_voxels(const Voxel & voxel, int adjacent_voxels = 1)
+inline std::vector<Voxel> get_adjacent_voxels(const Voxel& voxel, int adjacent_voxels = 1)
 {
   std::vector<Voxel> voxel_neighborhood;
   voxel_neighborhood.reserve(27);
@@ -64,6 +64,7 @@ inline std::vector<Voxel> get_adjacent_voxels(const Voxel & voxel, int adjacent_
   }
   return voxel_neighborhood;
 }
+
 /**
  * @brief Downsample a frame of points to a voxel grid
  * => Only one point per voxel
@@ -73,21 +74,21 @@ inline std::vector<Voxel> get_adjacent_voxels(const Voxel & voxel, int adjacent_
  */
 template <typename TConfig>
 std::vector<types::Point<TConfig>> voxel_downsample(
-  const std::vector<types::Point<TConfig>> & frame, const double voxel_size)
+  const std::vector<types::Point<TConfig>>& frame, const double voxel_size)
 {
   robin_map<Voxel, types::Point<TConfig>> grid;
   grid.reserve(frame.size());
-  std::for_each(frame.cbegin(), frame.cend(), [&](const auto & point) {
+  std::for_each(frame.cbegin(), frame.cend(), [&](const auto& point) {
     const Voxel vox = point_to_voxel<TConfig>(point, voxel_size);
     if (!grid.contains(vox)) grid.insert({vox, point});
   });
   std::vector<types::Point<TConfig>> frame_dowsampled;
   frame_dowsampled.reserve(grid.size());
-  std::for_each(grid.cbegin(), grid.cend(), [&](const auto & voxel_and_point) {
-    frame_dowsampled.emplace_back(voxel_and_point.second);
-  });
+  std::for_each(grid.cbegin(), grid.cend(),
+    [&](const auto& voxel_and_point) { frame_dowsampled.emplace_back(voxel_and_point.second); });
   return frame_dowsampled;
 }
+
 /**
  * @brief Downsample a frame of points to a voxel grid twice with different
  * voxel sizes
@@ -96,24 +97,23 @@ std::vector<types::Point<TConfig>> voxel_downsample(
  * @return Downsampled frame
  */
 template <typename TConfig>
-std::tuple<std::vector<types::Point<TConfig>>, std::vector<types::Point<TConfig>>>
-voxel_doubledownsample(const std::vector<types::Point<TConfig>> & frame, const double voxel_size)
+std::tuple<std::vector<types::Point<TConfig>>, std::vector<types::Point<TConfig>>> voxel_doubledownsample(
+  const std::vector<types::Point<TConfig>>& frame, const double voxel_size)
 {
   const std::vector<types::Point<TConfig>> frame_0_5 = voxel_downsample(frame, voxel_size * 0.5);
-  const std::vector<types::Point<TConfig>> frame_1_5 =
-    voxel_downsample(frame_0_5, voxel_size * 1.5);
+  const std::vector<types::Point<TConfig>> frame_1_5 = voxel_downsample(frame_0_5, voxel_size * 1.5);
   return std::make_tuple(frame_1_5, frame_0_5);
 }
 }  // namespace tam::core::state
+
 /**
  * @brief Hash function for Voxel
  */
 template <>
-struct std::hash<tam::core::state::Voxel>
-{
-  std::size_t operator()(const tam::core::state::Voxel & voxel) const
+struct std::hash<tam::core::state::Voxel> {
+  std::size_t operator()(const tam::core::state::Voxel& voxel) const
   {
-    const uint32_t * vec = reinterpret_cast<const uint32_t *>(voxel.data());
+    const uint32_t* vec = reinterpret_cast<const uint32_t*>(voxel.data());
     return (vec[0] * 73856093 ^ vec[1] * 19349669 ^ vec[2] * 83492791);
   }
 };

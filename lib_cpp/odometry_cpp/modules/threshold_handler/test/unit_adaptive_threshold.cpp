@@ -18,9 +18,10 @@
 
 #include <iostream>
 
-#include "threshold_handler/adaptive_threshold.hpp"
 #include "param_management_cpp/param_reference_manager.hpp"
+#include "threshold_handler/adaptive_threshold.hpp"
 #include "tsl_logger_cpp/reference_logger.hpp"
+
 /**
  * @brief Test construction of AdaptiveThreshold from param manager and logger
  */
@@ -33,11 +34,12 @@ TEST(AdaptiveThreshold, BuildPmgLogger)
   std::unique_ptr<tam::core::state::ThresholdHandler<tam::core::state::types::ICP_EXT>> threshold_ =  // NOLINT
     tam::core::state::AdaptiveThreshold<tam::core::state::types::ICP_EXT>::from_config(pmg_.get(), logger_.get()); // NOLINT
   // clang-format on
-  tam::pmg::MgmtInterface * pmg_raw = pmg_.get();
+  tam::pmg::MgmtInterface* pmg_raw = pmg_.get();
   pmg_raw->set_value("threshold.initial_threshold", 8.0);
   EXPECT_EQ(threshold_->get_config().initial_threshold, 8.0)
     << "Failed to construct AdaptiveThreshold from param manager and logger";
 }
+
 /**
  * @brief Test construction of AdaptiveThreshold from config and debug object
  */
@@ -56,4 +58,3 @@ TEST(AdaptiveThreshold, BuildConfigDebug)
   EXPECT_EQ(threshold_->get_config().initial_threshold, 8.0)
     << "Failed to construct AdaptiveThreshold from config and debug";
 }
-

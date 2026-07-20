@@ -21,8 +21,8 @@
 #include <sophus/se3.hpp>
 
 #include "model_handler/model_handler_base.hpp"
-namespace tam::core::state
-{
+
+namespace tam::core::state {
 template <typename TConfig>
 class ExternalGuess : public ModelHandler<TConfig>
 {
@@ -31,26 +31,28 @@ public:
    * @brief Constructor for param manager and logger
    */
   static std::unique_ptr<ModelHandler<TConfig>> from_config(
-    tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
+    tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
   {
     std::unique_ptr<ExternalGuess<TConfig>> pm =
       std::unique_ptr<ExternalGuess<TConfig>>(new ExternalGuess<TConfig>(pmg, logger));
     return pm;
   }
+
   /**
    * @brief Constructor for config and debug objects
    */
   static std::unique_ptr<ModelHandler<TConfig>> from_config(
-    const types::ModelConfig & config, const types::ModelDebug & debug)
+    const types::ModelConfig& config, const types::ModelDebug& debug)
   {
     std::unique_ptr<ExternalGuess<TConfig>> pm =
       std::unique_ptr<ExternalGuess<TConfig>>(new ExternalGuess<TConfig>(config, debug));
     return pm;
   }
+
   /**
    * @brief Set pose from external source (EKF)
    */
-  void set_pose(const types::PoseStamped & pose, const bool valid) override
+  void set_pose(const types::PoseStamped& pose, const bool valid) override
   {
     this->previous_guess_ = this->current_guess_;
     // Valid pose, just set it
@@ -60,8 +62,7 @@ public:
       std::cerr << "[ModelHandler]: Invalid pose received, using CV prediction!" << std::endl;
       if (this->current_guess_.has_value()) {
         // Compute new pose predicting the difference between to the last pose forward
-        Sophus::SE3f predicted_pose =
-          utils::cv_prediction(pose.pose, this->current_guess_.value().pose);
+        Sophus::SE3f predicted_pose = utils::cv_prediction(pose.pose, this->current_guess_.value().pose);
         // Update current pose
         this->current_guess_.value().pose = predicted_pose;
         this->current_guess_.value().stamp = pose.stamp;
@@ -71,14 +72,14 @@ public:
       }
     }
   };
+
   /**
    * @brief Return current initial guess
    */
   types::PoseStamped get_initial_guess([[maybe_unused]] std::uint64_t stamp) override
   {
     if (!this->current_guess_.has_value()) {
-      std::cerr << "[ModelHandler]: Prediction model not initialized! - Return empty pose!"
-                << std::endl;
+      std::cerr << "[ModelHandler]: Prediction model not initialized! - Return empty pose!" << std::endl;
       return types::PoseStamped{};
     }
     this->debug_.current_pos_x = this->current_guess_.value().pose.translation().x();
@@ -93,14 +94,14 @@ public:
 
 protected:
   // Inherit constructor from ModelHandler for param manager and logger
-  ExternalGuess(tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
-  : ModelHandler<TConfig>(pmg, logger)
+  ExternalGuess(tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
+      : ModelHandler<TConfig>(pmg, logger)
   {
     // Additional initialization
   }
+
   // Inherit constructor from ModelHandler for config and debug object
-  ExternalGuess(const types::ModelConfig & config, const types::ModelDebug & debug)
-  : ModelHandler<TConfig>(config, debug)
+  ExternalGuess(const types::ModelConfig& config, const types::ModelDebug& debug) : ModelHandler<TConfig>(config, debug)
   {
     // Additional initialization
   }

@@ -49,8 +49,8 @@
 #include "odometry_base/odometry_base.hpp"
 #include "odometry_types/point_types.hpp"
 #include "odometry_utils/utils.hpp"
-namespace tam::core::state
-{
+
+namespace tam::core::state {
 /**
  * @brief Base class for map handling
  */
@@ -92,13 +92,12 @@ public:
  * @param [in] (stream)                    Reference to the CUDA stream to use
  */
 #ifdef __CUDACC__
-  virtual __host__ void search_closest_neighbor(
-    thrust::device_vector<types::Point<TConfig>> & points,
-    thrust::device_vector<types::Correspondence<TConfig>> & correspondences,
-    const int16_t adjacent_voxels = 1, ::cuda::stream_ref stream = {}) const = 0;
+  virtual __host__ void search_closest_neighbor(thrust::device_vector<types::Point<TConfig>>& points,
+    thrust::device_vector<types::Correspondence<TConfig>>& correspondences, const int16_t adjacent_voxels = 1,
+    ::cuda::stream_ref stream = {}) const = 0;
 #else
   virtual types::Correspondence<TConfig> search_closest_neighbor(
-    const types::Point<TConfig> & point, const int16_t adjacent_voxels = 1) const = 0;
+    const types::Point<TConfig>& point, const int16_t adjacent_voxels = 1) const = 0;
 #endif
 /**
  * @brief Add points to the map
@@ -111,23 +110,18 @@ public:
  * @param [in] (stream)           Reference to the CUDA stream to use
  */
 #ifdef __CUDACC__
-  virtual __host__ void add_points(
-    const std::vector<types::Point<tam::core::state::types::Point_XYZ>> & points,
-    const std::variant<int16_t, types::AdaptiveMapDensity> & map_density =
-      TConfig::MAX_POINTS_PER_VOXEL,
+  virtual __host__ void add_points(const std::vector<types::Point<tam::core::state::types::Point_XYZ>>& points,
+    const std::variant<int16_t, types::AdaptiveMapDensity>& map_density = TConfig::MAX_POINTS_PER_VOXEL,
     const int16_t adjacent_voxels = 1, const int16_t num_neighbors = TConfig::NUM_NEIGHBORS,
     const bool use_active_map = true, ::cuda::stream_ref stream = {}) = 0;
   virtual __host__ void add_points_device(
-    const thrust::device_vector<types::Point<tam::core::state::types::Point_XYZ>> & points,
-    const std::variant<int16_t, types::AdaptiveMapDensity> & map_density =
-      TConfig::MAX_POINTS_PER_VOXEL,
+    const thrust::device_vector<types::Point<tam::core::state::types::Point_XYZ>>& points,
+    const std::variant<int16_t, types::AdaptiveMapDensity>& map_density = TConfig::MAX_POINTS_PER_VOXEL,
     const int16_t adjacent_voxels = 1, const int16_t num_neighbors = TConfig::NUM_NEIGHBORS,
     const bool use_active_map = true, ::cuda::stream_ref stream = {}) = 0;
 #else
-  virtual void add_points(
-    const std::vector<types::Point<tam::core::state::types::Point_XYZ>> & points,
-    const std::variant<int16_t, types::AdaptiveMapDensity> & map_density =
-      TConfig::MAX_POINTS_PER_VOXEL,
+  virtual void add_points(const std::vector<types::Point<tam::core::state::types::Point_XYZ>>& points,
+    const std::variant<int16_t, types::AdaptiveMapDensity>& map_density = TConfig::MAX_POINTS_PER_VOXEL,
     const int16_t adjacent_voxels = 1, const int16_t num_neighbors = TConfig::NUM_NEIGHBORS,
     const bool use_active_map = true) = 0;
 #endif
@@ -142,17 +136,14 @@ public:
  * @param [in] (stream)           Reference to the CUDA stream to use
  */
 #ifdef __CUDACC__
-  virtual __host__ void update_points(
-    const thrust::device_vector<types::Point<TConfig>> & points, const Sophus::SE3f & pose,
-    const std::variant<int16_t, types::AdaptiveMapDensity> & map_density =
-      TConfig::MAX_POINTS_PER_VOXEL,
+  virtual __host__ void update_points(const thrust::device_vector<types::Point<TConfig>>& points,
+    const Sophus::SE3f& pose,
+    const std::variant<int16_t, types::AdaptiveMapDensity>& map_density = TConfig::MAX_POINTS_PER_VOXEL,
     const int16_t adjacent_voxels = 1, const int16_t num_neighbors = TConfig::NUM_NEIGHBORS,
     ::cuda::stream_ref stream = {}) = 0;
 #else
-  virtual void update_points(
-    const std::vector<types::Point<TConfig>> & points, const Sophus::SE3f & pose,
-    const std::variant<int16_t, types::AdaptiveMapDensity> & map_density =
-      TConfig::MAX_POINTS_PER_VOXEL,
+  virtual void update_points(const std::vector<types::Point<TConfig>>& points, const Sophus::SE3f& pose,
+    const std::variant<int16_t, types::AdaptiveMapDensity>& map_density = TConfig::MAX_POINTS_PER_VOXEL,
     const int16_t adjacent_voxels = 1, const int16_t num_neighbors = TConfig::NUM_NEIGHBORS) = 0;
 #endif
 
@@ -162,8 +153,7 @@ public:
    * @return                          Adaptive Map density
    */
 #ifdef __CUDACC__
-  virtual __host__ types::AdaptiveMapDensity get_density(
-    double range, ::cuda::stream_ref stream = {}) = 0;
+  virtual __host__ types::AdaptiveMapDensity get_density(double range, ::cuda::stream_ref stream = {}) = 0;
 #else
   virtual types::AdaptiveMapDensity get_density(double range) = 0;
 #endif
@@ -172,8 +162,7 @@ public:
    * @return                        Point cloud of the map
    */
 #ifdef __CUDACC__
-  virtual __host__ thrust::device_vector<types::Point<TConfig>> get_cloud(
-    ::cuda::stream_ref stream = {}) const = 0;
+  virtual __host__ thrust::device_vector<types::Point<TConfig>> get_cloud(::cuda::stream_ref stream = {}) const = 0;
 #else
   virtual std::vector<types::Point<TConfig>> get_cloud() const = 0;
 #endif
@@ -191,17 +180,20 @@ public:
    * @brief Switch the active map
    */
   virtual void switch_active_map() = 0;
+
   /**
    * @brief Mutex that serializes async-update writes to the inactive map
    *        against any in-place use of the inactive slot (e.g. swap_map on
    *        the CUDA backend).
    */
-  std::mutex & get_mutex() { return this->mutex_; }
+  std::mutex& get_mutex() { return this->mutex_; }
+
   /**
    * @brief Function to request switch between active maps.
    *        Requires filling the inactive map slot beforehand.
    */
   void request_map_switch() { this->switch_pending_.store(true); }
+
   /**
    * @brief Switch active map under mutex (e.g. if updated asynchronously).
    */
@@ -213,15 +205,16 @@ public:
     this->switch_active_map();
     switch_pending_.store(false);
   }
+
   /**
    * @brief Get the map resolution
    * @return                        Map resolution
    */
   double get_resolution() const
   {
-    return std::sqrt(
-      this->config_.voxel_size * this->config_.voxel_size / TConfig::MAX_POINTS_PER_VOXEL);
+    return std::sqrt(this->config_.voxel_size * this->config_.voxel_size / TConfig::MAX_POINTS_PER_VOXEL);
   }
+
   /**
    * @brief Initialize threading
    * -> needs to be done after param override
@@ -230,8 +223,8 @@ public:
   {
     // This global variable requires static duration storage to be able to manipulate the max
     // concurrency from TBB across the entire class
-    static const auto tbb_control_settings = tbb::global_control(
-      tbb::global_control::max_allowed_parallelism, static_cast<size_t>(num_threads));
+    static const auto tbb_control_settings =
+      tbb::global_control(tbb::global_control::max_allowed_parallelism, static_cast<size_t>(num_threads));
     // Set cov regularization type
     if (this->config_.cov_regularization == "SVD")
       this->cov_regularization_type_ = types::CovRegularizationType::SVD;
@@ -240,8 +233,7 @@ public:
     else if (this->config_.cov_regularization == "MIN_EIGENVALUE")
       this->cov_regularization_type_ = types::CovRegularizationType::MIN_EIGENVALUE;
     else
-      std::runtime_error(
-        "Invalid covariance regularization type: " + this->config_.cov_regularization);
+      std::runtime_error("Invalid covariance regularization type: " + this->config_.cov_regularization);
 #ifdef __CUDACC__
     // Allocate memory for CUDA vectors
     this->allocate_memory(update_map, 50000);
@@ -250,24 +242,26 @@ public:
 
 protected:
   // Inherit constructor from OdometryBase for param manager and logger
-  MapHandler(tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
-  : OdometryBase<TConfig, types::MapConfig, types::MapDebug>(pmg, logger)
+  MapHandler(tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
+      : OdometryBase<TConfig, types::MapConfig, types::MapDebug>(pmg, logger)
   {
     this->set_config(pmg);
     this->set_logging(logger);
     // Additional initialization
   }
+
   // Inherit constructor from OdometryBase for config and debug object
-  MapHandler(const types::MapConfig & config, const types::MapDebug & debug)
-  : OdometryBase<TConfig, types::MapConfig, types::MapDebug>(config, debug)
+  MapHandler(const types::MapConfig& config, const types::MapDebug& debug)
+      : OdometryBase<TConfig, types::MapConfig, types::MapDebug>(config, debug)
   {
     // Additional initialization
   }
+
   /**
    * @brief Set the configuration of the map from the param manager
    * @param [in] pmg                Param manager
    */
-  void set_config(tam::pmg::ParamReferenceManager * pmg) override
+  void set_config(tam::pmg::ParamReferenceManager* pmg) override
   {
     // clang-format off
     pmg->declare_parameter("map.frame_map", &this->config_.frame_map, false, tam::pmg::ParameterType::BOOL, "Keep only the last added frame instead of building a local map");  // NOLINT
@@ -276,11 +270,12 @@ protected:
     pmg->declare_parameter("map.cov_regularization", &this->config_.cov_regularization, "SVD", tam::pmg::ParameterType::STRING, "Covariance regularization: SVD, FROBENIUS or MIN_EIGENVALUE");  // NOLINT
     // clang-format on
   }
+
   /**
    * @brief Register the debug variables with the logger
    * @param [in] logger             Logger
    */
-  void set_logging(tam::tsl::ReferenceLogger * logger) const override
+  void set_logging(tam::tsl::ReferenceLogger* logger) const override
   {
     logger->log("map/num_voxel", &this->debug_.num_voxel);
     logger->log("map/num_points", &this->debug_.num_points);
@@ -293,13 +288,13 @@ protected:
     logger->log("map/load_factor", &this->debug_.load_factor);
     logger->log("map/conditional", &this->debug_.conditional);
   }
+
   /**
    * @brief Allocate memory for map instance
    * @param [in] update_map          Flag to indicate if the map is being updated
    * @param [in] size                Size to allocate
    */
-  virtual void allocate_memory(
-    [[maybe_unused]] const bool update_map, [[maybe_unused]] const size_t size) = 0;
+  virtual void allocate_memory([[maybe_unused]] const bool update_map, [[maybe_unused]] const size_t size) = 0;
 
 protected:
 /**
@@ -316,14 +311,12 @@ protected:
  * @param [in] (stream)                 Reference to the CUDA stream to use
  */
 #ifdef __CUDACC__
-  virtual __host__ void search_closest_neighbors(
-    thrust::device_vector<types::Neighbors<TConfig>> & neighbors, const int16_t adjacent_voxels,
-    const int16_t num_neighbors, const bool use_active_map = true,
+  virtual __host__ void search_closest_neighbors(thrust::device_vector<types::Neighbors<TConfig>>& neighbors,
+    const int16_t adjacent_voxels, const int16_t num_neighbors, const bool use_active_map = true,
     ::cuda::stream_ref stream = {}) = 0;
 #else
-  virtual void search_closest_neighbors(
-    types::Neighbors<TConfig> & point, const int16_t adjacent_voxels, const int16_t num_neighbors,
-    const bool use_active_map = true) const = 0;
+  virtual void search_closest_neighbors(types::Neighbors<TConfig>& point, const int16_t adjacent_voxels,
+    const int16_t num_neighbors, const bool use_active_map = true) const = 0;
 #endif
 /**
  * @brief Compute normals and covariances for a point cloud
@@ -339,16 +332,14 @@ protected:
    * @param [in] num_multiprocessors Amount of multiprocessors of the GPU
    * @param [in] stream             Reference to the CUDA stream to use
    */
-  __host__ void set_normal_covariance(
-    thrust::device_vector<types::Neighbors<TConfig>> & neighbors, const int16_t num_neighbors,
-    const size_t num_multiprocessors, ::cuda::stream_ref stream = {})
+  __host__ void set_normal_covariance(thrust::device_vector<types::Neighbors<TConfig>>& neighbors,
+    const int16_t num_neighbors, const size_t num_multiprocessors, ::cuda::stream_ref stream = {})
     requires types::HASNORMALCOV<TConfig>
   {
     nvtxRangePush("set_normal_covariance");
-    auto grid_size = std::min(
-      4 * num_multiprocessors, (neighbors.size() + cuda::BLOCK_SIZE - 1) / cuda::BLOCK_SIZE);
+    auto grid_size = std::min(4 * num_multiprocessors, (neighbors.size() + cuda::BLOCK_SIZE - 1) / cuda::BLOCK_SIZE);
 
-    types::Neighbors<TConfig> * raw_neighbors = thrust::raw_pointer_cast(neighbors.data());
+    types::Neighbors<TConfig>* raw_neighbors = thrust::raw_pointer_cast(neighbors.data());
 
     cuda::utils::set_normal_covariance_kernel<<<grid_size, cuda::BLOCK_SIZE, 0, stream.get()>>>(
       raw_neighbors, neighbors.size(), this->cov_regularization_type_, num_neighbors);
@@ -357,7 +348,7 @@ protected:
     nvtxRangePop();
   }
 #else
-  void set_normal_covariance(types::Neighbors<TConfig> & neighbor, const int16_t num_neighbors)
+  void set_normal_covariance(types::Neighbors<TConfig>& neighbor, const int16_t num_neighbors)
     requires types::HASNORMALCOV<TConfig>
   {
     // Check if enough neighbors were found and set the normal to zero if not
@@ -396,8 +387,7 @@ protected:
       case types::CovRegularizationType::SVD: {
         // SVD regularization
         const Eigen::Vector3f values(1.0e-3, 1.0, 1.0);
-        neighbor.point->cov =
-          eigensolver.eigenvectors() * values.asDiagonal() * eigensolver.eigenvectors().transpose();
+        neighbor.point->cov = eigensolver.eigenvectors() * values.asDiagonal() * eigensolver.eigenvectors().transpose();
         break;
       }
       case types::CovRegularizationType::FROBENIUS: {
@@ -421,8 +411,7 @@ protected:
         regularized_values[2] = fmaxf(1.0e-3, eigen_values[2]);
 
         // Reconstruct regularized covariance directly
-        neighbor.point->cov =
-          eigen_vectors * regularized_values.asDiagonal() * eigen_vectors.transpose();
+        neighbor.point->cov = eigen_vectors * regularized_values.asDiagonal() * eigen_vectors.transpose();
         break;
       }
       default: {

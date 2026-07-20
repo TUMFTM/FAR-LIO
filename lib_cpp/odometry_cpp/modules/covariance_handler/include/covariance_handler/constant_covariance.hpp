@@ -21,8 +21,8 @@
 #include <vector>
 
 #include "covariance_handler/covariance_handler_base.hpp"
-namespace tam::core::state
-{
+
+namespace tam::core::state {
 template <typename TConfig>
 class ConstantCovariance : public CovarianceHandler<TConfig>
 {
@@ -31,25 +31,26 @@ public:
    * @brief Constructor for param manager and logger
    */
   static std::unique_ptr<CovarianceHandler<TConfig>> from_config(
-    tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
+    tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
   {
     std::unique_ptr<ConstantCovariance<TConfig>> ch =
       std::unique_ptr<ConstantCovariance<TConfig>>(new ConstantCovariance<TConfig>(pmg, logger));
     return ch;
   }
+
   /**
    * @brief Constructor for config and debug objects
    */
   static std::unique_ptr<CovarianceHandler<TConfig>> from_config(
-    const types::CovarianceConfig & config, const types::CovarianceDebug & debug)
+    const types::CovarianceConfig& config, const types::CovarianceDebug& debug)
   {
     std::unique_ptr<ConstantCovariance<TConfig>> ch =
       std::unique_ptr<ConstantCovariance<TConfig>>(new ConstantCovariance<TConfig>(config, debug));
     return ch;
   }
-  std::array<float, 36> get_pose_covariance(
-    [[maybe_unused]] const Sophus::SE3f & pose,
-    [[maybe_unused]] const std::vector<types::Correspondence<TConfig>> & correspondences,
+
+  std::array<float, 36> get_pose_covariance([[maybe_unused]] const Sophus::SE3f& pose,
+    [[maybe_unused]] const std::vector<types::Correspondence<TConfig>>& correspondences,
     [[maybe_unused]] const float kernel_scale) override
   {
     auto start = std::chrono::high_resolution_clock::now();
@@ -68,14 +69,15 @@ public:
 
 protected:
   // Inherit constructor from MapHandler for param manager and logger
-  ConstantCovariance(tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
-  : CovarianceHandler<TConfig>(pmg, logger)
+  ConstantCovariance(tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
+      : CovarianceHandler<TConfig>(pmg, logger)
   {
     // Additional initialization
   }
+
   // Inherit constructor from MapHandler for config and debug object
-  ConstantCovariance(const types::CovarianceConfig & config, const types::CovarianceDebug & debug)
-  : CovarianceHandler<TConfig>(config, debug)
+  ConstantCovariance(const types::CovarianceConfig& config, const types::CovarianceDebug& debug)
+      : CovarianceHandler<TConfig>(config, debug)
   {
     // Additional initialization
   }

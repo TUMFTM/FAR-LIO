@@ -17,17 +17,16 @@
 #include <eigen3/Eigen/Core>
 #include <map>
 #include <memory>
-namespace tam::core::state::types
-{
-struct Empty
-{
+
+namespace tam::core::state::types {
+struct Empty {
 };
+
 /**
  * @brief Point type for the map
  */
 template <typename TConfig>
-struct Point
-{
+struct Point {
   // Geometrical coordinates
   Eigen::Vector3f pos{Eigen::Vector3f::Zero()};
   // Original sensor-frame spherical coordinates
@@ -58,12 +57,12 @@ struct Point
   // Sensor id
   std::conditional_t<TConfig::SENSOR_ID, std::uint8_t, tam::core::state::types::Empty> sensor_id{};
 };
+
 /**
  * @brief Correspondence definition
  */
 template <typename TConfig>
-struct Correspondence
-{
+struct Correspondence {
   Correspondence() = default;
   types::Point<TConfig> frame{};
   types::Point<TConfig> map{};
@@ -72,15 +71,15 @@ struct Correspondence
   // Precision matrix
   std::conditional_t<TConfig::COV, Eigen::Matrix3f, tam::core::state::types::Empty> precision{};
 };
+
 /**
  * @brief Neighbors Definition for the map
  */
 template <typename TConfig>
-struct Neighbors
-{
+struct Neighbors {
   Neighbors() = default;
-  types::Point<TConfig> * point{};
-  types::Point<TConfig> * neighbor[TConfig::NUM_NEIGHBORS] = {};
+  types::Point<TConfig>* point{};
+  types::Point<TConfig>* neighbor[TConfig::NUM_NEIGHBORS] = {};
   float distance[TConfig::NUM_NEIGHBORS] = {};
   std::uint8_t num_neighbors{};
 };

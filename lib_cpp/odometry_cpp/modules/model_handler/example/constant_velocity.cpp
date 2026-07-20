@@ -22,6 +22,7 @@
 
 #include "param_management_cpp/param_reference_manager.hpp"
 #include "tsl_logger_cpp/reference_logger.hpp"
+
 int main()
 {
   // clang-format off
@@ -38,8 +39,8 @@ int main()
   pose.translation() = Eigen::Vector3f(1.0, 2.0, 0.0);
   model_->set_pose(tam::core::state::types::PoseStamped{pose, stamp}, true);  // NOLINT
   // clang-format on
-  std::cout << "Initial position: (" << model_->get_initial_guess(stamp).pose.translation().x()
-            << ", " << model_->get_initial_guess(stamp).pose.translation().y() << ", "
+  std::cout << "Initial position: (" << model_->get_initial_guess(stamp).pose.translation().x() << ", "
+            << model_->get_initial_guess(stamp).pose.translation().y() << ", "
             << model_->get_initial_guess(stamp).pose.translation().z() << ")" << std::endl;
   return 0;
 }

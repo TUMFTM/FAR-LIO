@@ -18,21 +18,20 @@
 #include "odometry_types/odometry_config.hpp"
 #include "odometry_types/odometry_types.hpp"
 #include "odometry_types/point_types.hpp"
-namespace tam::core::state::cuda
-{
-struct Square
-{
+
+namespace tam::core::state::cuda {
+struct Square {
   __host__ __device__ float operator()(float x) const { return x * x; }
 };
+
 /**
  * @brief Calculate the Kernel weight
  * @param [in] residual       Square norm of the residual between the correspondences
  * @param [in] kernel_scale   Scale of the kernel
  */
 template <typename TConfig>
-struct RobustKernelWeight
-{
-  __host__ __device__ float operator()(const Eigen::Vector3f & residual, float kernel_scale) const
+struct RobustKernelWeight {
+  __host__ __device__ float operator()(const Eigen::Vector3f& residual, float kernel_scale) const
   {
     // clang-format off
     if constexpr (TConfig::KERNEL == tam::core::state::types::RobustKernelType::HUBER) {

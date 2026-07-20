@@ -21,6 +21,7 @@
 #include "odometry_pipeline/odometry_pipeline.hpp"
 #include "param_management_cpp/param_reference_manager.hpp"
 #include "tsl_logger_cpp/reference_logger.hpp"
+
 /**
  * @brief Test construction of OdometryPipeline from param manager and logger
  */
@@ -36,24 +37,26 @@ TEST(OdometryPipeline, BuildPmgLogger)
   // clang-format on
 
   // Check correct parameterization based on single parameter
-  tam::pmg::MgmtInterface * pmg_raw = pmg_.get();
+  tam::pmg::MgmtInterface* pmg_raw = pmg_.get();
   pmg_raw->set_value("diagnostic.frame_outdated", 97.0);  // NOLINT
   EXPECT_EQ(odom_pipeline->get_diagnostic_config().frame_outdated, 97.0);
 }
+
 /**
  * @brief Test construction of OdometryPipeline from config and debug object
  */
-TEST(OdometryPipeline, BuildConfigDebug) {
-    // Construct from config and debug object
-    tam::core::state::types::PipelineConfig config;
-    tam::core::state::types::PipelineDebug debug;
-    // Check correct parameterization based on single parameter
+TEST(OdometryPipeline, BuildConfigDebug)
+{
+  // Construct from config and debug object
+  tam::core::state::types::PipelineConfig config;
+  tam::core::state::types::PipelineDebug debug;
+  // Check correct parameterization based on single parameter
 
-    std::unique_ptr<tam::core::state::OdometryPipeline<tam::core::state::types::ICP_EXT>> odom_pipeline =  // NOLINT
-        tam::core::state::OdometryPipeline<tam::core::state::types::ICP_EXT>::from_config(config, debug); // NOLINT
+  std::unique_ptr<tam::core::state::OdometryPipeline<tam::core::state::types::ICP_EXT>> odom_pipeline =  // NOLINT
+    tam::core::state::OdometryPipeline<tam::core::state::types::ICP_EXT>::from_config(config, debug);    // NOLINT
 
-    // Check correct parameterization based on single parameter
-    odom_pipeline->get_diagnostic_config().frame_outdated = 97.0;
+  // Check correct parameterization based on single parameter
+  odom_pipeline->get_diagnostic_config().frame_outdated = 97.0;
 
-    EXPECT_EQ(odom_pipeline->get_diagnostic_config().frame_outdated, 97.0);
+  EXPECT_EQ(odom_pipeline->get_diagnostic_config().frame_outdated, 97.0);
 }

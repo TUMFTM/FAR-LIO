@@ -22,11 +22,12 @@
 #include <thrust/remove.h>
 
 #include <Eigen/Dense>
+#include <algorithm>
 #include <vector>
 
 #include "odometry_cuda_utils/cuda_utils.cuh"
-namespace tam::core::state::cuda::utils
-{
+
+namespace tam::core::state::cuda::utils {
 /**
  * @brief Accumulate the linear system
  * @param [in] JTJ                           Jacobian transpose times Jacobian
@@ -34,8 +35,7 @@ namespace tam::core::state::cuda::utils
  * @param [out] ls_flattened                 Linear system as flattened array
  */
 __inline__ __device__ void accumulate_ls(
-  const Eigen::Matrix<float, 6, 6> & JTJ, const Eigen::Matrix<float, 6, 1> & JTr,
-  float * ls_flattened)
+  const Eigen::Matrix<float, 6, 6>& JTJ, const Eigen::Matrix<float, 6, 1>& JTr, float* ls_flattened)
 {
   int idx = 0;
 #pragma unroll
@@ -50,6 +50,7 @@ __inline__ __device__ void accumulate_ls(
     ls_flattened[idx++] += JTr(r);
   }
 }
+
 /**
  * @brief Kernel to reduce vector of correspondences
  * @param [in] correspondence                   Correspondences
@@ -62,8 +63,7 @@ __inline__ __device__ void accumulate_ls(
  */
 template <typename TConfig, typename FactorType, int BLOCK_PARTIAL_SIZE>
 __global__ void reduce_correspondences_kernel(
-  types::Correspondence<TConfig> * correspondence, int num_correspondences, float * d_final,
-  const FactorType factor)
+  types::Correspondence<TConfig>* correspondence, int num_correspondences, float* d_final, const FactorType factor)
 {
   // local partial
   float local_sum[BLOCK_PARTIAL_SIZE] = {0.0};
@@ -121,6 +121,7 @@ __global__ void reduce_correspondences_kernel(
     }
   }
 }
+
 /**
  * @brief Build the linear system for the optimization
  * @param [in] correspondences_device       Correspondences
@@ -131,17 +132,16 @@ __global__ void reduce_correspondences_kernel(
  */
 template <typename TConfig, typename FactorType>
 __host__ types::LinearSystem build_linear_system(
-  thrust::device_vector<types::Correspondence<TConfig>> & correspondences_device,
-  thrust::device_vector<float> & ls_flattened_d, const FactorType & factor,
-  ::cuda::stream_ref stream = {})
+  thrust::device_vector<types::Correspondence<TConfig>>& correspondences_device,
+  thrust::device_vector<float>& ls_flattened_d, const FactorType& factor, ::cuda::stream_ref stream = {})
 {
   nvtxRangePush("build_linear_system");
   int n = correspondences_device.size();
   static constexpr int LS_SIZE = 42;
   // Call kernel
-  reduce_correspondences_kernel<TConfig, FactorType, LS_SIZE><<<1, BLOCK_SIZE, 0, stream.get()>>>(
-    thrust::raw_pointer_cast(correspondences_device.data()), n,
-    thrust::raw_pointer_cast(ls_flattened_d.data()), factor);
+  reduce_correspondences_kernel<TConfig, FactorType, LS_SIZE>
+    <<<1, BLOCK_SIZE, 0, stream.get()>>>(thrust::raw_pointer_cast(correspondences_device.data()), n,
+      thrust::raw_pointer_cast(ls_flattened_d.data()), factor);
 
   // Make sure everything is done
   cudaStreamSynchronize(stream.get());
@@ -149,8 +149,7 @@ __host__ types::LinearSystem build_linear_system(
   // // Copy result back to host
   std::vector<float> ls_final(LS_SIZE);
   cudaMemcpy(
-    ls_final.data(), thrust::raw_pointer_cast(ls_flattened_d.data()), LS_SIZE * sizeof(float),
-    cudaMemcpyDeviceToHost);
+    ls_final.data(), thrust::raw_pointer_cast(ls_flattened_d.data()), LS_SIZE * sizeof(float), cudaMemcpyDeviceToHost);
 
   // Fill linear system
   types::LinearSystem linear_system{};
@@ -170,6 +169,7 @@ __host__ types::LinearSystem build_linear_system(
   nvtxRangePop();
   return linear_system;
 }
+
 /**
  * @brief Compute the error of a set of correspondences for a given transformation
  * @param [in] correspondences_device      Correspondences
@@ -179,15 +179,14 @@ __host__ types::LinearSystem build_linear_system(
  * @return error
  */
 template <typename TConfig, typename ErrorType>
-__host__ float compute_error(
-  thrust::device_vector<types::Correspondence<TConfig>> & correspondences_device,
-  float * error_d, const ErrorType & factor, ::cuda::stream_ref stream = {})
+__host__ float compute_error(thrust::device_vector<types::Correspondence<TConfig>>& correspondences_device,
+  float* error_d, const ErrorType& factor, ::cuda::stream_ref stream = {})
 {
   nvtxRangePush("compute_error");
   int n = correspondences_device.size();
   // Call kernel
-  reduce_correspondences_kernel<TConfig, ErrorType, 1><<<1, BLOCK_SIZE, 0, stream.get()>>>(
-    thrust::raw_pointer_cast(correspondences_device.data()), n, error_d, factor);
+  reduce_correspondences_kernel<TConfig, ErrorType, 1>
+    <<<1, BLOCK_SIZE, 0, stream.get()>>>(thrust::raw_pointer_cast(correspondences_device.data()), n, error_d, factor);
   // Make sure everything is done
   cudaStreamSynchronize(stream.get());
   // Copy result back to host
@@ -196,6 +195,7 @@ __host__ float compute_error(
   nvtxRangePop();
   return error_h;
 }
+
 /**
  * @brief Get correspondences between map and frame for given pose
  * @param [in] points                     Frame with points
@@ -207,10 +207,9 @@ __host__ float compute_error(
  */
 template <typename TConfig>
 __host__ std::vector<types::Correspondence<TConfig>> get_correspondences(
-  const thrust::device_vector<types::Point<TConfig>> & points,
-  thrust::device_vector<types::Correspondence<TConfig>> & correspondences_device,
-  const MapHandler<TConfig> * map, const Sophus::SE3f & pose, const float correspondence_threshold,
-  ::cuda::stream_ref stream = {})
+  const thrust::device_vector<types::Point<TConfig>>& points,
+  thrust::device_vector<types::Correspondence<TConfig>>& correspondences_device, const MapHandler<TConfig>* map,
+  const Sophus::SE3f& pose, const float correspondence_threshold, ::cuda::stream_ref stream = {})
 {
   // Transform points
   // TODO(Maxi/Marcel): Currently creating a copy here on the device, this could be avoided
@@ -219,18 +218,15 @@ __host__ std::vector<types::Correspondence<TConfig>> get_correspondences(
   map->search_closest_neighbor(source, correspondences_device, 1, stream);
 
   // Check for correspondence threshold (otherwise done during build of linear system)
-  auto end = thrust::remove_if(
-    thrust::cuda::par.on(stream.get()), correspondences_device.begin(),
-    correspondences_device.end(),
-    [correspondence_threshold] __device__(const types::Correspondence<TConfig> & c) {
+  auto end = thrust::remove_if(thrust::cuda::par.on(stream.get()), correspondences_device.begin(),
+    correspondences_device.end(), [correspondence_threshold] __device__(const types::Correspondence<TConfig>& c) {
       return c.distance > correspondence_threshold;
     });
   correspondences_device.resize(end - correspondences_device.begin());
 
   // Copy correspondences to host
   std::vector<types::Correspondence<TConfig>> correspondences(correspondences_device.size());
-  thrust::copy(
-    correspondences_device.begin(), correspondences_device.end(), correspondences.begin());
+  thrust::copy(correspondences_device.begin(), correspondences_device.end(), correspondences.begin());
   return correspondences;
 }
 }  // namespace tam::core::state::cuda::utils

@@ -26,15 +26,15 @@
 
 // ROS2
 #include <tf2_ros/transform_broadcaster.h>
+
 //
-namespace tam::core::state
-{
+namespace tam::core::state {
 template <typename TConfig>
 class OdometryNode : public NodeBase<TConfig, types::OdometryNodeConfig, types::OdometryNodeDebug>
 {
 public:
-  explicit OdometryNode(const rclcpp::NodeOptions & options)
-  : NodeBase<TConfig, types::OdometryNodeConfig, types::OdometryNodeDebug>(options)
+  explicit OdometryNode(const rclcpp::NodeOptions& options)
+      : NodeBase<TConfig, types::OdometryNodeConfig, types::OdometryNodeDebug>(options)
   {
     // Call common initialization here to be able to call set_config/set_logging,
     // which are pure virtual in the base class
@@ -51,8 +51,9 @@ public:
 
     // Finish
     this->monitor_->initialization_finished();
-    std::cout << "tam_odometry node initialized!" << std::endl;
+    RCLCPP_INFO(this->get_logger(), "[%s]: Node initialized!", this->get_name());  // NOLINT
   }
+
   ~OdometryNode() override = default;
 
 private:
@@ -63,10 +64,8 @@ private:
     // Check initial guess status
     if (this->init_status_ == types::InitStatus::WAITING_FOR_EKF && this->config_.wait_tf) {
       std::string tf_error{};
-      if (
-        this->tf_buffer_->canTransform(
-          this->config_.odom_frame, this->config_.child_frame, tf2::TimePointZero,
-          tf2::durationFromSec(0.0), &tf_error)) {
+      if (this->tf_buffer_->canTransform(this->config_.odom_frame, this->config_.child_frame, tf2::TimePointZero,
+            tf2::durationFromSec(0.0), &tf_error)) {
         const types::PoseStamped pose = utils::transform2pose(this->tf_buffer_->lookupTransform(
           this->config_.odom_frame, this->config_.child_frame, tf2::TimePointZero));  // NOLINT
         this->pipeline_->set_pose_model(pose, true);
@@ -84,6 +83,7 @@ private:
       this->monitor_->update();
     }
   }
+
   /**
    * @brief callback incoming lidar frame
    *
@@ -129,8 +129,7 @@ private:
     // Set deskewing poses to the pipeline by sampling tf around the frame stamp
     this->set_undistortion_poses(utils::stamp2ns(msg_ptr->header.stamp));
     // Register frame
-    types::Odometry odom = this->pipeline_->register_frame(
-      frame, utils::stamp2ns(msg_ptr->header.stamp));
+    types::Odometry odom = this->pipeline_->register_frame(frame, utils::stamp2ns(msg_ptr->header.stamp));
 
     // Compute elapsed time
     // clang-format off
@@ -144,8 +143,7 @@ private:
     }
     // Publish diagnostics
     utils::set_monitor(odom, this->monitor_.get());
-    const nav_msgs::msg::Odometry odom_msg =
-      utils::odom2msg(odom, this->config_.odom_frame, this->config_.child_frame);
+    const nav_msgs::msg::Odometry odom_msg = utils::odom2msg(odom, this->config_.odom_frame, this->config_.child_frame);
     // Publish status and odometry with same stamp
     this->monitor_->update(odom_msg.header);
     this->odom_publisher_->publish(odom_msg);
@@ -165,13 +163,11 @@ private:
       // Publish frame
       std_msgs::msg::Header cloud_header = msg_ptr->header;
       cloud_header.frame_id = this->config_.child_frame;
-      this->frame_publisher_->publish(
-        utils::eigen2cloud<TConfig>(this->pipeline_->get_frame(), cloud_header));
+      this->frame_publisher_->publish(utils::eigen2cloud<TConfig>(this->pipeline_->get_frame(), cloud_header));
       // Publish map
       if (this->pipeline_->get_config().update_map) {
         cloud_header.frame_id = this->config_.odom_frame;
-        this->map_publisher_->publish(
-          utils::eigen2cloud<TConfig>(this->pipeline_->get_map(), cloud_header));
+        this->map_publisher_->publish(utils::eigen2cloud<TConfig>(this->pipeline_->get_map(), cloud_header));
       }
     }
   }
@@ -180,7 +176,7 @@ private:
   /**
    * @brief Declare configuration parameters for the node
    */
-  void set_config(tam::pmg::ParamReferenceManager * pmg) override
+  void set_config(tam::pmg::ParamReferenceManager* pmg) override
   {
     // Call common config
     this->set_config_common(pmg);
@@ -188,10 +184,11 @@ private:
     pmg->declare_parameter("node.wait_tf", &this->config_.wait_tf, true, tam::pmg::ParameterType::BOOL, "Wait for the initial pose from tf (EKF) before starting");  // NOLINT
     // clang-format on
   }
+
   /**
    * @brief Declare logging parameters for the node
    */
-  void set_logging(tam::tsl::ReferenceLogger * logger) const override
+  void set_logging(tam::tsl::ReferenceLogger* logger) const override
   {
     // Call common logging
     this->set_logging_common(logger);

@@ -20,6 +20,7 @@
 
 #include "odometry_types/odometry_types.hpp"
 #include "odometry_types/point_types.hpp"
+
 int main()
 {
   // Define residual and kernel scale

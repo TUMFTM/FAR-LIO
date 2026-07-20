@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-#include "odometry_pipeline/odometry_pipeline.hpp"
-
 #include <iostream>
 #include <sophus/se3.hpp>
 
+#include "odometry_pipeline/odometry_pipeline.hpp"
 #include "param_management_cpp/param_reference_manager.hpp"
 #include "tsl_logger_cpp/reference_logger.hpp"
+
 int main()
 {
   // clang-format off
@@ -36,7 +36,7 @@ int main()
 #endif
   // clang-format on
 
-  tam::pmg::MgmtInterface * pmg_raw = pmg_.get();
+  tam::pmg::MgmtInterface* pmg_raw = pmg_.get();
   // Diagnostic parameters
   pmg_raw->set_value("diagnostic.frame_outdated", 100.0);      // NOLINT
   pmg_raw->set_value("diagnostic.check_forward", true);        // NOLINT
@@ -48,8 +48,8 @@ int main()
   pmg_raw->set_value("diagnostic.max_time_diff", 0.05);        // NOLINT
 
   // Map parameters
-  pmg_raw->set_value("map.voxel_size", 1.0);          // NOLINT
-  pmg_raw->set_value("map.max_distance", 50.0);       // NOLINT
+  pmg_raw->set_value("map.voxel_size", 1.0);     // NOLINT
+  pmg_raw->set_value("map.max_distance", 50.0);  // NOLINT
 
   // Model parameters
   pmg_raw->set_value("model.initial_pos_x", 1.0);  // NOLINT
@@ -61,10 +61,10 @@ int main()
   pmg_raw->set_value("model.initial_rot_w", 4.0);  // NOLINT
 
   // Registration parameters
-  pmg_raw->set_value("registration.max_iter", std::int64_t{500});                // NOLINT
-  pmg_raw->set_value("registration.max_time", 150.0);              // NOLINT
-  pmg_raw->set_value("registration.convergence_criterion", 1e-6);  // NOLINT
-  pmg_raw->set_value("registration.num_threads", std::int64_t{1});               // NOLINT
+  pmg_raw->set_value("registration.max_iter", std::int64_t{500});   // NOLINT
+  pmg_raw->set_value("registration.max_time", 150.0);               // NOLINT
+  pmg_raw->set_value("registration.convergence_criterion", 1e-6);   // NOLINT
+  pmg_raw->set_value("registration.num_threads", std::int64_t{1});  // NOLINT
 
   // Threshold parameters
   pmg_raw->set_value("threshold.initial_threshold", 6.0);          // NOLINT
@@ -72,7 +72,6 @@ int main()
   pmg_raw->set_value("threshold.max_correspondence_range", 20.0);  // NOLINT
 
   std::cout << "Odometry pipeline created" << std::endl;
-  std::cout << "Max registration time: " << odom_pipeline->get_registration_config().max_time
-            << std::endl;
+  std::cout << "Max registration time: " << odom_pipeline->get_registration_config().max_time << std::endl;
   return 0;
 }

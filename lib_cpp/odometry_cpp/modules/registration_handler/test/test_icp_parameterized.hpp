@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "test_utils.hpp"
+
 /**
  * @brief Parameterized test class for ICP registration
  */
@@ -28,14 +29,16 @@ class ICPParameterizedTest : public ::testing::TestWithParam<TestParams>
 {
 protected:
   void SetUp() override {}
+
   void TearDown() override {}
 };
+
 /**
  * @brief Test registration of a frame to the map
  */
 TEST_P(ICPParameterizedTest, ICPRegisterFrameParameterized)
 {
-  const auto & params = GetParam();
+  const auto& params = GetParam();
   // Initialize ICP
   // clang-format off
   // Construct from param manager and logger
@@ -51,7 +54,7 @@ TEST_P(ICPParameterizedTest, ICPRegisterFrameParameterized)
   auto registration_ =  tam::core::state::ICP<tam::core::state::types::ICP_EXT>::from_config(pmg_.get(), logger_.get()); // NOLINT
   #endif
   // clang-format on
-  tam::pmg::MgmtInterface * pmg_raw = pmg_.get();
+  tam::pmg::MgmtInterface* pmg_raw = pmg_.get();
   pmg_raw->set_value("map.frame_map", false);
   pmg_raw->set_value("map.voxel_size", 1.0);
   pmg_raw->set_value("map.max_distance", 100.0);
@@ -69,15 +72,15 @@ TEST_P(ICPParameterizedTest, ICPRegisterFrameParameterized)
   map_->add_points(frame);
   // clang-format on
 
-  Sophus::SE3f trans = Sophus::SE3f(
-    Sophus::SE3f::QuaternionType(0.50, 0.004, 0.02, 0.86), Sophus::SE3f::Point(3.0, 2.0, 5.0));
+  Sophus::SE3f trans =
+    Sophus::SE3f(Sophus::SE3f::QuaternionType(0.50, 0.004, 0.02, 0.86), Sophus::SE3f::Point(3.0, 2.0, 5.0));
 
   // Transform points
 #ifdef __CUDACC__
-  std::vector<tam::core::state::types::Point<tam::core::state::types::CUDA_ICP_EXT>>
-    transformed_frame_h = generate_points<tam::core::state::types::CUDA_ICP_EXT>(trans);
-  thrust::device_vector<tam::core::state::types::Point<tam::core::state::types::CUDA_ICP_EXT>>
-    transformed_frame(transformed_frame_h.begin(), transformed_frame_h.end());
+  std::vector<tam::core::state::types::Point<tam::core::state::types::CUDA_ICP_EXT>> transformed_frame_h =
+    generate_points<tam::core::state::types::CUDA_ICP_EXT>(trans);
+  thrust::device_vector<tam::core::state::types::Point<tam::core::state::types::CUDA_ICP_EXT>> transformed_frame(
+    transformed_frame_h.begin(), transformed_frame_h.end());
 #else
   std::vector<tam::core::state::types::Point<tam::core::state::types::ICP_EXT>> transformed_frame =
     generate_points<tam::core::state::types::ICP_EXT>(trans);
@@ -87,7 +90,7 @@ TEST_P(ICPParameterizedTest, ICPRegisterFrameParameterized)
   Sophus::SE3f init_guess = trans.inverse();
   std::default_random_engine generator;
   std::normal_distribution<float> quaternion_distribution_init(0.05, 0.001);  // Mean 0, Stddev 0.01
-  std::normal_distribution<float> translation_distribution_init(1.0, 0.1);  // Mean 0.1, Stddev 0.1
+  std::normal_distribution<float> translation_distribution_init(1.0, 0.1);    // Mean 0.1, Stddev 0.1
   Sophus::SE3f init_guess_noise = init_guess;
   init_guess_noise.translation().x() += translation_distribution_init(generator);
   init_guess_noise.translation().y() += translation_distribution_init(generator);
@@ -102,8 +105,8 @@ TEST_P(ICPParameterizedTest, ICPRegisterFrameParameterized)
   init_guess_noise.setQuaternion(init_guess_quaternion);
 
   const float sigma = 6.0;
-  const Sophus::SE3f T_icp = registration_->register_frame(
-    transformed_frame, map_.get(), init_guess_noise, 3.0 * sigma, sigma / 3.0);
+  const Sophus::SE3f T_icp =
+    registration_->register_frame(transformed_frame, map_.get(), init_guess_noise, 3.0 * sigma, sigma / 3.0);
 
   std::cout << "Testing with solver_type: " << params.solver_type << std::endl;
   std::cout << "Iterations: " << registration_->get_debug().num_iter << std::endl;

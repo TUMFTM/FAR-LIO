@@ -22,6 +22,7 @@
 #include "odometry_types/odometry_config.hpp"
 #include "odometry_types/point_types.hpp"
 #include "preprocessing_handler/lidar_preprocessing.hpp"
+
 /**
  * @brief Test construction of LidarPreprocessing from param manager and logger
  */
@@ -33,11 +34,12 @@ TEST(LidarPreprocessing, BuildPmgLogger)
   tam::tsl::ReferenceLogger::UniquePtr logger_ = std::make_unique<tam::tsl::ReferenceLogger>(); // NOLINT
   auto lidar_preprocessing_ = tam::core::state::LidarPreprocessing<tam::core::state::types::ICP_EXT>::from_config(pmg_.get(), logger_.get()); // NOLINT
   // clang-format on
-  tam::pmg::MgmtInterface * pmg_raw = pmg_.get();
+  tam::pmg::MgmtInterface* pmg_raw = pmg_.get();
   pmg_raw->set_value("preprocessing.crop_range", std::vector<double>{5.0, 50.0});
   EXPECT_EQ(lidar_preprocessing_->get_config().crop_range.front(), 5.0)
     << "Failed to construct LidarPreprocessing from param manager and logger";
 }
+
 /**
  * @brief Test construction of LidarPreprocessing from config and debug object
  */

@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "test_utils.hpp"
+
 /**
  * @brief Parameterized test class for GICP registration
  */
@@ -28,14 +29,16 @@ class GICPParameterizedTest : public ::testing::TestWithParam<TestParams>
 {
 protected:
   void SetUp() override {}
+
   void TearDown() override {}
 };
+
 /**
  * @brief Test registration of a frame to the map with various parameter combinations
  */
 TEST_P(GICPParameterizedTest, GICPRegisterFrameParameterized)
 {
-  const auto & params = GetParam();
+  const auto& params = GetParam();
 
   // Initialize ICP
   // clang-format off
@@ -52,7 +55,7 @@ TEST_P(GICPParameterizedTest, GICPRegisterFrameParameterized)
   #endif
   // clang-format on
 
-  tam::pmg::MgmtInterface * pmg_raw = pmg_.get();
+  tam::pmg::MgmtInterface* pmg_raw = pmg_.get();
   pmg_raw->set_value("map.frame_map", false);
   pmg_raw->set_value("map.voxel_size", 1.0);
   pmg_raw->set_value("map.max_distance", 100.0);
@@ -71,18 +74,18 @@ TEST_P(GICPParameterizedTest, GICPRegisterFrameParameterized)
   // Add points to the map
   map_->add_points(frame);
 
-  Sophus::SE3f trans = Sophus::SE3f(
-    Sophus::SE3f::QuaternionType(0.50, 0.004, 0.02, 0.86), Sophus::SE3f::Point(3.0, 2.0, 5.0));
+  Sophus::SE3f trans =
+    Sophus::SE3f(Sophus::SE3f::QuaternionType(0.50, 0.004, 0.02, 0.86), Sophus::SE3f::Point(3.0, 2.0, 5.0));
 
   // Transform points
 #ifdef __CUDACC__
-  std::vector<tam::core::state::types::Point<tam::core::state::types::CUDA_GICP_EXT>>
-    transformed_frame_h = generate_points<tam::core::state::types::CUDA_GICP_EXT>(trans);
-  thrust::device_vector<tam::core::state::types::Point<tam::core::state::types::CUDA_GICP_EXT>>
-    transformed_frame(transformed_frame_h.begin(), transformed_frame_h.end());
+  std::vector<tam::core::state::types::Point<tam::core::state::types::CUDA_GICP_EXT>> transformed_frame_h =
+    generate_points<tam::core::state::types::CUDA_GICP_EXT>(trans);
+  thrust::device_vector<tam::core::state::types::Point<tam::core::state::types::CUDA_GICP_EXT>> transformed_frame(
+    transformed_frame_h.begin(), transformed_frame_h.end());
 #else
-  std::vector<tam::core::state::types::Point<tam::core::state::types::GICP_EXT>>
-    transformed_frame = generate_points<tam::core::state::types::GICP_EXT>(trans);
+  std::vector<tam::core::state::types::Point<tam::core::state::types::GICP_EXT>> transformed_frame =
+    generate_points<tam::core::state::types::GICP_EXT>(trans);
 #endif
 
   // Generate initial guess
@@ -105,8 +108,8 @@ TEST_P(GICPParameterizedTest, GICPRegisterFrameParameterized)
   init_guess_noise.setQuaternion(init_guess_quaternion);
 
   const float sigma = 6.0;
-  const Sophus::SE3f T_icp = registration_->register_frame(
-    transformed_frame, map_.get(), init_guess_noise, 3.0 * sigma, sigma / 3.0);
+  const Sophus::SE3f T_icp =
+    registration_->register_frame(transformed_frame, map_.get(), init_guess_noise, 3.0 * sigma, sigma / 3.0);
 
   std::cout << "Testing with cov_regularization: " << params.cov_regularization
             << ", solver_type: " << params.solver_type << std::endl;

@@ -20,8 +20,8 @@
 #include <vector>
 
 #include "odometry_types/odometry_types.hpp"
-namespace tam::core::state::types
-{
+
+namespace tam::core::state::types {
 enum class CovarianceType : std::uint8_t {
   CONSTANT = 0,
   CENSI = 1,
@@ -30,21 +30,21 @@ enum class CovarianceType : std::uint8_t {
   SEGWEIGHTEDP2P = 4,
   SEGWEIGHTEDP2PL = 5
 };
+
 /**
  * @brief Configuration for the covariance handler
  */
-struct CovarianceConfig
-{
+struct CovarianceConfig {
   std::vector<double> min_cov_translation{0.01, 0.01, 0.01};
   std::vector<double> min_cov_orientation{0.001, 0.001, 0.001};
   std::vector<double> min_cov_linear_twist{0.1, 0.1, 0.1};
   std::vector<double> min_cov_angular_twist{0.01, 0.01, 0.01};
 };
+
 /**
  * @brief Debug signals for the covariance handler
  */
-struct CovarianceDebug
-{
+struct CovarianceDebug {
   double pose_covariance_time{0.0};
   double twist_covariance_time{0.0};
 };

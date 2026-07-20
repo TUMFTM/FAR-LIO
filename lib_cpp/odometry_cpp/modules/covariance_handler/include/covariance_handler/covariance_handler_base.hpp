@@ -23,23 +23,21 @@
 
 #include "odometry_base/odometry_base.hpp"
 #include "robust_kernel/robust_kernel.hpp"
-namespace tam::core::state
-{
+
+namespace tam::core::state {
 template <typename TConfig>
-class CovarianceHandler
-: public OdometryBase<TConfig, types::CovarianceConfig, types::CovarianceDebug>
+class CovarianceHandler : public OdometryBase<TConfig, types::CovarianceConfig, types::CovarianceDebug>
 {
 public:
-  virtual std::array<float, 36> get_pose_covariance(
-    [[maybe_unused]] const Sophus::SE3f & pose,
-    [[maybe_unused]] const std::vector<types::Correspondence<TConfig>> & correspondences,
+  virtual std::array<float, 36> get_pose_covariance([[maybe_unused]] const Sophus::SE3f& pose,
+    [[maybe_unused]] const std::vector<types::Correspondence<TConfig>>& correspondences,
     [[maybe_unused]] const float kernel_scale) = 0;
+
   std::array<float, 36> get_tangent_covariance() const
   {
     // Return config values for minimum covariance as twist covariance
     Eigen::Matrix<float, 6, 6> cov_matrix = Eigen::Matrix<float, 6, 6>::Zero();
-    std::array<float, 6> min_cov = {
-      static_cast<float>(this->config_.min_cov_linear_twist[0]),
+    std::array<float, 6> min_cov = {static_cast<float>(this->config_.min_cov_linear_twist[0]),
       static_cast<float>(this->config_.min_cov_linear_twist[1]),
       static_cast<float>(this->config_.min_cov_linear_twist[2]),
       static_cast<float>(this->config_.min_cov_angular_twist[0]),
@@ -50,24 +48,26 @@ public:
 
 protected:
   // Inherit constructor from OdometryBase for param manager and logger
-  CovarianceHandler(tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
-  : OdometryBase<TConfig, types::CovarianceConfig, types::CovarianceDebug>(pmg, logger)
+  CovarianceHandler(tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
+      : OdometryBase<TConfig, types::CovarianceConfig, types::CovarianceDebug>(pmg, logger)
   {
     this->set_config(pmg);
     this->set_logging(logger);
     // Additional initialization
   }
+
   // Inherit constructor from OdometryBase for config and debug object
-  CovarianceHandler(const types::CovarianceConfig & config, const types::CovarianceDebug & debug)
-  : OdometryBase<TConfig, types::CovarianceConfig, types::CovarianceDebug>(config, debug)
+  CovarianceHandler(const types::CovarianceConfig& config, const types::CovarianceDebug& debug)
+      : OdometryBase<TConfig, types::CovarianceConfig, types::CovarianceDebug>(config, debug)
   {
     // Additional initialization
   }
+
   /**
    * @brief Set the configuration of the covariance handler from the param manager
    * @param [in] pmg                Param manager
    */
-  void set_config(tam::pmg::ParamReferenceManager * pmg) override
+  void set_config(tam::pmg::ParamReferenceManager* pmg) override
   {
     // clang-format off
     pmg->declare_parameter("covariance.min_cov_translation", &this->config_.min_cov_translation, std::vector<double>{0.01, 0.01, 0.01}, tam::pmg::ParameterType::DOUBLE_ARRAY, "Min translation covariance diagonal [x, y, z] (m^2)");  // NOLINT
@@ -76,11 +76,12 @@ protected:
     pmg->declare_parameter("covariance.min_cov_angular_twist", &this->config_.min_cov_angular_twist, std::vector<double>{0.01, 0.01, 0.01}, tam::pmg::ParameterType::DOUBLE_ARRAY, "Min angular twist covariance diagonal [x, y, z] ((rad/s)^2)");  // NOLINT
     // clang-format on
   }
+
   /**
    * @brief Register the debug variables with the logger
    * @param [in] logger             Logger
    */
-  void set_logging(tam::tsl::ReferenceLogger * logger) const override
+  void set_logging(tam::tsl::ReferenceLogger* logger) const override
   {
     logger->log("covariance/pose_covariance_time", &this->debug_.pose_covariance_time);
     logger->log("covariance/twist_covariance_time", &this->debug_.twist_covariance_time);
@@ -93,8 +94,7 @@ protected:
    * @param [in] min_cov            Minimum values for the covariance diagonal
    * @return                        Array of floats
    */
-  std::array<float, 36> matrix2array(
-    Eigen::Matrix<float, 6, 6> & cov_matrix, const std::array<float, 6> & min_cov) const
+  std::array<float, 36> matrix2array(Eigen::Matrix<float, 6, 6>& cov_matrix, const std::array<float, 6>& min_cov) const
   {
     // Initialize array
     std::array<float, 36> cov_array = {};
@@ -110,13 +110,14 @@ protected:
     }
     return cov_array;
   }
+
   /**
    * @brief Calculate Cramér-Rao lower bound
    * @param [in] correspondences    Correspondences
    * @param [in] pose               Pose
    */
   Eigen::Matrix<float, 6, 6> cramer_rao_bound(
-    const std::vector<types::Correspondence<TConfig>> & correspondences, const Sophus::SE3f & pose)
+    const std::vector<types::Correspondence<TConfig>>& correspondences, const Sophus::SE3f& pose)
     requires types::HASNORMALCOV<TConfig> && types::HASSEG<TConfig>
   {
     // Initialize variables

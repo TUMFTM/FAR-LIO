@@ -26,9 +26,9 @@
 #include <vector>
 
 // Pipeline
-#include "odometry_pipeline/odometry_pipeline.hpp"
-#include "tam_odometry/node.hpp"
 #include "tam_odometry/utils.hpp"
+#include "tam_odometry/node.hpp"
+#include "odometry_pipeline/odometry_pipeline.hpp"
 
 // ROS2
 #include <tf2/LinearMath/Matrix3x3.h>
@@ -55,18 +55,18 @@
 #include "tum_ros_helpers_cpp/qos.hpp"
 #include "tum_ros_helpers_cpp/timer.hpp"
 #include "tum_ros_helpers_cpp/transform.hpp"
-namespace tam::core::state
-{
+
+namespace tam::core::state {
 template <typename TConfig, typename TNodeConfig, typename TNodeDebug>
 class NodeBase : public rclcpp::Node, public OdometryBase<TConfig, TNodeConfig, TNodeDebug>
 {
 public:
-  explicit NodeBase(const rclcpp::NodeOptions & options)
-  : rclcpp::Node("NodeBase", options),
-    OdometryBase<TConfig, TNodeConfig, TNodeDebug>(TNodeConfig{}, TNodeDebug{})
+  explicit NodeBase(const rclcpp::NodeOptions& options)
+      : rclcpp::Node("NodeBase", options), OdometryBase<TConfig, TNodeConfig, TNodeDebug>(TNodeConfig{}, TNodeDebug{})
   {
     // Call common initialization in derived constructor!
   }
+
   ~NodeBase()
   {
     // Free the preallocated memory of the OdometryPipeline
@@ -78,6 +78,7 @@ protected:
    * @brief Regular timer callback
    */
   virtual void timer_callback() = 0;
+
   /**
    * @brief Initialization sequence for the map
    */
@@ -110,6 +111,7 @@ protected:
     this->monitor_->set_error_lvl("map", tam::types::ErrorLvl::WARN);
     this->monitor_->update();
   }
+
   /**
    * @brief callback incoming lidar frame
    *
@@ -118,8 +120,7 @@ protected:
    * @param[in] diag_msg_ptr       - diagnostic_msgs::msg::DiagnosticArray::ConstSharedPtr
    *                                 containing diagnostic status of the pointcloud source
    */
-  void cloud_callback_synced(
-    const sensor_msgs::msg::PointCloud2::ConstSharedPtr msg_ptr,
+  void cloud_callback_synced(const sensor_msgs::msg::PointCloud2::ConstSharedPtr msg_ptr,
     const diagnostic_msgs::msg::DiagnosticArray::ConstSharedPtr diag_msg_ptr)
   {
     // Set status
@@ -128,6 +129,7 @@ protected:
     // Call regular cloud callback
     this->cloud_callback(msg_ptr);
   }
+
   /**
    * @brief callback incoming lidar frame
    *
@@ -135,6 +137,7 @@ protected:
    *                                 containing lidar frame as sensor_msgs
    */
   virtual void cloud_callback(const sensor_msgs::msg::PointCloud2::ConstSharedPtr msg_ptr) = 0;
+
   /**
    * @brief send diagnostics in case of timeout of incoming ros2 topic
    *
@@ -146,9 +149,7 @@ protected:
   void timeout_callback_pointcloud(bool trigger, std::chrono::milliseconds timeout)
   {
     if (trigger && this->init_status_ == types::InitStatus::READY) {
-      RCLCPP_ERROR(
-        this->get_logger(), "[%s]: No pointcloud received for %ldms!", this->get_name(),
-        timeout.count());
+      RCLCPP_ERROR(this->get_logger(), "[%s]: No pointcloud received for %ldms!", this->get_name(), timeout.count());
       this->monitor_->set_message("Pointcloud Timeout");
       this->monitor_->set_error_lvl("pointcloud_timeout", tam::types::ErrorLvl::ERROR);
       // Publish the monitor status as this is the timeout callback corresponding to
@@ -159,6 +160,7 @@ protected:
       this->monitor_->set_error_lvl("pointcloud_timeout", tam::types::ErrorLvl::OK);
     }
   }
+
   /**
    * @brief Callback to update the map asynchronously
    * @param [in] msg            - std_msgs::msg::Header::SharedPtr
@@ -192,6 +194,7 @@ protected:
       // clang-format on
     }
   }
+
   /**
    * @brief Map callback for the service response
    * @param [in] future           -
@@ -200,13 +203,11 @@ protected:
    * update
    */
   void map_callback(
-    const rclcpp::Client<tum_map_msgs::srv::GetPointCloudMap>::SharedFuture future,
-    const bool initial_map)
+    const rclcpp::Client<tum_map_msgs::srv::GetPointCloudMap>::SharedFuture future, const bool initial_map)
   {
     auto response = future.get();
-    const std::string service_name = initial_map
-                                       ? this->map_client_.get()->get_service_name()
-                                       : this->update_map_client_.get()->get_service_name();
+    const std::string service_name =
+      initial_map ? this->map_client_.get()->get_service_name() : this->update_map_client_.get()->get_service_name();
     if (!response->success) {
       // clang-format off
       RCLCPP_ERROR(this->get_logger(), "[%s]: Map service %s returned failure - skipping", this->get_name(), service_name.c_str());  // NOLINT
@@ -216,12 +217,10 @@ protected:
     }
 
     // Helper lambda to load the map and print the time taken for loading
-    auto load = [&](
-                  const tum_map_msgs::srv::GetPointCloudMap::Response::SharedPtr response,
-                  const std::string & service_name) {
+    auto load = [&](const tum_map_msgs::srv::GetPointCloudMap::Response::SharedPtr response,
+                  const std::string& service_name) {
       const auto start = std::chrono::high_resolution_clock::now();
-      const sensor_msgs::msg::PointCloud2 cloud =
-        tam::ros::read_pointcloud_file(response->map.pointcloud);
+      const sensor_msgs::msg::PointCloud2 cloud = tam::ros::read_pointcloud_file(response->map.pointcloud);
       tam::ros::remove_pointcloud_file(response->map.pointcloud);
       // clang-format off
       const auto time_ms = std::chrono::duration<double, std::milli>(std::chrono::high_resolution_clock::now() - start).count();  // NOLINT
@@ -239,8 +238,7 @@ protected:
         std_msgs::msg::Header header;
         header.stamp = this->get_clock()->now();
         header.frame_id = this->config_.odom_frame;
-        this->map_publisher_->publish(
-          utils::eigen2cloud<TConfig>(this->pipeline_->get_map(), header));
+        this->map_publisher_->publish(utils::eigen2cloud<TConfig>(this->pipeline_->get_map(), header));
       }
       // Set the status and cancel the init-map retry timer
       this->init_status_ = types::InitStatus::WAITING_FOR_EKF;
@@ -253,8 +251,7 @@ protected:
         auto points = load(response, service_name);
         {
           std::lock_guard<std::mutex> lock(this->pipeline_->get_map_mutex());
-          this->pipeline_->add_points(
-            points, TConfig::MAX_POINTS_PER_VOXEL, 1, TConfig::NUM_NEIGHBORS, false);
+          this->pipeline_->add_points(points, TConfig::MAX_POINTS_PER_VOXEL, 1, TConfig::NUM_NEIGHBORS, false);
           this->pipeline_->request_map_switch();
         }
         // clang-format off
@@ -278,7 +275,7 @@ protected:
    *
    * @param[in] stamp           Timestamp of the incoming frame
    */
-  void set_undistortion_poses(const std::uint64_t & stamp)
+  void set_undistortion_poses(const std::uint64_t& stamp)
   {
     if (!this->pipeline_->get_config().undistort) {
       return;
@@ -357,16 +354,15 @@ protected:
 
     // Load static map either from a local .pcd file or from the map loader service
     if (!this->pipeline_->get_config().update_map) {
-      const std::string & input_map = this->config_.input_map;
+      const std::string& input_map = this->config_.input_map;
       if (input_map.ends_with(".pcd")) {
-        this->pipeline_->add_points(
-          utils::load_static_map<tam::core::state::types::Point_XYZ>(input_map));
+        this->pipeline_->add_points(utils::load_static_map<tam::core::state::types::Point_XYZ>(input_map));
         this->init_status_ = types::InitStatus::WAITING_FOR_EKF;
       } else {
         // Create client to request the map from service (within a separate timer)
         this->map_client_ = this->create_client<tum_map_msgs::srv::GetPointCloudMap>(input_map);
-        this->init_map_timer_ = tam::create_timer(
-          this, std::chrono::milliseconds(5000), std::bind(&NodeBase::init_map, this));
+        this->init_map_timer_ =
+          tam::create_timer(this, std::chrono::milliseconds(5000), std::bind(&NodeBase::init_map, this));
       }
     } else {
       // If we don't need a map at initialization, we can directly wait for the EKF handshake
@@ -379,77 +375,64 @@ protected:
       // Both subscriptions need to have the same QoS settings
       auto sub_pc = topic_watchdog_->add_synced_subscription<sensor_msgs::msg::PointCloud2>(
         this->config_.input_pointcloud, qos_lidar);
-      auto sub_pc_diag =
-        topic_watchdog_->add_synced_subscription<diagnostic_msgs::msg::DiagnosticArray>(
-          this->config_.input_pointcloud_status, qos_lidar);
-      topic_watchdog_->register_synced_callback(
-        sub_pc, sub_pc_diag,
-        std::bind(
-          &NodeBase::cloud_callback_synced, this, std::placeholders::_1, std::placeholders::_2),
-        std::bind(
-          &NodeBase::timeout_callback_pointcloud, this, std::placeholders::_1,
-          std::placeholders::_2),
+      auto sub_pc_diag = topic_watchdog_->add_synced_subscription<diagnostic_msgs::msg::DiagnosticArray>(
+        this->config_.input_pointcloud_status, qos_lidar);
+      topic_watchdog_->register_synced_callback(sub_pc, sub_pc_diag,
+        std::bind(&NodeBase::cloud_callback_synced, this, std::placeholders::_1, std::placeholders::_2),
+        std::bind(&NodeBase::timeout_callback_pointcloud, this, std::placeholders::_1, std::placeholders::_2),
         std::chrono::milliseconds(static_cast<int64_t>(500.0)));
     } else {
       // just subscribe to the pointcloud topic without diagnostics using the downstream
       // callback
-      topic_watchdog_->add_subscription<sensor_msgs::msg::PointCloud2>(
-        this->config_.input_pointcloud, qos_lidar,
+      topic_watchdog_->add_subscription<sensor_msgs::msg::PointCloud2>(this->config_.input_pointcloud, qos_lidar,
         std::bind(&NodeBase::cloud_callback, this, std::placeholders::_1),
-        std::bind(
-          &NodeBase::timeout_callback_pointcloud, this, std::placeholders::_1,
-          std::placeholders::_2),
+        std::bind(&NodeBase::timeout_callback_pointcloud, this, std::placeholders::_1, std::placeholders::_2),
         std::chrono::milliseconds(static_cast<int64_t>(500.0)));
     }
 
     // Map Update service and subscriber for update trigger
     if (!this->config_.update_map_srv.empty()) {
-      this->update_map_client_ =
-        this->create_client<tum_map_msgs::srv::GetPointCloudMap>(this->config_.update_map_srv);
+      this->update_map_client_ = this->create_client<tum_map_msgs::srv::GetPointCloudMap>(this->config_.update_map_srv);
       const std::string update_ready_topic = this->config_.update_map_srv + "_ready";
       this->update_ready_sub_ = this->create_subscription<std_msgs::msg::Header>(
-        update_ready_topic, qos_odom,
-        std::bind(&NodeBase::update_ready_callback, this, std::placeholders::_1));
+        update_ready_topic, qos_odom, std::bind(&NodeBase::update_ready_callback, this, std::placeholders::_1));
     }
 
     // Initialize publishers
-    this->odom_publisher_ =
-      this->create_publisher<nav_msgs::msg::Odometry>(this->config_.output_odom, qos_odom);
+    this->odom_publisher_ = this->create_publisher<nav_msgs::msg::Odometry>(this->config_.output_odom, qos_odom);
 
     // Debug mode publishers
     if (this->pipeline_->get_config().debug_mode) {
-      this->frame_publisher_ = this->create_publisher<sensor_msgs::msg::PointCloud2>(
-        "/core/state/frame_registration", qos_lidar);
+      this->frame_publisher_ =
+        this->create_publisher<sensor_msgs::msg::PointCloud2>("/core/state/frame_registration", qos_lidar);
       if (!this->pipeline_->get_config().update_map) {
         // If static map is used, only publish once now transient local
-        this->map_publisher_ = this->create_publisher<sensor_msgs::msg::PointCloud2>(
-          "/core/state/map", tam::ros::get_qos(tam::ros::EVENT));
+        this->map_publisher_ =
+          this->create_publisher<sensor_msgs::msg::PointCloud2>("/core/state/map", tam::ros::get_qos(tam::ros::EVENT));
         if (!this->map_client_) {
           // Map already available from file, publish it now
           std_msgs::msg::Header header;
           header.stamp = this->get_clock()->now();
           header.frame_id = this->config_.odom_frame;
-          this->map_publisher_->publish(
-            utils::eigen2cloud<TConfig>(this->pipeline_->get_map(), header));
+          this->map_publisher_->publish(utils::eigen2cloud<TConfig>(this->pipeline_->get_map(), header));
         }
       } else {
         // If map is updated, publish with QoS
-        this->map_publisher_ =
-          this->create_publisher<sensor_msgs::msg::PointCloud2>("/core/state/map", qos_lidar);
+        this->map_publisher_ = this->create_publisher<sensor_msgs::msg::PointCloud2>("/core/state/map", qos_lidar);
       }
     }
     // Set static transform for pointcloud
     this->pc_transform_ = tam::ros::transform2eigen(
-      tam::ros::wait_static_transform(
-        this, tf_buffer_.get(), this->config_.child_frame, this->config_.cloud_frame));
+      tam::ros::wait_static_transform(this, tf_buffer_.get(), this->config_.child_frame, this->config_.cloud_frame));
 
     // Initialize timer
     this->timer_ = tam::create_timer(this, 100ms, std::bind(&NodeBase::timer_callback, this));
   }
+
   /**
    * @brief Declare common configuration parameters for the node
    */
-  void set_config_common(tam::pmg::ParamReferenceManager * pmg)
+  void set_config_common(tam::pmg::ParamReferenceManager* pmg)
   {
     // clang-format off
     pmg->declare_parameter("node.odom_frame", &this->config_.odom_frame, "", tam::pmg::ParameterType::STRING, "Frame id of the output odometry");  // NOLINT
@@ -460,12 +443,13 @@ protected:
     pmg->declare_parameter("node.output_odom", &this->config_.output_odom, "/core/state/lidar_odometry", tam::pmg::ParameterType::STRING, "Topic for the odometry output");  // NOLINT
     pmg->declare_parameter("node.input_map", &this->config_.input_map, "/core/map/get_pointcloud_map", tam::pmg::ParameterType::STRING, "Path to a .pcd file to load or name of the GetPointCloudMap service");  // NOLINT
     pmg->declare_parameter("node.update_map_srv", &this->config_.update_map_srv, "", tam::pmg::ParameterType::STRING, "Name of the GetPointCloudMap service for asynchronous map updates. The trigger topic is derived by appending '_ready'. Leave empty to disable.");  // NOLINT
-                                                                  // clang-format on
+                                             // clang-format on
   }
+
   /**
    * @brief Declare common logging parameters for the node
    */
-  void set_logging_common(tam::tsl::ReferenceLogger * logger) const
+  void set_logging_common(tam::tsl::ReferenceLogger* logger) const
   {
     logger->log("node/map_update", &this->debug_.map_update);
     logger->log("node/cloud_callback_time", &this->debug_.callback_time);

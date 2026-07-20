@@ -22,8 +22,8 @@
 #include <vector>
 
 #include "distortion_handler/distortion_handler_base.hpp"
-namespace tam::core::state
-{
+
+namespace tam::core::state {
 template <typename TConfig>
 class PolynomUndistortion : public DistortionHandler<TConfig>
 {
@@ -32,28 +32,28 @@ public:
    * @brief Constructor for param manager and logger
    */
   static std::unique_ptr<DistortionHandler<TConfig>> from_config(
-    tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
+    tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
   {
     std::unique_ptr<PolynomUndistortion<TConfig>> dh =
       std::unique_ptr<PolynomUndistortion<TConfig>>(new PolynomUndistortion<TConfig>(pmg, logger));
     return dh;
   }
+
   /**
    * @brief Constructor for config and debug objects
    */
   static std::unique_ptr<DistortionHandler<TConfig>> from_config(
-    const types::DistortionConfig & config, const types::DistortionDebug & debug)
+    const types::DistortionConfig& config, const types::DistortionDebug& debug)
   {
     std::unique_ptr<PolynomUndistortion<TConfig>> ct =
-      std::unique_ptr<PolynomUndistortion<TConfig>>(
-        new PolynomUndistortion<TConfig>(config, debug));
+      std::unique_ptr<PolynomUndistortion<TConfig>>(new PolynomUndistortion<TConfig>(config, debug));
     return ct;
   }
+
   /**
    * @brief Undistort a frame of points
    */
-  void undistort(
-    std::vector<types::Point<TConfig>> & frame, const std::uint64_t frame_stamp) override
+  void undistort(std::vector<types::Point<TConfig>>& frame, const std::uint64_t frame_stamp) override
   {
     // Return early if no pose history is available or the velocity is below the threshold
     // clang-format off
@@ -87,10 +87,9 @@ public:
     const float max_timestamp = static_cast<float>((static_cast<double>(this->pose_history_.back().stamp) - static_cast<double>(frame_stamp)) * 1.0e-9);  // NOLINT
     const int degree = types::POLYNOM_DEGREE;
     // clang-format on
-    tbb::parallel_for(
-      tbb::blocked_range<points_iterator>(frame.begin(), frame.end()),
-      [&](const tbb::blocked_range<points_iterator> & r) {
-        std::for_each(r.begin(), r.end(), [&](auto & point) {
+    tbb::parallel_for(tbb::blocked_range<points_iterator>(frame.begin(), frame.end()),
+      [&](const tbb::blocked_range<points_iterator>& r) {
+        std::for_each(r.begin(), r.end(), [&](auto& point) {
           // Extract and clamp timestamp to avoid extrapolation.
           float timestamp = std::clamp(point.timestamp, min_timestamp, max_timestamp);
 
@@ -130,13 +129,14 @@ public:
 
 protected:
   // Inherit constructor from ModelHandler for param manager and logger
-  PolynomUndistortion(tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
-  : DistortionHandler<TConfig>(pmg, logger)
+  PolynomUndistortion(tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
+      : DistortionHandler<TConfig>(pmg, logger)
   {
   }
+
   // Inherit constructor from ModelHandler for config and debug object
-  PolynomUndistortion(const types::DistortionConfig & config, const types::DistortionDebug & debug)
-  : DistortionHandler<TConfig>(config, debug)
+  PolynomUndistortion(const types::DistortionConfig& config, const types::DistortionDebug& debug)
+      : DistortionHandler<TConfig>(config, debug)
   {
   }
 };

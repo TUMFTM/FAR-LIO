@@ -22,4 +22,4 @@ namespace tam::core::state {
 // Explicit template instantiation
 template class OdometryPipeline<tam::core::state::types::CUDA_ICP_EXT>;
 template class OdometryPipeline<tam::core::state::types::CUDA_GICP_EXT>;
-}
+}  // namespace tam::core::state

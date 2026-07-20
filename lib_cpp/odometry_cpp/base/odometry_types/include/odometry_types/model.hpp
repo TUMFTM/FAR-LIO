@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 #pragma once
-#include <vector>
 #include <string>
+#include <vector>
 
-namespace tam::core::state::types
-{
+namespace tam::core::state::types {
 enum class ModelType : std::uint8_t { EXTERNALGUESS = 0, CONSTANTVELOCITY = 1 };
+
 /**
  * @brief Configuration for the model handler
  */
-struct ModelConfig
-{
+struct ModelConfig {
   double initial_pos_x{0.0};
   double initial_pos_y{0.0};
   double initial_pos_z{0.0};
@@ -33,11 +32,11 @@ struct ModelConfig
   double initial_rot_z{0.0};
   double initial_rot_w{0.0};
 };
+
 /**
  * @brief Debug signals for the model handler
  */
-struct ModelDebug
-{
+struct ModelDebug {
   double current_pos_x{0.0};
   double current_pos_y{0.0};
   double current_pos_z{0.0};

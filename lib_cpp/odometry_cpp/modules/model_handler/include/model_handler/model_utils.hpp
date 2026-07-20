@@ -17,8 +17,7 @@
 
 #include <sophus/se3.hpp>
 
-namespace tam::core::state::utils
-{
+namespace tam::core::state::utils {
 /**
  * @brief Predict pose based on constant velocity assumption (CV)
  * @note It's actually constant distance
@@ -26,7 +25,7 @@ namespace tam::core::state::utils
  * @param previous Previous pose
  * @return Predicted pose
  */
-inline Sophus::SE3f cv_prediction(const Sophus::SE3f & current, const Sophus::SE3f & previous)
+inline Sophus::SE3f cv_prediction(const Sophus::SE3f& current, const Sophus::SE3f& previous)
 {
   return current * previous.inverse() * current;
 }

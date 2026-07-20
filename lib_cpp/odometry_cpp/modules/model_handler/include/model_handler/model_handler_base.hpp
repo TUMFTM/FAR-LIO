@@ -27,8 +27,8 @@
 #include "model_handler/model_utils.hpp"
 #include "odometry_base/odometry_base.hpp"
 #include "odometry_types/odometry_types.hpp"
-namespace tam::core::state
-{
+
+namespace tam::core::state {
 template <typename TConfig>
 class ModelHandler : public OdometryBase<TConfig, types::ModelConfig, types::ModelDebug>
 {
@@ -38,49 +38,49 @@ public:
    * @param [in] pose               Pose to set
    * @param [in] valid              Whether the given pose is valid
    */
-  virtual void set_pose(const types::PoseStamped & pose, const bool valid) = 0;
+  virtual void set_pose(const types::PoseStamped& pose, const bool valid) = 0;
   /**
    * @brief Get the initial guess
    * @param [in] stamp              Timestamp to get the initial guess for
    * @return Initial guess
    */
   virtual types::PoseStamped get_initial_guess([[maybe_unused]] std::uint64_t stamp) = 0;
+
   /**
    * @brief Initialize current guess pose from config
    */
   void init_model_config()
   {
     this->current_guess_ = types::PoseStamped{};
-    this->current_guess_.value().pose = Sophus::SE3f(
-      Sophus::SE3f::QuaternionType(
-        this->config_.initial_rot_w, this->config_.initial_rot_x, this->config_.initial_rot_y,
-        this->config_.initial_rot_z),
-      Sophus::SE3f::Point(
-        this->config_.initial_pos_x, this->config_.initial_pos_y, this->config_.initial_pos_z));
-    this->current_guess_.value().stamp =
-      std::chrono::system_clock::now().time_since_epoch().count();
+    this->current_guess_.value().pose =
+      Sophus::SE3f(Sophus::SE3f::QuaternionType(this->config_.initial_rot_w, this->config_.initial_rot_x,
+                     this->config_.initial_rot_y, this->config_.initial_rot_z),
+        Sophus::SE3f::Point(this->config_.initial_pos_x, this->config_.initial_pos_y, this->config_.initial_pos_z));
+    this->current_guess_.value().stamp = std::chrono::system_clock::now().time_since_epoch().count();
   }
 
 protected:
   // Inherit constructor from OdometryBase for param manager and logger
-  ModelHandler(tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
-  : OdometryBase<TConfig, types::ModelConfig, types::ModelDebug>(pmg, logger)
+  ModelHandler(tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
+      : OdometryBase<TConfig, types::ModelConfig, types::ModelDebug>(pmg, logger)
   {
     this->set_config(pmg);
     this->set_logging(logger);
     // Additional initialization
   }
+
   // Inherit constructor from OdometryBase for config and debug object
-  ModelHandler(const types::ModelConfig & config, const types::ModelDebug & debug)
-  : OdometryBase<TConfig, types::ModelConfig, types::ModelDebug>(config, debug)
+  ModelHandler(const types::ModelConfig& config, const types::ModelDebug& debug)
+      : OdometryBase<TConfig, types::ModelConfig, types::ModelDebug>(config, debug)
   {
     // Additional initialization
   }
+
   /**
    * @brief Set the configuration of the model handler from the param manager
    * @param [in] pmg                Param manager
    */
-  void set_config(tam::pmg::ParamReferenceManager * pmg) override
+  void set_config(tam::pmg::ParamReferenceManager* pmg) override
   {
     // clang-format off
     pmg->declare_parameter("model.initial_pos_x", &this->config_.initial_pos_x, 0.0, tam::pmg::ParameterType::DOUBLE, "Initial pose: x position (m)"); // NOLINT
@@ -92,11 +92,12 @@ protected:
     pmg->declare_parameter("model.initial_rot_w", &this->config_.initial_rot_w, 1.0, tam::pmg::ParameterType::DOUBLE, "Initial pose: quaternion w"); // NOLINT
     // clang-format on
   }
+
   /**
    * @brief Register the debug variables with the logger
    * @param [in] logger             Logger
    */
-  void set_logging(tam::tsl::ReferenceLogger * logger) const override
+  void set_logging(tam::tsl::ReferenceLogger* logger) const override
   {
     logger->log("model/current_pos_x", &this->debug_.current_pos_x);
     logger->log("model/current_pos_y", &this->debug_.current_pos_y);

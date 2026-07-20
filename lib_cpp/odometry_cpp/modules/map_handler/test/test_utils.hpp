@@ -32,7 +32,7 @@
  */
 template <typename TConfig>
 std::unique_ptr<tam::core::state::MapHandler<TConfig>> init_map(
-  const size_t num_points = 10, const std::string & cov_reg = "SVD")
+  const size_t num_points = 10, const std::string& cov_reg = "SVD")
 {
   // Construct from config and debug objects
   tam::core::state::types::MapConfig config;
@@ -50,8 +50,8 @@ std::unique_ptr<tam::core::state::MapHandler<TConfig>> init_map(
   std::vector<tam::core::state::types::Point<tam::core::state::types::Point_XYZ>> frame{};
   if (num_points <= 10) {
     // Define a frame of points manually (for deterministic testing of neighbor search)
-    tam::core::state::types::Point<tam::core::state::types::Point_XYZ> point_1, point_2, point_3,
-      point_4, point_5, point_6, point_7, point_8, point_9, point_10;
+    tam::core::state::types::Point<tam::core::state::types::Point_XYZ> point_1, point_2, point_3, point_4, point_5,
+      point_6, point_7, point_8, point_9, point_10;
     point_1.pos = Eigen::Vector3f(5.1, 2.1, 3.1);
     point_2.pos = Eigen::Vector3f(5.8, 2.5, 3.9);
     point_3.pos = Eigen::Vector3f(5.9, 2.9, 3.9);

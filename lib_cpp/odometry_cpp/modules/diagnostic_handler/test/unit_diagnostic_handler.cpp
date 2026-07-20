@@ -22,6 +22,7 @@
 #include "diagnostic_handler/diagnostic_handler_base.hpp"
 #include "param_management_cpp/param_reference_manager.hpp"
 #include "tsl_logger_cpp/reference_logger.hpp"
+
 /**
  * @brief Test construction of DiagnosticHandler from param manager and logger
  */
@@ -34,12 +35,13 @@ TEST(DiagnosticHandler, BuildPmgLogger)
   std::unique_ptr<tam::core::state::DiagnosticHandler<tam::core::state::types::ICP_EXT>> diagnostic_handler_ =  // NOLINT
     tam::core::state::DiagnosticHandler<tam::core::state::types::ICP_EXT>::from_config(pmg_.get(), logger_.get()); // NOLINT
   // clang-format on
-  tam::pmg::MgmtInterface * pmg_raw = pmg_.get();
+  tam::pmg::MgmtInterface* pmg_raw = pmg_.get();
   pmg_raw->set_value("diagnostic.ellipsis_size_s", 6.0);
 
   EXPECT_EQ(diagnostic_handler_->get_config().ellipsis_size_s, 6.0)
     << "Failed to construct DiagnosticHandler from param manager and logger";
 }
+
 /**
  * @brief Test construction of DiagnosticHandler from config and debug object
  */
@@ -56,6 +58,7 @@ TEST(DiagnosticHandler, BuildConfigDebug)
   EXPECT_EQ(diagnostic_handler_->get_config().ellipsis_size_s, 6.0)
     << "Failed to construct DiagnosticHandler from config and debug object";
 }
+
 /**
  * @brief Test DiagnosticHandler check of the input pointcloud status
  */
@@ -76,10 +79,10 @@ TEST(DiagnosticHandler, InputStatus)
   // clang-format on
 
   // Create pose and initial guess
-  const Sophus::SE3f pose = Sophus::SE3f(
-    Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(2.2, 2.0, 3.0));
-  const Sophus::SE3f init_guess = Sophus::SE3f(
-    Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(2.0, 2.0, 3.0));
+  const Sophus::SE3f pose =
+    Sophus::SE3f(Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(2.2, 2.0, 3.0));
+  const Sophus::SE3f init_guess =
+    Sophus::SE3f(Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(2.0, 2.0, 3.0));
   // Create timestamps
   const std::uint64_t pose_stamp = 19483583754837;
   const std::uint64_t init_guess_stamp = 19483583754837;
@@ -93,13 +96,11 @@ TEST(DiagnosticHandler, InputStatus)
   // Set input status
   diagnostic_handler_->set_input_status(input_status);
   const tam::core::state::types::DiagnosticStatus status =
-    diagnostic_handler_->get_diagnostic_status(
-      pose_stamped, tangent_stamped, init_guess_stamped, reg_status);
-  EXPECT_EQ(status.level, tam::core::state::types::DiagnosticLevel::ERROR)
-    << "Failed input status check";
-  EXPECT_EQ(status.message, "not converged | cloud error | pose valid")
-    << "Failed input message check";
+    diagnostic_handler_->get_diagnostic_status(pose_stamped, tangent_stamped, init_guess_stamped, reg_status);
+  EXPECT_EQ(status.level, tam::core::state::types::DiagnosticLevel::ERROR) << "Failed input status check";
+  EXPECT_EQ(status.message, "not converged | cloud error | pose valid") << "Failed input message check";
 }
+
 /**
  * @brief Test DiagnosticHandler status for a non-converged registration
  */
@@ -120,10 +121,10 @@ TEST(DiagnosticHandler, NotConverged)
   // clang-format on
 
   // Create pose and initial guess
-  const Sophus::SE3f pose = Sophus::SE3f(
-    Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(2.2, 2.0, 3.0));
-  const Sophus::SE3f init_guess = Sophus::SE3f(
-    Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(2.0, 2.0, 3.0));
+  const Sophus::SE3f pose =
+    Sophus::SE3f(Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(2.2, 2.0, 3.0));
+  const Sophus::SE3f init_guess =
+    Sophus::SE3f(Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(2.0, 2.0, 3.0));
   // Create timestamps
   const std::uint64_t pose_stamp = 19483583754837;
   const std::uint64_t init_guess_stamp = 19483583754837;
@@ -137,12 +138,11 @@ TEST(DiagnosticHandler, NotConverged)
   // Set input status
   diagnostic_handler_->set_input_status(input_status);
   const tam::core::state::types::DiagnosticStatus status =
-    diagnostic_handler_->get_diagnostic_status(
-      pose_stamped, tangent_stamped, init_guess_stamped, reg_status);
-  EXPECT_EQ(status.level, tam::core::state::types::DiagnosticLevel::ERROR)
-    << "Failed convergence check";
+    diagnostic_handler_->get_diagnostic_status(pose_stamped, tangent_stamped, init_guess_stamped, reg_status);
+  EXPECT_EQ(status.level, tam::core::state::types::DiagnosticLevel::ERROR) << "Failed convergence check";
   EXPECT_EQ(status.message, "not converged | pose valid") << "Failed convergence check";
 }
+
 /**
  * @brief Test DiagnosticHandler status for an outdated frame
  */
@@ -164,10 +164,10 @@ TEST(DiagnosticHandler, FrameOutdated)
   // clang-format on
 
   // Create pose and initial guess
-  const Sophus::SE3f pose = Sophus::SE3f(
-    Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(2.2, 2.0, 3.0));
-  const Sophus::SE3f init_guess = Sophus::SE3f(
-    Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(2.0, 2.0, 3.0));
+  const Sophus::SE3f pose =
+    Sophus::SE3f(Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(2.2, 2.0, 3.0));
+  const Sophus::SE3f init_guess =
+    Sophus::SE3f(Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(2.0, 2.0, 3.0));
   // Create timestamps
   const std::uint64_t pose_stamp = 19483583754837;
   const std::uint64_t init_guess_stamp = 19483583754837;
@@ -181,12 +181,11 @@ TEST(DiagnosticHandler, FrameOutdated)
   // Set input status
   diagnostic_handler_->set_input_status(input_status);
   const tam::core::state::types::DiagnosticStatus status =
-    diagnostic_handler_->get_diagnostic_status(
-      pose_stamped, tangent_stamped, init_guess_stamped, reg_status);
-  EXPECT_EQ(status.level, tam::core::state::types::DiagnosticLevel::WARN)
-    << "Failed outdated frame check";
+    diagnostic_handler_->get_diagnostic_status(pose_stamped, tangent_stamped, init_guess_stamped, reg_status);
+  EXPECT_EQ(status.level, tam::core::state::types::DiagnosticLevel::WARN) << "Failed outdated frame check";
   EXPECT_EQ(status.message, "outdated | pose valid") << "Failed oudated frame check";
 }
+
 /**
  * @brief Test DiagnosticHandler check for forward movement
  */
@@ -208,10 +207,10 @@ TEST(DiagnosticHandler, Forward)
   // clang-format on
 
   // Create pose and initial guess
-  const Sophus::SE3f pose = Sophus::SE3f(
-    Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(1.0, 2.0, 3.0));
-  const Sophus::SE3f init_guess = Sophus::SE3f(
-    Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(2.0, 2.0, 3.0));
+  const Sophus::SE3f pose =
+    Sophus::SE3f(Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(1.0, 2.0, 3.0));
+  const Sophus::SE3f init_guess =
+    Sophus::SE3f(Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(2.0, 2.0, 3.0));
   // Create timestamps
   const std::uint64_t pose_stamp = 19483583754837;
   const std::uint64_t init_guess_stamp = 19483583754345;
@@ -225,24 +224,23 @@ TEST(DiagnosticHandler, Forward)
   // Set input status
   diagnostic_handler_->set_input_status(input_status);
   // Check pose -> init forward check
-  tam::core::state::types::DiagnosticStatus status = diagnostic_handler_->get_diagnostic_status(
-    pose_stamped, tangent_stamped, init_guess_stamped, reg_status);
+  tam::core::state::types::DiagnosticStatus status =
+    diagnostic_handler_->get_diagnostic_status(pose_stamped, tangent_stamped, init_guess_stamped, reg_status);
   // Create second pose and initial guess for forward movement evaluation
-  const Sophus::SE3f pose2 = Sophus::SE3f(
-    Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(0.9, 2.0, 3.0));
-  const Sophus::SE3f init_guess2 = Sophus::SE3f(
-    Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(3.0, 2.0, 3.0));
+  const Sophus::SE3f pose2 =
+    Sophus::SE3f(Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(0.9, 2.0, 3.0));
+  const Sophus::SE3f init_guess2 =
+    Sophus::SE3f(Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(3.0, 2.0, 3.0));
   tam::core::state::types::PoseStamped pose_stamped2 = {pose2, pose_stamp};
   tam::core::state::types::PoseStamped init_guess_stamped2 = {init_guess2, init_guess_stamp};
   // Check second pose -> forward check possible
   // Create registration status object
   const tam::core::state::types::DiagnosticStatus status2 =
-    diagnostic_handler_->get_diagnostic_status(
-      pose_stamped2, tangent_stamped, init_guess_stamped2, reg_status);
-  EXPECT_EQ(status2.level, tam::core::state::types::DiagnosticLevel::ERROR)
-    << "Failed Forward check";
+    diagnostic_handler_->get_diagnostic_status(pose_stamped2, tangent_stamped, init_guess_stamped2, reg_status);
+  EXPECT_EQ(status2.level, tam::core::state::types::DiagnosticLevel::ERROR) << "Failed Forward check";
   EXPECT_EQ(status2.message, "converged | behind previous") << "Failed Forward check";
 }
+
 /**
  * @brief Test DiagnosticHandler check for ellipsis
  */
@@ -265,10 +263,10 @@ TEST(DiagnosticHandler, Ellipsis)
   // clang-format on
 
   // Create pose and initial guess
-  const Sophus::SE3f pose = Sophus::SE3f(
-    Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(8.0, 2.0, 3.0));
-  const Sophus::SE3f init_guess = Sophus::SE3f(
-    Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(2.0, 2.0, 3.0));
+  const Sophus::SE3f pose =
+    Sophus::SE3f(Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(8.0, 2.0, 3.0));
+  const Sophus::SE3f init_guess =
+    Sophus::SE3f(Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(2.0, 2.0, 3.0));
   // Create timestamps
   const std::uint64_t pose_stamp = 19483583754837;
   const std::uint64_t init_guess_stamp = 19483583754345;
@@ -282,12 +280,11 @@ TEST(DiagnosticHandler, Ellipsis)
   // Set input status
   diagnostic_handler_->set_input_status(input_status);
   const tam::core::state::types::DiagnosticStatus status =
-    diagnostic_handler_->get_diagnostic_status(
-      pose_stamped, tangent_stamped, init_guess_stamped, reg_status);
-  EXPECT_EQ(status.level, tam::core::state::types::DiagnosticLevel::ERROR)
-    << "Failed Ellipsis check";
+    diagnostic_handler_->get_diagnostic_status(pose_stamped, tangent_stamped, init_guess_stamped, reg_status);
+  EXPECT_EQ(status.level, tam::core::state::types::DiagnosticLevel::ERROR) << "Failed Ellipsis check";
   EXPECT_EQ(status.message, "converged | too far from guess") << "Failed Ellipsis check";
 }
+
 /**
  * @brief Test DiagnosticHandler check for time diff
  */
@@ -309,10 +306,10 @@ TEST(DiagnosticHandler, TimeDiff)
   // clang-format on
 
   // Create pose and initial guess
-  const Sophus::SE3f pose = Sophus::SE3f(
-    Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(2.0, 4.0, 3.0));
-  const Sophus::SE3f init_guess = Sophus::SE3f(
-    Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(2.0, 2.0, 3.0));
+  const Sophus::SE3f pose =
+    Sophus::SE3f(Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(2.0, 4.0, 3.0));
+  const Sophus::SE3f init_guess =
+    Sophus::SE3f(Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(2.0, 2.0, 3.0));
   // Create timestamps
   const std::uint64_t pose_stamp = 19483583754837;
   const std::uint64_t init_guess_stamp = 19483683754345;
@@ -326,12 +323,11 @@ TEST(DiagnosticHandler, TimeDiff)
   // Set input status
   diagnostic_handler_->set_input_status(input_status);
   const tam::core::state::types::DiagnosticStatus status =
-    diagnostic_handler_->get_diagnostic_status(
-      pose_stamped, tangent_stamped, init_guess_stamped, reg_status);
-  EXPECT_EQ(status.level, tam::core::state::types::DiagnosticLevel::ERROR)
-    << "Failed Time Diff check";
+    diagnostic_handler_->get_diagnostic_status(pose_stamped, tangent_stamped, init_guess_stamped, reg_status);
+  EXPECT_EQ(status.level, tam::core::state::types::DiagnosticLevel::ERROR) << "Failed Time Diff check";
   EXPECT_EQ(status.message, "converged | large time diff") << "Failed Time Diff check";
 }
+
 /**
  * @brief Test DiagnosticHandler check for forward movement
  */
@@ -353,10 +349,10 @@ TEST(DiagnosticHandler, Velocity)
   // clang-format on
 
   // Create pose and initial guess
-  const Sophus::SE3f pose = Sophus::SE3f(
-    Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(1.0, 2.0, 3.0));
-  const Sophus::SE3f init_guess = Sophus::SE3f(
-    Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(2.0, 2.0, 3.0));
+  const Sophus::SE3f pose =
+    Sophus::SE3f(Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(1.0, 2.0, 3.0));
+  const Sophus::SE3f init_guess =
+    Sophus::SE3f(Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(2.0, 2.0, 3.0));
   // Create timestamps
   const std::uint64_t pose_stamp = 19483583754837;
   const std::uint64_t init_guess_stamp = 19483583754345;
@@ -370,24 +366,23 @@ TEST(DiagnosticHandler, Velocity)
   // Set input status
   diagnostic_handler_->set_input_status(input_status);
   // Check pose -> init forward check
-  tam::core::state::types::DiagnosticStatus status = diagnostic_handler_->get_diagnostic_status(
-    pose_stamped, tangent_stamped, init_guess_stamped, reg_status);
+  tam::core::state::types::DiagnosticStatus status =
+    diagnostic_handler_->get_diagnostic_status(pose_stamped, tangent_stamped, init_guess_stamped, reg_status);
   // Create second pose and initial guess for forward movement evaluation
-  const Sophus::SE3f pose2 = Sophus::SE3f(
-    Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(0.9, 2.0, 3.0));
-  const Sophus::SE3f init_guess2 = Sophus::SE3f(
-    Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(3.0, 2.0, 3.0));
+  const Sophus::SE3f pose2 =
+    Sophus::SE3f(Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(0.9, 2.0, 3.0));
+  const Sophus::SE3f init_guess2 =
+    Sophus::SE3f(Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(3.0, 2.0, 3.0));
   tam::core::state::types::PoseStamped pose_stamped2 = {pose2, pose_stamp};
   tam::core::state::types::PoseStamped init_guess_stamped2 = {init_guess2, init_guess_stamp};
   // Check second pose -> forward check possible
   // Create registration status object
   const tam::core::state::types::DiagnosticStatus status2 =
-    diagnostic_handler_->get_diagnostic_status(
-      pose_stamped2, tangent_stamped, init_guess_stamped2, reg_status);
-  EXPECT_EQ(status2.level, tam::core::state::types::DiagnosticLevel::WARN)
-    << "Failed Velocity check";
+    diagnostic_handler_->get_diagnostic_status(pose_stamped2, tangent_stamped, init_guess_stamped2, reg_status);
+  EXPECT_EQ(status2.level, tam::core::state::types::DiagnosticLevel::WARN) << "Failed Velocity check";
   EXPECT_EQ(status2.message, "converged | below velocity threshold") << "Failed Velocity check";
 }
+
 /**
  * @brief Test DiagnosticHandler check that ssa is disabled
  */
@@ -409,10 +404,10 @@ TEST(DiagnosticHandler, SSA_Disabled)
   // clang-format on
 
   // Create pose and initial guess
-  const Sophus::SE3f pose = Sophus::SE3f(
-    Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(1.0, 2.0, 3.0));
-  const Sophus::SE3f init_guess = Sophus::SE3f(
-    Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(2.0, 2.0, 3.0));
+  const Sophus::SE3f pose =
+    Sophus::SE3f(Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(1.0, 2.0, 3.0));
+  const Sophus::SE3f init_guess =
+    Sophus::SE3f(Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(2.0, 2.0, 3.0));
   // Create timestamps
   const std::uint64_t pose_stamp = 19483583754837;
   const std::uint64_t init_guess_stamp = 19483583754345;
@@ -426,21 +421,19 @@ TEST(DiagnosticHandler, SSA_Disabled)
   // Set input status
   diagnostic_handler_->set_input_status(input_status);
   // Check pose -> init forward check
-  tam::core::state::types::DiagnosticStatus status = diagnostic_handler_->get_diagnostic_status(
-    pose_stamped, tangent_stamped, init_guess_stamped, reg_status);
+  tam::core::state::types::DiagnosticStatus status =
+    diagnostic_handler_->get_diagnostic_status(pose_stamped, tangent_stamped, init_guess_stamped, reg_status);
   // Create second pose and initial guess for forward movement evaluation
-  const Sophus::SE3f pose2 = Sophus::SE3f(
-    Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(0.9, 2.0, 3.0));
-  const Sophus::SE3f init_guess2 = Sophus::SE3f(
-    Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(3.0, 2.0, 3.0));
+  const Sophus::SE3f pose2 =
+    Sophus::SE3f(Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(0.9, 2.0, 3.0));
+  const Sophus::SE3f init_guess2 =
+    Sophus::SE3f(Sophus::SE3f::QuaternionType(1.0, 0.0, 0.0, 0.0), Sophus::SE3f::Point(3.0, 2.0, 3.0));
   tam::core::state::types::PoseStamped pose_stamped2 = {pose2, pose_stamp};
   tam::core::state::types::PoseStamped init_guess_stamped2 = {init_guess2, init_guess_stamp};
   // Check second pose -> forward check possible
   // Create registration status object
   const tam::core::state::types::DiagnosticStatus status2 =
-    diagnostic_handler_->get_diagnostic_status(
-      pose_stamped2, tangent_stamped, init_guess_stamped2, reg_status);
-  EXPECT_EQ(status2.level, tam::core::state::types::DiagnosticLevel::WARN)
-    << "Failed to detect that vel is disabled";
+    diagnostic_handler_->get_diagnostic_status(pose_stamped2, tangent_stamped, init_guess_stamped2, reg_status);
+  EXPECT_EQ(status2.level, tam::core::state::types::DiagnosticLevel::WARN) << "Failed to detect that vel is disabled";
   EXPECT_EQ(status2.message, "converged | vel disabled") << "Failed to detect that vel is disabled";
 }

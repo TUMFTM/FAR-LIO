@@ -47,11 +47,10 @@
 #include "registration_handler/factor_base.hpp"
 #include "registration_handler/registration_utils.hpp"
 #include "robust_kernel/robust_kernel.hpp"
-namespace tam::core::state
-{
+
+namespace tam::core::state {
 template <typename TConfig>
-class RegistrationHandler
-: public OdometryBase<TConfig, types::RegistrationConfig, types::RegistrationDebug>
+class RegistrationHandler : public OdometryBase<TConfig, types::RegistrationConfig, types::RegistrationDebug>
 {
 public:
 /**
@@ -64,15 +63,12 @@ public:
  * @return                              Transformation from frame to map
  */
 #ifdef __CUDACC__
-  virtual __host__ Sophus::SE3f register_frame(
-    const thrust::device_vector<types::Point<TConfig>> & frame, const MapHandler<TConfig> * map,
-    const Sophus::SE3f & initial_guess, const float correspondence_threshold,
+  virtual __host__ Sophus::SE3f register_frame(const thrust::device_vector<types::Point<TConfig>>& frame,
+    const MapHandler<TConfig>* map, const Sophus::SE3f& initial_guess, const float correspondence_threshold,
     const float kernel_scale, ::cuda::stream_ref stream = {}) = 0;
 #else
-  virtual Sophus::SE3f register_frame(
-    const std::vector<types::Point<TConfig>> & frame, const MapHandler<TConfig> * map,
-    const Sophus::SE3f & initial_guess, const float correspondence_threshold,
-    const float kernel_scale) = 0;
+  virtual Sophus::SE3f register_frame(const std::vector<types::Point<TConfig>>& frame, const MapHandler<TConfig>* map,
+    const Sophus::SE3f& initial_guess, const float correspondence_threshold, const float kernel_scale) = 0;
 #endif
   /**
    * @brief Get the registration status
@@ -86,6 +82,7 @@ public:
     status.num_iter = this->debug_.num_iter;
     return status;
   };
+
 /**
  * @brief Get correspondences between map and frame for given pose
  * @param [in] points                     Frame with points
@@ -96,13 +93,12 @@ public:
  */
 #ifdef __CUDACC__
   virtual __host__ std::vector<types::Correspondence<TConfig>> get_correspondences(
-    const thrust::device_vector<types::Point<TConfig>> & points, const MapHandler<TConfig> * map,
-    const Sophus::SE3f & pose, const float correspondence_threshold,
-    ::cuda::stream_ref stream = {}) const = 0;
+    const thrust::device_vector<types::Point<TConfig>>& points, const MapHandler<TConfig>* map,
+    const Sophus::SE3f& pose, const float correspondence_threshold, ::cuda::stream_ref stream = {}) const = 0;
 #else
   virtual std::vector<types::Correspondence<TConfig>> get_correspondences(
-    const std::vector<types::Point<TConfig>> & points, const MapHandler<TConfig> * map,
-    const Sophus::SE3f & pose, const float correspondence_threshold) const = 0;
+    const std::vector<types::Point<TConfig>>& points, const MapHandler<TConfig>* map, const Sophus::SE3f& pose,
+    const float correspondence_threshold) const = 0;
 #endif
   /**
    * @brief Initialize threading
@@ -112,15 +108,17 @@ public:
   {
     // This global variable requires static duration storage to be able to manipulate the max
     // concurrency from TBB across the entire class
-    static const auto tbb_control_settings = tbb::global_control(
-      tbb::global_control::max_allowed_parallelism, static_cast<size_t>(num_threads));
+    static const auto tbb_control_settings =
+      tbb::global_control(tbb::global_control::max_allowed_parallelism, static_cast<size_t>(num_threads));
   }
+
   /**
    * @brief Initialize frame map instance if necessary
    * @param [in] config Configuration for the map
    * @note Debug signal of frame map are currently not used
    */
-  void init_frame_map(const types::MapConfig & config) requires types::FRAMEMAP<TConfig>
+  void init_frame_map(const types::MapConfig& config)
+    requires types::FRAMEMAP<TConfig>
   {
     // Initialize map handler instance for frame
     // Copy the config to avoid modifying the original
@@ -130,18 +128,18 @@ public:
     types::MapDebug map_debug{};
     INIT_MODULE(MAP, MapType::VOXELHASHMAP, frame_map_, VoxelHashMap, map_config, map_debug);
 #ifdef __CUDACC__
-    INIT_MODULE(
-      MAP, MapType::CUDA_VOXELHASHMAP, frame_map_, cuda::VoxelHashMap, map_config, map_debug);
+    INIT_MODULE(MAP, MapType::CUDA_VOXELHASHMAP, frame_map_, cuda::VoxelHashMap, map_config, map_debug);
 #endif
     this->frame_map_->init(false);
   }
+
   /**
    * @brief Get the average number of points per voxel in the frame map
    */
 #ifdef __CUDACC__
   types::AdaptiveMapDensity get_frame_map_density(
-    const double range, const Eigen::Vector3f & origin,
-    ::cuda::stream_ref stream = {}) requires types::FRAMEMAP<TConfig>
+    const double range, const Eigen::Vector3f& origin, ::cuda::stream_ref stream = {})
+    requires types::FRAMEMAP<TConfig>
   {
     // clang-format off
     types::AdaptiveMapDensity density = this->frame_map_->get_density(range, stream);  // NOLINT
@@ -167,8 +165,8 @@ public:
 
 protected:
   // Inherit constructor from OdometryBase for param manager and logger
-  RegistrationHandler(tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
-  : OdometryBase<TConfig, types::RegistrationConfig, types::RegistrationDebug>(pmg, logger)
+  RegistrationHandler(tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
+      : OdometryBase<TConfig, types::RegistrationConfig, types::RegistrationDebug>(pmg, logger)
   {
     this->set_config(pmg);
     this->set_logging(logger);
@@ -177,21 +175,22 @@ protected:
     this->setup_cuda_device();
 #endif
   }
+
   // Inherit constructor from OdometryBase for config and debug object
-  RegistrationHandler(
-    const types::RegistrationConfig & config, const types::RegistrationDebug & debug)
-  : OdometryBase<TConfig, types::RegistrationConfig, types::RegistrationDebug>(config, debug)
+  RegistrationHandler(const types::RegistrationConfig& config, const types::RegistrationDebug& debug)
+      : OdometryBase<TConfig, types::RegistrationConfig, types::RegistrationDebug>(config, debug)
   {
     // Additional initialization
 #ifdef __CUDACC__
     this->setup_cuda_device();
 #endif
   }
+
   /**
    * @brief Set the configuration of the registration handler from the param manager
    * @param [in] pmg                Param manager
    */
-  void set_config(tam::pmg::ParamReferenceManager * pmg) override
+  void set_config(tam::pmg::ParamReferenceManager* pmg) override
   {
     // clang-format off
     pmg->declare_parameter("registration.solver_type", &this->config_.solver_type, "GaussNewton", tam::pmg::ParameterType::STRING, "Solver: GaussNewton or LevenbergMarquardt");  // NOLINT
@@ -203,11 +202,12 @@ protected:
     pmg->declare_parameter("registration.damping_scale", &this->config_.damping_scale, 2.0, tam::pmg::ParameterType::DOUBLE, "LM damping increase factor on rejected steps");  // NOLINT
     // clang-format on
   }
+
   /**
    * @brief Register the debug variables with the logger
    * @param [in] logger             Logger
    */
-  void set_logging(tam::tsl::ReferenceLogger * logger) const override
+  void set_logging(tam::tsl::ReferenceLogger* logger) const override
   {
     logger->log("registration/converged", &this->debug_.converged);
     logger->log("registration/registration_time", &this->debug_.registration_time);
@@ -229,15 +229,12 @@ protected:
    */
   template <typename FactorType, typename ErrorType>
 #ifdef __CUDACC__
-  Sophus::SE3f solve(
-    thrust::device_vector<types::Point<TConfig>> & frame, const MapHandler<TConfig> * map,
-    FactorType & factor, ErrorType & error, const float correspondence_threshold,
-    const float kernel_scale, ::cuda::stream_ref stream = {})
+  Sophus::SE3f solve(thrust::device_vector<types::Point<TConfig>>& frame, const MapHandler<TConfig>* map,
+    FactorType& factor, ErrorType& error, const float correspondence_threshold, const float kernel_scale,
+    ::cuda::stream_ref stream = {})
 #else
-  Sophus::SE3f solve(
-    std::vector<types::Point<TConfig>> & frame, const MapHandler<TConfig> * map,
-    FactorType & factor, ErrorType & error, const float correspondence_threshold,
-    const float kernel_scale)
+  Sophus::SE3f solve(std::vector<types::Point<TConfig>>& frame, const MapHandler<TConfig>* map, FactorType& factor,
+    ErrorType& error, const float correspondence_threshold, const float kernel_scale)
 #endif
   {
     // Prepare factor and error
@@ -264,8 +261,7 @@ protected:
       T = this->solve_levenbergmarquardt(frame, map, factor, error);
 #endif
     } else {
-      throw std::runtime_error(
-        "Unknown solver type: " + this->config_.solver_type +
+      throw std::runtime_error("Unknown solver type: " + this->config_.solver_type +
         ". Supported types are GaussNewton and LevenbergMarquardt.");
     }
     return T;
@@ -280,13 +276,11 @@ protected:
    */
   template <typename FactorType, typename ErrorType>
 #ifdef __CUDACC__
-  Sophus::SE3f solve_gaussnewton(
-    thrust::device_vector<types::Point<TConfig>> & frame, const MapHandler<TConfig> * map,
-    FactorType & factor, [[maybe_unused]] ErrorType & error, ::cuda::stream_ref stream = {})
+  Sophus::SE3f solve_gaussnewton(thrust::device_vector<types::Point<TConfig>>& frame, const MapHandler<TConfig>* map,
+    FactorType& factor, [[maybe_unused]] ErrorType& error, ::cuda::stream_ref stream = {})
 #else
-  Sophus::SE3f solve_gaussnewton(
-    std::vector<types::Point<TConfig>> & frame, const MapHandler<TConfig> * map,
-    FactorType & factor, [[maybe_unused]] ErrorType & error)
+  Sophus::SE3f solve_gaussnewton(std::vector<types::Point<TConfig>>& frame, const MapHandler<TConfig>* map,
+    FactorType& factor, [[maybe_unused]] ErrorType& error)
 #endif
   {
     // Start timer
@@ -313,15 +307,14 @@ protected:
 
         // Build linear system
 #ifdef __CUDACC__
-      const types::LinearSystem & ls = cuda::utils::build_linear_system(
-        this->correspondences_device_, this->ls_final_d_, factor, stream);
+      const types::LinearSystem& ls =
+        cuda::utils::build_linear_system(this->correspondences_device_, this->ls_final_d_, factor, stream);
 #else
-      const types::LinearSystem & ls = utils::build_linear_system(correspondences, factor);
+      const types::LinearSystem& ls = utils::build_linear_system(correspondences, factor);
 #endif
       // Solve linear system
       const Eigen::Matrix<float, 6, 1> dx =
-        (ls.JTJ +
-         static_cast<float>(this->config_.damping_factor) * Eigen::Matrix<float, 6, 6>::Identity())
+        (ls.JTJ + static_cast<float>(this->config_.damping_factor) * Eigen::Matrix<float, 6, 6>::Identity())
           .ldlt()
           .solve(-ls.JTr);
       const Sophus::SE3f estimation = Sophus::SE3f::exp(dx);
@@ -361,13 +354,11 @@ protected:
    */
   template <typename FactorType, typename ErrorType>
 #ifdef __CUDACC__
-  Sophus::SE3f solve_levenbergmarquardt(
-    thrust::device_vector<types::Point<TConfig>> & frame, const MapHandler<TConfig> * map,
-    FactorType & factor, ErrorType & error, ::cuda::stream_ref stream = {})
+  Sophus::SE3f solve_levenbergmarquardt(thrust::device_vector<types::Point<TConfig>>& frame,
+    const MapHandler<TConfig>* map, FactorType& factor, ErrorType& error, ::cuda::stream_ref stream = {})
 #else
   Sophus::SE3f solve_levenbergmarquardt(
-    std::vector<types::Point<TConfig>> & frame, const MapHandler<TConfig> * map,
-    FactorType & factor, ErrorType & error)
+    std::vector<types::Point<TConfig>>& frame, const MapHandler<TConfig>* map, FactorType& factor, ErrorType& error)
 #endif
   {
     // Start timer
@@ -398,14 +389,13 @@ protected:
 #endif
       // Reset error transform to identity for the current iteration
       error.set_transform(Sophus::SE3f());
-        // Build linear system and compute current error
+      // Build linear system and compute current error
 #ifdef __CUDACC__
-      const types::LinearSystem & ls = cuda::utils::build_linear_system(
-        this->correspondences_device_, this->ls_final_d_, factor, stream);
-      current_error =
-        cuda::utils::compute_error(this->correspondences_device_, this->error_d_, error, stream);
+      const types::LinearSystem& ls =
+        cuda::utils::build_linear_system(this->correspondences_device_, this->ls_final_d_, factor, stream);
+      current_error = cuda::utils::compute_error(this->correspondences_device_, this->error_d_, error, stream);
 #else
-      const types::LinearSystem & ls = utils::build_linear_system(correspondences, factor);
+      const types::LinearSystem& ls = utils::build_linear_system(correspondences, factor);
       current_error = utils::compute_error(correspondences, error);
 #endif
 
@@ -415,9 +405,7 @@ protected:
       // Set initial lambda for first iteration
       if (j == 0) {
         current_lambda = std::max(
-          static_cast<float>(this->config_.damping_factor) *
-            ls.JTJ.diagonal().array().abs().maxCoeff(),
-          1.0e-12f);
+          static_cast<float>(this->config_.damping_factor) * ls.JTJ.diagonal().array().abs().maxCoeff(), 1.0e-12f);
       }
       // Start Levenberg-Marquardt inner loop
       bool success_lm = false;
@@ -425,9 +413,7 @@ protected:
       for (std::int64_t lm_iter = 0; lm_iter < this->config_.max_inner_iter; ++lm_iter) {
         // Solve linear system
         const Eigen::Matrix<float, 6, 1> candidate_dx =
-          (ls.JTJ + current_lambda * Eigen::Matrix<float, 6, 6>::Identity())
-            .ldlt()
-            .solve(-ls.JTr);  // NOLINT
+          (ls.JTJ + current_lambda * Eigen::Matrix<float, 6, 6>::Identity()).ldlt().solve(-ls.JTr);  // NOLINT
         delta_lm = Sophus::SE3f::exp(candidate_dx);
         // Set the transformation to the factor
         error.set_transform(delta_lm);
@@ -438,8 +424,7 @@ protected:
 #else
         float candidate_error = utils::compute_error(correspondences, error);
 #endif
-        float rho = (current_error - candidate_error) /
-                    (candidate_dx.dot(current_lambda * candidate_dx - ls.JTr));
+        float rho = (current_error - candidate_error) / (candidate_dx.dot(current_lambda * candidate_dx - ls.JTr));
 
         // Update debug information
         inner_iter = lm_iter;
@@ -462,9 +447,8 @@ protected:
         T_icp = delta_lm * T_icp;                 // Update complete transformation
         delta = delta_lm;                         // Update delta to transform points
         solver_status = solver_status_candidate;  // Update solver status
-        current_lambda = std::max(
-          current_lambda * std::max(1.0f / 3.0f, 1.0f - std::pow(2.0f * rho - 1.0f, 3.0f)),
-          1.0e-12f);
+        current_lambda =
+          std::max(current_lambda * std::max(1.0f / 3.0f, 1.0f - std::pow(2.0f * rho - 1.0f, 3.0f)), 1.0e-12f);
         success_lm = true;
         break;  // Break the inner loop if we found a valid solution
       }
@@ -494,12 +478,13 @@ protected:
     this->debug_.num_points_frame = frame.size();
     return T_icp;
   }
+
   /**
    * @brief Check solver convergence based on translational and rotational criterion
    * @param[in] dx                       Update vector
    * @return                             True, if criteria fullfilled
    */
-  types::SolverStatus solver_state(const Eigen::Matrix<float, 6, 1> & dx) const
+  types::SolverStatus solver_state(const Eigen::Matrix<float, 6, 1>& dx) const
   {
     const double dx_norm = dx.norm();
     // Check if an actual solution was computed
@@ -514,6 +499,7 @@ protected:
       return types::SolverStatus::NOT_CONVERGED;
     }
   }
+
   /**
    * @brief Check optimization termination criteria
    * @param [in] status                  Current solver status
@@ -521,8 +507,7 @@ protected:
    * @param [in] time                    Elapsed time in milliseconds
    * @return                             True if the optimization should terminate
    */
-  bool termination_criteria(
-    const types::SolverStatus & status, const std::int64_t iter, const double time) const
+  bool termination_criteria(const types::SolverStatus& status, const std::int64_t iter, const double time) const
   {
     // clang-format off
     if (status == types::SolverStatus::CONVERGED || status == types::SolverStatus::INVALID) return true;  // NOLINT
@@ -564,7 +549,7 @@ protected:
   // Preallocated device vectors
   mutable thrust::device_vector<types::Correspondence<TConfig>> correspondences_device_;
   mutable thrust::device_vector<float> ls_final_d_;
-  mutable float * error_d_;
+  mutable float* error_d_;
 #endif
 };
 }  // namespace tam::core::state

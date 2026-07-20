@@ -26,12 +26,12 @@
 #include "param_management_cpp/param_reference_manager.hpp"
 #include "tsl_logger_cpp/reference_logger.hpp"
 #include "voxel_tools/voxel_tools.hpp"
-int main(int argc, char * argv[])
+
+int main(int argc, char* argv[])
 {
   // Check the number of arguments
   if (argc < 4) {
-    std::cerr << "Usage: " << argv[0] << " <map_path> <frame_path> <initial_guess_path>"
-              << std::endl;
+    std::cerr << "Usage: " << argv[0] << " <map_path> <frame_path> <initial_guess_path>" << std::endl;
     return 1;
   }
   for (int i = 0; i < argc; ++i) {
@@ -52,7 +52,7 @@ int main(int argc, char * argv[])
   // clang-format on
 
   // init multi-threading and set number of threads
-  tam::pmg::MgmtInterface * pmg_raw = pmg_.get();
+  tam::pmg::MgmtInterface* pmg_raw = pmg_.get();
   pmg_raw->set_value("registration.solver_type", "GaussNewton");
   pmg_raw->set_value("registration.max_iter", std::int64_t{1000});
   pmg_raw->set_value("registration.max_inner_iter", std::int64_t{20});
@@ -100,17 +100,14 @@ int main(int argc, char * argv[])
   std::cout << "Initial guess: " << std::endl << init_guess.matrix() << std::endl;
   std::cout << "Transformation from frame to map: " << std::endl << T_icp.matrix() << std::endl;
   std::cout << "Converged: " << registration_->get_registration_status().converged << std::endl;
-  std::cout << "Registration time: " << registration_->get_debug().registration_time << " ms"
-            << std::endl;
+  std::cout << "Registration time: " << registration_->get_debug().registration_time << " ms" << std::endl;
   std::cout << "Damping Factor: " << registration_->get_debug().damping_factor << std::endl;
   std::cout << "Iterations: " << registration_->get_debug().num_iter << std::endl;
-if (registration_->get_config().solver_type == "LevenbergMarquardt") {
-  std::cout << "Error: " << std::get<double>(registration_->get_debug().conditional["error"])
-            << std::endl;
-  std::cout << "Inner Iterations: "
-            << std::get<std::int64_t>(registration_->get_debug().conditional["num_inner_iter"])
-            << std::endl;
-}
+  if (registration_->get_config().solver_type == "LevenbergMarquardt") {
+    std::cout << "Error: " << std::get<double>(registration_->get_debug().conditional["error"]) << std::endl;
+    std::cout << "Inner Iterations: "
+              << std::get<std::int64_t>(registration_->get_debug().conditional["num_inner_iter"]) << std::endl;
+  }
 #ifdef USE_VISUALIZATION
   // Create rerun stream over TCP
   rerun::RecordingStream rec = tam::core::state::utils::spawn_rerun_stream("ICP");
@@ -125,17 +122,11 @@ if (registration_->get_config().solver_type == "LevenbergMarquardt") {
   const std::tuple<std::vector<rerun::Position3D>, std::vector<rerun::Color>> rerun_frame_final =
     tam::core::state::utils::points2rerun(frame, "Green", T_icp);
 
-  rec.log(
-    "map",
-    rerun::Points3D(std::get<0>(rerun_map)).with_colors(std::get<1>(rerun_map)).with_radii({0.3f}));
-  rec.log(
-    "frame_init", rerun::Points3D(std::get<0>(rerun_frame_init))
-                    .with_colors(std::get<1>(rerun_frame_init))
-                    .with_radii({0.3f}));
-  rec.log(
-    "frame_final", rerun::Points3D(std::get<0>(rerun_frame_final))
-                     .with_colors(std::get<1>(rerun_frame_init))
-                     .with_radii({0.3f}));
+  rec.log("map", rerun::Points3D(std::get<0>(rerun_map)).with_colors(std::get<1>(rerun_map)).with_radii({0.3f}));
+  rec.log("frame_init",
+    rerun::Points3D(std::get<0>(rerun_frame_init)).with_colors(std::get<1>(rerun_frame_init)).with_radii({0.3f}));
+  rec.log("frame_final",
+    rerun::Points3D(std::get<0>(rerun_frame_final)).with_colors(std::get<1>(rerun_frame_init)).with_radii({0.3f}));
 #endif
   return 0;
 }

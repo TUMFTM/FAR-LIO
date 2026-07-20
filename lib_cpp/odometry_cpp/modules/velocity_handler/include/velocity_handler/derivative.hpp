@@ -15,9 +15,8 @@
  */
 #pragma once
 
-#include <cmath>
-
 #include <chrono>
+#include <cmath>
 #include <eigen3/Eigen/Core>
 #include <iostream>
 #include <memory>
@@ -26,8 +25,8 @@
 #include <vector>
 
 #include "velocity_handler/velocity_handler_base.hpp"
-namespace tam::core::state
-{
+
+namespace tam::core::state {
 /**
  * @brief Pose-derivative velocity handler.
  */
@@ -39,30 +38,31 @@ public:
    * @brief Constructor for param manager and logger
    */
   static std::unique_ptr<VelocityHandler<TConfig>> from_config(
-    tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
+    tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
   {
     std::unique_ptr<Derivative<TConfig>> vh =
       std::unique_ptr<Derivative<TConfig>>(new Derivative<TConfig>(pmg, logger));
     return vh;
   }
+
   /**
    * @brief Constructor for config and debug objects
    */
   static std::unique_ptr<VelocityHandler<TConfig>> from_config(
-    const types::VelocityConfig & config, const types::VelocityDebug & debug)
+    const types::VelocityConfig& config, const types::VelocityDebug& debug)
   {
     std::unique_ptr<Derivative<TConfig>> vh =
       std::unique_ptr<Derivative<TConfig>>(new Derivative<TConfig>(config, debug));
     return vh;
   }
+
   /**
    * @brief Estimate twist from pose pair. The frame argument is unused.
    * @param[in] frame                   The input frame of points (unused).
    * @param[in] pose_registered         The current registered pose
    */
-  types::TangentStamped get_tangent(
-    [[maybe_unused]] const std::vector<types::Point<TConfig>> & frame,
-    const types::PoseStamped & pose_registered) override
+  types::TangentStamped get_tangent([[maybe_unused]] const std::vector<types::Point<TConfig>>& frame,
+    const types::PoseStamped& pose_registered) override
   {
     const auto t_start = std::chrono::high_resolution_clock::now();
     types::TangentStamped result{};
@@ -70,8 +70,7 @@ public:
 
     // Return if the buffer is empty or the handler is not initialized
     if (!previous_pose_.has_value()) {
-      std::cerr << "[VelocityHandler::Derivative]: Velocity estimation not initialized!"
-                << std::endl;
+      std::cerr << "[VelocityHandler::Derivative]: Velocity estimation not initialized!" << std::endl;
       previous_pose_ = pose_registered;
       result.tangent << Eigen::Matrix<float, 6, 1>::Zero();
       finalize(t_start, 0.0);
@@ -92,8 +91,8 @@ public:
     }
     // Check if dt is too large
     if (std::abs(dt) > 1.0f) {
-      std::cerr << "[VelocityHandler::Derivative]: Time delta too large: " << dt
-                << "s. Resetting velocity." << std::endl;
+      std::cerr << "[VelocityHandler::Derivative]: Time delta too large: " << dt << "s. Resetting velocity."
+                << std::endl;
       previous_pose_ = pose_registered;
       result.tangent << Eigen::Matrix<float, 6, 1>::Zero();
       finalize(t_start, dt);
@@ -130,12 +129,13 @@ public:
   }
 
 protected:
-  Derivative(tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
-  : VelocityHandler<TConfig>(pmg, logger)
+  Derivative(tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
+      : VelocityHandler<TConfig>(pmg, logger)
   {
   }
-  Derivative(const types::VelocityConfig & config, const types::VelocityDebug & debug)
-  : VelocityHandler<TConfig>(config, debug)
+
+  Derivative(const types::VelocityConfig& config, const types::VelocityDebug& debug)
+      : VelocityHandler<TConfig>(config, debug)
   {
   }
 

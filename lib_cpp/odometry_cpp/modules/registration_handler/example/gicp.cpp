@@ -26,12 +26,12 @@
 #include "param_management_cpp/param_reference_manager.hpp"
 #include "tsl_logger_cpp/reference_logger.hpp"
 #include "voxel_tools/voxel_tools.hpp"
-int main(int argc, char * argv[])
+
+int main(int argc, char* argv[])
 {
   // Check the number of arguments
   if (argc < 4) {
-    std::cerr << "Usage: " << argv[0] << " <map_path> <frame_path> <initial_guess_path>"
-              << std::endl;
+    std::cerr << "Usage: " << argv[0] << " <map_path> <frame_path> <initial_guess_path>" << std::endl;
     return 1;
   }
   for (int i = 0; i < argc; ++i) {
@@ -53,7 +53,7 @@ int main(int argc, char * argv[])
   // clang-format on
 
   // init multi-threading and set number of threads
-  tam::pmg::MgmtInterface * pmg_raw = pmg_.get();
+  tam::pmg::MgmtInterface* pmg_raw = pmg_.get();
   pmg_raw->set_value("map.cov_regularization", "FROBENIUS");
   pmg_raw->set_value("map.voxel_size", 4.0);
   pmg_raw->set_value("map.num_threads", std::int64_t{3});
@@ -69,7 +69,8 @@ int main(int argc, char * argv[])
   registration_->init_frame_map(map_->get_config());
 
   // Load the map
-  std::vector<tam::core::state::types::Point<tam::core::state::types::Point_XYZ>> map = tam::core::state::utils::load_pointcloud_bin<tam::core::state::types::Point_XYZ>(argv[1]); // NOLINT
+  std::vector<tam::core::state::types::Point<tam::core::state::types::Point_XYZ>> map =
+    tam::core::state::utils::load_pointcloud_bin<tam::core::state::types::Point_XYZ>(argv[1]);  // NOLINT
   std::cout << "Loaded " << map.size() << " points from " << argv[1] << std::endl;
   // Add points to the map
   map_->add_points(map);
@@ -77,16 +78,19 @@ int main(int argc, char * argv[])
   std::cout << "Voxels in the map: " << map_->get_debug().num_voxel << std::endl;
   std::cout << "Points in the map: " << map_->get_debug().num_points << std::endl;
 
-  std::vector<tam::core::state::types::Point<tam::core::state::types::GICP_EXT>> frame = tam::core::state::utils::load_pointcloud_bin<tam::core::state::types::GICP_EXT>(argv[2]); // NOLINT
+  std::vector<tam::core::state::types::Point<tam::core::state::types::GICP_EXT>> frame =
+    tam::core::state::utils::load_pointcloud_bin<tam::core::state::types::GICP_EXT>(argv[2]);  // NOLINT
   std::cout << "Loaded " << frame.size() << " points from " << argv[2] << std::endl;
   // Load the initial guess
-  Sophus::SE3f init_guess = tam::core::state::utils::load_pose<tam::core::state::types::GICP_EXT>(argv[3]); // NOLINT
+  Sophus::SE3f init_guess = tam::core::state::utils::load_pose<tam::core::state::types::GICP_EXT>(argv[3]);  // NOLINT
 
   // Downsample the frame
-  const auto & [frame_registration, frame_map] = tam::core::state::voxel_doubledownsample(frame, map_->get_config().voxel_size);  // NOLINT
+  const auto& [frame_registration, frame_map] =
+    tam::core::state::voxel_doubledownsample(frame, map_->get_config().voxel_size);  // NOLINT
 
   const float sigma = 6.0;
-  const Sophus::SE3f T_icp = registration_->register_frame(frame_map, map_.get(), init_guess, 3.0 * sigma, sigma);  // NOLINT
+  const Sophus::SE3f T_icp =
+    registration_->register_frame(frame_map, map_.get(), init_guess, 3.0 * sigma, sigma);  // NOLINT
   map_->update_points(frame_registration, T_icp);
   // clang-format on
   std::cout << "Voxels in the map: " << map_->get_debug().num_voxel << std::endl;
@@ -98,17 +102,14 @@ int main(int argc, char * argv[])
   std::cout << "Initial guess: " << std::endl << init_guess.matrix() << std::endl;
   std::cout << "Transformation from frame to map: " << std::endl << T_icp.matrix() << std::endl;
   std::cout << "Converged: " << registration_->get_registration_status().converged << std::endl;
-  std::cout << "Registration time: " << registration_->get_debug().registration_time << " ms"
-            << std::endl;
+  std::cout << "Registration time: " << registration_->get_debug().registration_time << " ms" << std::endl;
   std::cout << "Damping Factor: " << registration_->get_debug().damping_factor << std::endl;
   std::cout << "Iterations: " << registration_->get_debug().num_iter << std::endl;
-if (registration_->get_config().solver_type == "LevenbergMarquardt") {
-  std::cout << "Error: " << std::get<double>(registration_->get_debug().conditional["error"])
-            << std::endl;
-  std::cout << "Inner Iterations: "
-            << std::get<std::int64_t>(registration_->get_debug().conditional["num_inner_iter"])
-            << std::endl;
-}
+  if (registration_->get_config().solver_type == "LevenbergMarquardt") {
+    std::cout << "Error: " << std::get<double>(registration_->get_debug().conditional["error"]) << std::endl;
+    std::cout << "Inner Iterations: "
+              << std::get<std::int64_t>(registration_->get_debug().conditional["num_inner_iter"]) << std::endl;
+  }
 
 #ifdef USE_VISUALIZATION
   // Create rerun stream over TCP
@@ -124,17 +125,11 @@ if (registration_->get_config().solver_type == "LevenbergMarquardt") {
   const std::tuple<std::vector<rerun::Position3D>, std::vector<rerun::Color>> rerun_frame_final =
     tam::core::state::utils::points2rerun(frame, "Green", T_icp);
 
-  rec.log(
-    "map",
-    rerun::Points3D(std::get<0>(rerun_map)).with_colors(std::get<1>(rerun_map)).with_radii({0.3f}));
-  rec.log(
-    "frame_init", rerun::Points3D(std::get<0>(rerun_frame_init))
-                    .with_colors(std::get<1>(rerun_frame_init))
-                    .with_radii({0.3f}));
-  rec.log(
-    "frame_final", rerun::Points3D(std::get<0>(rerun_frame_final))
-                     .with_colors(std::get<1>(rerun_frame_init))
-                     .with_radii({0.3f}));
+  rec.log("map", rerun::Points3D(std::get<0>(rerun_map)).with_colors(std::get<1>(rerun_map)).with_radii({0.3f}));
+  rec.log("frame_init",
+    rerun::Points3D(std::get<0>(rerun_frame_init)).with_colors(std::get<1>(rerun_frame_init)).with_radii({0.3f}));
+  rec.log("frame_final",
+    rerun::Points3D(std::get<0>(rerun_frame_final)).with_colors(std::get<1>(rerun_frame_init)).with_radii({0.3f}));
 #endif
   return 0;
 }

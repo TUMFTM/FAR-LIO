@@ -25,5 +25,4 @@ template class OdometryPipeline<tam::core::state::types::ICP_EXT>;
 template class OdometryPipeline<tam::core::state::types::ICP_CV>;
 template class OdometryPipeline<tam::core::state::types::GICP_EXT>;
 // clang-format on
-}
-
+}  // namespace tam::core::state

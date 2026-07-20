@@ -22,6 +22,7 @@
 #include "distortion_handler/polynom_undistortion.hpp"
 #include "param_management_cpp/param_reference_manager.hpp"
 #include "tsl_logger_cpp/reference_logger.hpp"
+
 /**
  * @brief Test construction of PolynomUndistortion from param manager and logger
  */
@@ -35,12 +36,13 @@ TEST(PolynomUndistortion, BuildPmgLogger)
     tam::core::state::PolynomUndistortion<tam::core::state::types::ICP_EXT>::from_config(pmg_.get(), logger_.get()); // NOLINT
   // clang-format on
 
-  tam::pmg::MgmtInterface * pmg_raw = pmg_.get();
+  tam::pmg::MgmtInterface* pmg_raw = pmg_.get();
   (void)pmg_raw;
 
   EXPECT_EQ(undistort_->get_debug().undistortion_time, 0.0)
     << "Failed to construct PolynomUndistortion from param manager and logger";
 }
+
 /**
  * @brief Test construction of PolynomUndistortion from config and debug object
  */
@@ -57,6 +59,7 @@ TEST(PolynomUndistortion, BuildConfigDebug)
   EXPECT_EQ(undistort_->get_debug().undistortion_time, 0.0)
     << "Failed to construct PolynomUndistortion from param config and debug";
 }
+
 /**
  * @brief Test undistortion of a frame with known poses and timestamps
  */
@@ -74,9 +77,8 @@ TEST(PolynomUndistortion, UndistortFrame)
   // x-monotonicity assertion below holds)
   std::vector<tam::core::state::types::PoseStamped> poses{};
   // Capture current unix timestamp
-  std::uint64_t current_time = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                                 std::chrono::system_clock::now().time_since_epoch())
-                                 .count();
+  std::uint64_t current_time =
+    std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
   // Random distribution for noise
   std::random_device rd;
@@ -91,10 +93,8 @@ TEST(PolynomUndistortion, UndistortFrame)
     tam::core::state::types::PoseStamped pose_stamped{};
     pose_stamped.stamp = current_time + i * 1e7;  // 10ms apart
     // Define velocities
-    velocity = Eigen::Vector3f(
-      velocity.x() + acceleration.x() * dt + dis(gen),
-      velocity.y() + acceleration.y() * dt + 0.1f * dis(gen),
-      velocity.z() + acceleration.z() * dt + 0.1f * dis(gen));
+    velocity = Eigen::Vector3f(velocity.x() + acceleration.x() * dt + dis(gen),
+      velocity.y() + acceleration.y() * dt + 0.1f * dis(gen), velocity.z() + acceleration.z() * dt + 0.1f * dis(gen));
     // Integrate velocity into the position (identity rotation)
     position += velocity * dt;
     pose_stamped.pose = Sophus::SE3f(Eigen::Quaternionf::Identity(), position);
@@ -110,8 +110,7 @@ TEST(PolynomUndistortion, UndistortFrame)
   // Points generated circular around origin with stamps decreasing from frame_stamp
   for (size_t i = 0; i < 10; ++i) {
     tam::core::state::types::Point<tam::core::state::types::ICP_EXT> point{};
-    point.pos = Eigen::Vector3f(
-      5.0f * std::cos(i * 2.0f * std::numbers::pi_v<float> / 10.0f) + dis(gen),
+    point.pos = Eigen::Vector3f(5.0f * std::cos(i * 2.0f * std::numbers::pi_v<float> / 10.0f) + dis(gen),
       5.0f * std::sin(i * 2.0f * std::numbers::pi_v<float> / 10.0f) + dis(gen), 0.0f);
     point.timestamp = -1e-3 * i;
     frame.push_back(point);

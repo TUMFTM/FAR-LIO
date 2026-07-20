@@ -22,6 +22,7 @@
 #include "odometry_utils/utils.hpp"
 #include "param_management_cpp/param_reference_manager.hpp"
 #include "tsl_logger_cpp/reference_logger.hpp"
+
 int main()
 {
   // clang-format off
@@ -32,15 +33,14 @@ int main()
     tam::core::state::PolynomUndistortion<tam::core::state::types::ICP_EXT>::from_config(pmg_.get(), logger_.get()); // NOLINT
   // clang-format on
 
-  tam::pmg::MgmtInterface * pmg_raw = pmg_.get();
+  tam::pmg::MgmtInterface* pmg_raw = pmg_.get();
   (void)pmg_raw;
 
   // Initialize a pose history by integrating accelerating velocities
   std::vector<tam::core::state::types::PoseStamped> poses{};
   // Capture current unix timestamp
-  std::uint64_t current_time = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                                 std::chrono::system_clock::now().time_since_epoch())
-                                 .count();
+  std::uint64_t current_time =
+    std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
   // Random distribution for noise
   std::random_device rd;
@@ -56,17 +56,14 @@ int main()
     tam::core::state::types::PoseStamped pose_stamped{};
     pose_stamped.stamp = current_time + i * 1e7;  // 10ms apart
     // Define velocities
-    velocity = Eigen::Vector3f(
-      velocity.x() + acceleration.x() * dt + dis(gen),
-      velocity.y() + acceleration.y() * dt + 0.1f * dis(gen),
-      velocity.z() + acceleration.z() * dt + 0.1f * dis(gen));
+    velocity = Eigen::Vector3f(velocity.x() + acceleration.x() * dt + dis(gen),
+      velocity.y() + acceleration.y() * dt + 0.1f * dis(gen), velocity.z() + acceleration.z() * dt + 0.1f * dis(gen));
     // Integrate velocity into the accumulated pose (small yaw rate to exercise rotation)
     Sophus::SE3f::Tangent twist;
     twist << velocity * dt, 0.0f, 0.0f, 0.1f * dt;
     pose = pose * Sophus::SE3f::exp(twist);
     pose_stamped.pose = pose;
-    std::cout << "Pose at time " << pose_stamped.stamp << ": "
-              << pose.translation().transpose() << std::endl;
+    std::cout << "Pose at time " << pose_stamped.stamp << ": " << pose.translation().transpose() << std::endl;
     poses.push_back(pose_stamped);
     undistort_->set_pose(pose_stamped);
   }
@@ -80,8 +77,7 @@ int main()
   // Points generated circular around origin with stamps decreasing from frame_stamp
   for (size_t i = 0; i < 10; ++i) {
     tam::core::state::types::Point<tam::core::state::types::ICP_EXT> point{};
-    point.pos = Eigen::Vector3f(
-      5.0f * std::cos(i * 2.0f * std::numbers::pi_v<float> / 10.0f) + dis(gen),
+    point.pos = Eigen::Vector3f(5.0f * std::cos(i * 2.0f * std::numbers::pi_v<float> / 10.0f) + dis(gen),
       5.0f * std::sin(i * 2.0f * std::numbers::pi_v<float> / 10.0f) + dis(gen), 0.0f);
     point.timestamp = -1e-3 * i;
     frame.push_back(point);
@@ -95,9 +91,8 @@ int main()
 
   std::cout << "Undistorted points:" << std::endl;
   for (size_t i = 0; i < frame.size(); ++i) {
-    std::cout << "Index: " << i
-              << ", Timestamp: " << frame[i].timestamp
-              << ", Point: " << frame[i].pos.transpose() << std::endl;
+    std::cout << "Index: " << i << ", Timestamp: " << frame[i].timestamp << ", Point: " << frame[i].pos.transpose()
+              << std::endl;
   }
 
   // clang-format off
@@ -112,16 +107,10 @@ int main()
   auto rec = tam::core::state::utils::spawn_rerun_stream("undistortion");
 
   // Knots
-  rec.log_static(
-    "undistort/x_knots", rerun::SeriesLines()
-                           .with_colors(rerun::Rgba32{255, 0, 0})
-                           .with_names("x_knots")
-                           .with_widths(4.0f));
-  rec.log_static(
-    "undistort/y_knots", rerun::SeriesLines()
-                           .with_colors(rerun::Rgba32{0, 255, 0})
-                           .with_names("y_knots")
-                           .with_widths(4.0f));
+  rec.log_static("undistort/x_knots",
+    rerun::SeriesLines().with_colors(rerun::Rgba32{255, 0, 0}).with_names("x_knots").with_widths(4.0f));
+  rec.log_static("undistort/y_knots",
+    rerun::SeriesLines().with_colors(rerun::Rgba32{0, 255, 0}).with_names("y_knots").with_widths(4.0f));
 
   // Log the data on a timeline called "step".
   for (size_t i = 0; i < poses.size(); ++i) {
@@ -133,11 +122,9 @@ int main()
 
   // Fitted polynomial
   rec.log_static(
-    "undistort/x",
-    rerun::SeriesLines().with_colors(rerun::Rgba32{255, 0, 0}).with_names("x").with_widths(1.0f));
+    "undistort/x", rerun::SeriesLines().with_colors(rerun::Rgba32{255, 0, 0}).with_names("x").with_widths(1.0f));
   rec.log_static(
-    "undistort/y",
-    rerun::SeriesLines().with_colors(rerun::Rgba32{0, 255, 0}).with_names("y").with_widths(1.0f));
+    "undistort/y", rerun::SeriesLines().with_colors(rerun::Rgba32{0, 255, 0}).with_names("y").with_widths(1.0f));
 
   // TODO(Maximilian): Log fitted polynomial for visualization
 #endif

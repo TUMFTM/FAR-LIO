@@ -16,23 +16,22 @@
 #pragma once
 #include <vector>
 
-namespace tam::core::state::types
-{
+namespace tam::core::state::types {
 enum class ThresholdType : std::uint8_t { FIXEDTHRESHOLD = 0, ADAPTIVETHRESHOLD = 1 };
+
 /**
  * @brief Configuration for the threshold handler
  */
-struct ThresholdConfig
-{
+struct ThresholdConfig {
   double initial_threshold{0.0};
   double min_motion_threshold{0.0};
   double max_correspondence_range{0.0};
 };
+
 /**
  * @brief Debug signals for the threshold handler
  */
-struct ThresholdDebug
-{
+struct ThresholdDebug {
   double internal_threshold{0.0};
   double current_threshold{0.0};
   double model_error{0.0};

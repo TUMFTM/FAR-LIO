@@ -19,13 +19,13 @@
 #include <chrono>
 #include <iostream>
 #include <variant>
+
 //
 int main()
 {
   tam::core::state::types::VelocityConfig config;
   tam::core::state::types::VelocityDebug debug;
-  auto vh =
-    tam::core::state::Derivative<tam::core::state::types::ICP_EXT>::from_config(config, debug);
+  auto vh = tam::core::state::Derivative<tam::core::state::types::ICP_EXT>::from_config(config, debug);
 
   const std::uint64_t t0 = static_cast<std::uint64_t>(1e9);
   const std::uint64_t step = static_cast<std::uint64_t>(0.1e9);
@@ -34,12 +34,10 @@ int main()
     pose.stamp = t0 + static_cast<std::uint64_t>(i) * step;
     pose.pose.translation().x() = static_cast<float>(i) * 1.0f;
     const auto result = vh->get_tangent({}, pose);
-    const auto & dbg = vh->get_debug();
-    const double dt =
-      dbg.conditional.count("vel_dt") ? std::get<double>(dbg.conditional.at("vel_dt")) : 0.0;
-    std::cout << "[" << i << "] vx=" << result.tangent(0) << " vy=" << result.tangent(1)
-              << " vz=" << result.tangent(2) << " dt=" << dt
-              << " velocity_time=" << dbg.velocity_time << " ms" << std::endl;
+    const auto& dbg = vh->get_debug();
+    const double dt = dbg.conditional.count("vel_dt") ? std::get<double>(dbg.conditional.at("vel_dt")) : 0.0;
+    std::cout << "[" << i << "] vx=" << result.tangent(0) << " vy=" << result.tangent(1) << " vz=" << result.tangent(2)
+              << " dt=" << dt << " velocity_time=" << dbg.velocity_time << " ms" << std::endl;
   }
   return 0;
 }

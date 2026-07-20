@@ -41,71 +41,63 @@
 
 #include "odometry_types/odometry_types.hpp"
 #include "odometry_types/point_types.hpp"
+#include "odometry_types/odometry_config.hpp"
 #include "ros2_watchdog_cpp/node_monitor.hpp"
-#include "tum_types_cpp/perception.hpp"
 //
 // Macros for optional PointCloud2 fields handled by cloud2eigen / eigen2cloud.
 // F(member, c++-type, ros_datatype_suffix, write_name, read_name_aliases...)
-#define SPHERICAL_FIELDS(F)            \
-  F(azimuth, float, FLOAT32, "azimuth", "azimuth")     \
-  F(range, float, FLOAT32, "range", "range")           \
+#define SPHERICAL_FIELDS(F)                        \
+  F(azimuth, float, FLOAT32, "azimuth", "azimuth") \
+  F(range, float, FLOAT32, "range", "range")       \
   F(elevation, float, FLOAT32, "elevation", "elevation")
-#define INTENSITY_FIELDS(F)            \
-  F(intensity, float, FLOAT32, "intensity", "intensity")
-#define RADAR_FIELDS(F)                       \
-  F(vel, float, FLOAT32, "velocity", "velocity")       \
-  F(rcs, float, FLOAT32, "rcs", "rcs")                 \
-  F(snr, float, FLOAT32, "snr", "snr")                 \
+#define INTENSITY_FIELDS(F) F(intensity, float, FLOAT32, "intensity", "intensity")
+#define RADAR_FIELDS(F)                                     \
+  F(vel, float, FLOAT32, "velocity", "velocity")            \
+  F(rcs, float, FLOAT32, "rcs", "rcs")                      \
+  F(snr, float, FLOAT32, "snr", "snr")                      \
   F(confidence, float, FLOAT32, "confidence", "confidence") \
   F(vel_interval, float, FLOAT32, "vel_interval", "velocity_interval")
-#define SENSOR_ID_FIELDS(F) \
-  F(sensor_id, std::uint8_t, UINT8, "sensor_id", "sensor_id", "id")
+#define SENSOR_ID_FIELDS(F) F(sensor_id, std::uint8_t, UINT8, "sensor_id", "sensor_id", "id")
 // Read Macros
 #define DECL_CONST_ITER(member, type, dtype, wname, ...) \
   std::optional<sensor_msgs::PointCloud2ConstIterator<type>> it_##member;
 #define INIT_CONST_ITER(member, type, dtype, wname, ...) \
-  it_##member.emplace(                                   \
-    msg,                                                 \
-    tam::core::state::utils::find_field(msg, sensor_msgs::msg::PointField::dtype, __VA_ARGS__));
+  it_##member.emplace(msg, tam::core::state::utils::find_field(msg, sensor_msgs::msg::PointField::dtype, __VA_ARGS__));
 // Validation entry: contributes a `|| <missing>` term for use in chained checks.
 #define CHECK_FIELD(member, type, dtype, wname, ...) \
-  || tam::core::state::utils::find_field(msg, sensor_msgs::msg::PointField::dtype, __VA_ARGS__) \
-       .empty()
+  || tam::core::state::utils::find_field(msg, sensor_msgs::msg::PointField::dtype, __VA_ARGS__).empty()
 #define READ_ITER(member, type, dtype, wname, ...) \
   points[i].member = **it_##member;                \
   ++(*it_##member);
 // Write Macros
-  #define DECL_ITER(member, type, dtype, wname, ...) \
-  std::optional<sensor_msgs::PointCloud2Iterator<type>> it_##member;
-#define INIT_ITER(member, type, dtype, wname, ...) \
-  it_##member.emplace(cloud_msg, wname);
+#define DECL_ITER(member, type, dtype, wname, ...) std::optional<sensor_msgs::PointCloud2Iterator<type>> it_##member;
+#define INIT_ITER(member, type, dtype, wname, ...) it_##member.emplace(cloud_msg, wname);
 #define WRITE_ITER(member, type, dtype, wname, ...) \
   **it_##member = points[i].member;                 \
   ++(*it_##member);
 #define ADD_FIELD(member, type, dtype, wname, ...) \
   offset = addPointField(cloud_msg, wname, 1, sensor_msgs::msg::PointField::dtype, offset);
-namespace tam::core::state
-{
-namespace utils
-{
+
+namespace tam::core::state {
+namespace utils {
 /**
  * @brief Convert a ROS time stamp (sec/nanosec) to nanoseconds
  * @param[in] stamp              ROS time stamp with `.sec` and `.nanosec` members
  * @return timestamp in nanoseconds
  */
 template <typename TimeT>
-inline std::uint64_t stamp2ns(const TimeT & stamp)
+inline std::uint64_t stamp2ns(const TimeT& stamp)
 {
-  return static_cast<std::uint64_t>(stamp.sec) * 1'000'000'000ULL +
-         static_cast<std::uint64_t>(stamp.nanosec);
+  return static_cast<std::uint64_t>(stamp.sec) * 1'000'000'000ULL + static_cast<std::uint64_t>(stamp.nanosec);
 }
+
 /**
  * @brief transform sophus pose to geometry msgs
  *
  * @param[in] T                  - Sophus::SE3f:
  * @return geometry_msgs::msg::Pose
  */
-geometry_msgs::msg::Pose sophus2pose(const Sophus::SE3f & T)
+geometry_msgs::msg::Pose sophus2pose(const Sophus::SE3f& T)
 {
   geometry_msgs::msg::Pose t;
   t.position.x = T.translation().x();
@@ -119,11 +111,12 @@ geometry_msgs::msg::Pose sophus2pose(const Sophus::SE3f & T)
   t.orientation.w = q.w();
   return t;
 }
+
 /**
  * @brief transform sophus pose to geometry msgs
  * @param[in] T                  - Sophus::SE3f:
  */
-geometry_msgs::msg::Transform sophus2transform(const Sophus::SE3f & T)
+geometry_msgs::msg::Transform sophus2transform(const Sophus::SE3f& T)
 {
   geometry_msgs::msg::Transform t;
   t.translation.x = T.translation().x();
@@ -137,41 +130,40 @@ geometry_msgs::msg::Transform sophus2transform(const Sophus::SE3f & T)
   t.rotation.w = q.w();
   return t;
 }
+
 /**
  * @brief Transform odometry message to PoseStamped
  * @param[in] odom               - nav_msgs::msg::Odometry::SharedPtr
  * @return types::PoseStamped
  */
-types::PoseStamped odom2pose(const nav_msgs::msg::Odometry::SharedPtr & odom)
+types::PoseStamped odom2pose(const nav_msgs::msg::Odometry::SharedPtr& odom)
 {
   types::PoseStamped pose;
   // Timestamp
   pose.stamp = stamp2ns(odom->header.stamp);
   // Pose
-  pose.pose = Sophus::SE3f(
-    Sophus::SE3f::QuaternionType(
-      odom->pose.pose.orientation.w, odom->pose.pose.orientation.x, odom->pose.pose.orientation.y,
-      odom->pose.pose.orientation.z),
-    Sophus::SE3f::Point(
-      odom->pose.pose.position.x, odom->pose.pose.position.y, odom->pose.pose.position.z));
+  pose.pose = Sophus::SE3f(Sophus::SE3f::QuaternionType(odom->pose.pose.orientation.w, odom->pose.pose.orientation.x,
+                             odom->pose.pose.orientation.y, odom->pose.pose.orientation.z),
+    Sophus::SE3f::Point(odom->pose.pose.position.x, odom->pose.pose.position.y, odom->pose.pose.position.z));
   return pose;
 }
+
 /**
  * @brief Transform odometry message to TangentStamped
  * @param[in] odom               - nav_msgs::msg::Odometry::SharedPtr
  * @return types::TangentStamped
  */
-types::TangentStamped odom2tangent(const nav_msgs::msg::Odometry::SharedPtr & odom)
+types::TangentStamped odom2tangent(const nav_msgs::msg::Odometry::SharedPtr& odom)
 {
   types::TangentStamped tangent;
   // Timestamp
   tangent.stamp = odom->header.stamp.sec * 1e9 + odom->header.stamp.nanosec;
   // Tangent
-  const auto & twist = odom->twist.twist;
-  tangent.tangent << twist.linear.x, twist.linear.y, twist.linear.z, twist.angular.x,
-    twist.angular.y, twist.angular.z;
+  const auto& twist = odom->twist.twist;
+  tangent.tangent << twist.linear.x, twist.linear.y, twist.linear.z, twist.angular.x, twist.angular.y, twist.angular.z;
   return tangent;
 }
+
 /**
  * @brief transform tf2 transform to Sophus pose
  * @param[in] transform          - geometry_msgs::msg::TransformStamped:
@@ -179,16 +171,16 @@ types::TangentStamped odom2tangent(const nav_msgs::msg::Odometry::SharedPtr & od
  * @return types::PoseStamped
 
  */
-types::PoseStamped transform2pose(const geometry_msgs::msg::TransformStamped & transform)
+types::PoseStamped transform2pose(const geometry_msgs::msg::TransformStamped& transform)
 {
   types::PoseStamped pose;
   pose.stamp = stamp2ns(transform.header.stamp);
-  const auto & t = transform.transform;
-  pose.pose = Sophus::SE3f(
-    Sophus::SE3f::QuaternionType(t.rotation.w, t.rotation.x, t.rotation.y, t.rotation.z),
+  const auto& t = transform.transform;
+  pose.pose = Sophus::SE3f(Sophus::SE3f::QuaternionType(t.rotation.w, t.rotation.x, t.rotation.y, t.rotation.z),
     Sophus::SE3f::Point(t.translation.x, t.translation.y, t.translation.z));
   return pose;
 }
+
 /**
  * @brief Transform Odometry to nav_msgs::msg::Odometry message
  * @param[in] odom               - types::Odometry
@@ -199,7 +191,7 @@ types::PoseStamped transform2pose(const geometry_msgs::msg::TransformStamped & t
  * @return nav_msgs::msg::Odometry
  */
 nav_msgs::msg::Odometry odom2msg(
-  const types::Odometry & odom, const std::string & frame_id, const std::string & child_frame_id)
+  const types::Odometry& odom, const std::string& frame_id, const std::string& child_frame_id)
 {
   nav_msgs::msg::Odometry msg;
   msg.header.stamp.sec = odom.stamp / 1000000000;
@@ -213,21 +205,19 @@ nav_msgs::msg::Odometry odom2msg(
   msg.twist.twist.angular.x = odom.tangent.tangent[3];
   msg.twist.twist.angular.y = odom.tangent.tangent[4];
   msg.twist.twist.angular.z = odom.tangent.tangent[5];
-  std::transform(
-    odom.pose.covariance.begin(), odom.pose.covariance.end(), msg.pose.covariance.begin(),
+  std::transform(odom.pose.covariance.begin(), odom.pose.covariance.end(), msg.pose.covariance.begin(),
     [](float val) { return static_cast<double>(val); });
-  std::transform(
-    odom.tangent.covariance.begin(), odom.tangent.covariance.end(), msg.twist.covariance.begin(),
+  std::transform(odom.tangent.covariance.begin(), odom.tangent.covariance.end(), msg.twist.covariance.begin(),
     [](float val) { return static_cast<double>(val); });
   return msg;
 }
+
 /**
  * @brief Transform diagnostic status to internal status
  * @param[in] msg                - diagnostic_msgs::msg::DiagnosticArray::ConstSharedPtr
  * @return types::DiagnosticStatus
  */
-types::DiagnosticStatus convert_diag_status(
-  const diagnostic_msgs::msg::DiagnosticArray::ConstSharedPtr & msg)
+types::DiagnosticStatus convert_diag_status(const diagnostic_msgs::msg::DiagnosticArray::ConstSharedPtr& msg)
 {
   types::DiagnosticStatus status{};
   // Take the first status message
@@ -239,58 +229,59 @@ types::DiagnosticStatus convert_diag_status(
   // NOTE: not converting key values here
   return status;
 }
+
 /**
  * @brief Set node monitor diagnostics
  * @param[in] odom               - types::Odometry
  * @param[in] monitor            - tam::core::NodeMonitor
  */
-void set_monitor(const types::Odometry & odom, tam::core::NodeMonitor * monitor)
+void set_monitor(const types::Odometry& odom, tam::core::NodeMonitor* monitor)
 {
   // Set error level and message
   monitor->set_error_lvl("diagnostic_status", static_cast<tam::types::ErrorLvl>(odom.status.level));
   monitor->set_message(odom.status.message);
   // Report key values to dashboard
-  for (const auto & [key, value] : odom.status.key_values) {
+  for (const auto& [key, value] : odom.status.key_values) {
     monitor->report_value(key, value);
   }
 }
+
 /**
  * @brief load static point cloud map from pcd file
  * @param[in] file_path          - std::string full path to the .pcd file
  * @return std::vector<types::Point<TConfig>>
  */
 template <typename TConfig>
-std::vector<types::Point<TConfig>> load_static_map(const std::string & file_path)
+std::vector<types::Point<TConfig>> load_static_map(const std::string& file_path)
 {
   std::cout << "Load map from " << file_path << std::endl;
 
-  pcl::PointCloud<tam::types::perception::XYZISPoint>::Ptr cloud(
-    new pcl::PointCloud<tam::types::perception::XYZISPoint>);
+  pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(
+    new pcl::PointCloud<pcl::PointXYZI>);
   std::vector<types::Point<TConfig>> map{};
 
-  if (pcl::io::loadPCDFile<tam::types::perception::XYZISPoint>(file_path, *cloud) == -1) {
+  if (pcl::io::loadPCDFile<pcl::PointXYZI>(file_path, *cloud) == -1) {
     std::cout << "Couldn't read file " << file_path << std::endl;
     return map;
   }
 
   map.reserve(cloud->size());
 
-  for (const auto & pt : cloud->points) {
+  for (const auto& pt : cloud->points) {
     types::Point<TConfig> p;
     p.pos = Eigen::Vector3f{pt.x, pt.y, pt.z};
-    // Set segment id if available
-    if constexpr (TConfig::SEG) {
-      p.seg = pt.segment;
-    }
+    // Assign intensity if available
+    if constexpr (TConfig::INTENSITY) p.intensity = pt.intensity;
     map.emplace_back(p);
   }
 
   std::cout << "Loading completed: " << cloud->width * cloud->height << " points" << std::endl;
   return map;
 }
+
 /**
  * @brief Search for a field in a PointCloud2 msg, given a list of candidates
- * 
+ *
  * @param[in] msg                - sensor_msgs::msg::PointCloud2
  *                                 msg to search in
  * @param[in] datatype           - std::uint8_t
@@ -299,15 +290,15 @@ std::vector<types::Point<TConfig>> load_static_map(const std::string & file_path
  *                                 list of candidates of field names
  */
 template <typename... S>
-inline std::string find_field(
-  const sensor_msgs::msg::PointCloud2 & msg, std::uint8_t datatype, S &&... candidates)
+inline std::string find_field(const sensor_msgs::msg::PointCloud2& msg, std::uint8_t datatype, S&&... candidates)
 {
-  for (const auto & f : msg.fields) {
+  for (const auto& f : msg.fields) {
     if (f.datatype != datatype) continue;
     if (((f.name == candidates) || ...)) return f.name;
   }
   return {};
 }
+
 /**
  * @brief transform incoming pointcloud to target frame and convert it to Eigen-vector
  *
@@ -318,8 +309,7 @@ inline std::string find_field(
  * @return std::vector<types::Point<TConfig>>
  */
 template <typename TConfig>
-std::vector<types::Point<TConfig>> cloud2eigen(
-  const sensor_msgs::msg::PointCloud2 & msg, const Eigen::Isometry3f & iso)
+std::vector<types::Point<TConfig>> cloud2eigen(const sensor_msgs::msg::PointCloud2& msg, const Eigen::Isometry3f& iso)
 {
   const double msg_time = rclcpp::Time(msg.header.stamp).seconds();
   const size_t num_points = static_cast<size_t>(msg.height) * msg.width;
@@ -332,8 +322,7 @@ std::vector<types::Point<TConfig>> cloud2eigen(
   SPHERICAL_FIELDS(DECL_CONST_ITER)
   if constexpr (TConfig::SPHERICAL) {
     if (false SPHERICAL_FIELDS(CHECK_FIELD)) {
-      throw std::runtime_error(
-        "[OdometryNode]: Missing 'azimuth'/'range'/'elevation' fields in PointCloud2 message");
+      throw std::runtime_error("[OdometryNode]: Missing 'azimuth'/'range'/'elevation' fields in PointCloud2 message");
     }
     SPHERICAL_FIELDS(INIT_CONST_ITER)
   }
@@ -363,11 +352,10 @@ std::vector<types::Point<TConfig>> cloud2eigen(
   }
 
   // Timestamp: optional + variant since the field name and datatype are runtime-determined.
-  std::optional<std::variant<
-    sensor_msgs::PointCloud2ConstIterator<uint32_t>, sensor_msgs::PointCloud2ConstIterator<float>,
-    sensor_msgs::PointCloud2ConstIterator<double>>>
+  std::optional<std::variant<sensor_msgs::PointCloud2ConstIterator<uint32_t>,
+    sensor_msgs::PointCloud2ConstIterator<float>, sensor_msgs::PointCloud2ConstIterator<double>>>
     msg_ts;
-  for (const auto & field : msg.fields) {
+  for (const auto& field : msg.fields) {
     if (field.name == "t" || field.name == "timestamp" || field.name == "time") {
       if (field.datatype == sensor_msgs::msg::PointField::UINT32) {
         msg_ts.emplace(sensor_msgs::PointCloud2ConstIterator<uint32_t>(msg, field.name));
@@ -382,17 +370,25 @@ std::vector<types::Point<TConfig>> cloud2eigen(
 
   // Single pass over points.
   for (size_t i = 0; i < num_points; ++i, ++it_x, ++it_y, ++it_z) {
-    auto & pt = points[i];
+    auto& pt = points[i];
     pt.pos = iso * Eigen::Vector3f{*it_x, *it_y, *it_z};
 
-    if constexpr (TConfig::SPHERICAL) { SPHERICAL_FIELDS(READ_ITER) }
-    if constexpr (TConfig::INTENSITY) { INTENSITY_FIELDS(READ_ITER) }
-    if constexpr (types::HASRADAR<TConfig>) { RADAR_FIELDS(READ_ITER) }
-    if constexpr (TConfig::SENSOR_ID) { SENSOR_ID_FIELDS(READ_ITER) }
+    if constexpr (TConfig::SPHERICAL) {
+      SPHERICAL_FIELDS(READ_ITER)
+    }
+    if constexpr (TConfig::INTENSITY) {
+      INTENSITY_FIELDS(READ_ITER)
+    }
+    if constexpr (types::HASRADAR<TConfig>) {
+      RADAR_FIELDS(READ_ITER)
+    }
+    if constexpr (TConfig::SENSOR_ID) {
+      SENSOR_ID_FIELDS(READ_ITER)
+    }
 
     if (msg_ts) {
       std::visit(
-        [&](auto & it) {
+        [&](auto& it) {
           double ts_s = 0.0;
           auto raw = *it;
           ++it;
@@ -415,6 +411,7 @@ std::vector<types::Point<TConfig>> cloud2eigen(
 
   return points;
 }
+
 /**
  * @brief transform vector of points to sensor_msgs::msg::PointCloud2
  *
@@ -426,7 +423,7 @@ std::vector<types::Point<TConfig>> cloud2eigen(
  */
 template <typename TConfig>
 sensor_msgs::msg::PointCloud2 eigen2cloud(
-  const std::vector<types::Point<TConfig>> & points, const std_msgs::msg::Header & header)
+  const std::vector<types::Point<TConfig>>& points, const std_msgs::msg::Header& header)
 {
   // Create PointCloud2 message
   sensor_msgs::msg::PointCloud2 cloud_msg;
@@ -455,23 +452,39 @@ sensor_msgs::msg::PointCloud2 eigen2cloud(
   sensor_msgs::PointCloud2Iterator<float> it_z(cloud_msg, "z");
 
   SPHERICAL_FIELDS(DECL_ITER)
-  if constexpr (TConfig::SPHERICAL) { SPHERICAL_FIELDS(INIT_ITER) }
+  if constexpr (TConfig::SPHERICAL) {
+    SPHERICAL_FIELDS(INIT_ITER)
+  }
   INTENSITY_FIELDS(DECL_ITER)
-  if constexpr (TConfig::INTENSITY) { INTENSITY_FIELDS(INIT_ITER) }
+  if constexpr (TConfig::INTENSITY) {
+    INTENSITY_FIELDS(INIT_ITER)
+  }
   RADAR_FIELDS(DECL_ITER)
-  if constexpr (types::HASRADAR<TConfig>) { RADAR_FIELDS(INIT_ITER) }
+  if constexpr (types::HASRADAR<TConfig>) {
+    RADAR_FIELDS(INIT_ITER)
+  }
   SENSOR_ID_FIELDS(DECL_ITER)
-  if constexpr (TConfig::SENSOR_ID) { SENSOR_ID_FIELDS(INIT_ITER) }
+  if constexpr (TConfig::SENSOR_ID) {
+    SENSOR_ID_FIELDS(INIT_ITER)
+  }
 
   for (size_t i = 0; i < points.size(); ++i, ++it_x, ++it_y, ++it_z) {
-    const Eigen::Vector3f & p = points[i].pos;
+    const Eigen::Vector3f& p = points[i].pos;
     *it_x = p.x();
     *it_y = p.y();
     *it_z = p.z();
-    if constexpr (TConfig::SPHERICAL) { SPHERICAL_FIELDS(WRITE_ITER) }
-    if constexpr (TConfig::INTENSITY) { INTENSITY_FIELDS(WRITE_ITER) }
-    if constexpr (types::HASRADAR<TConfig>) { RADAR_FIELDS(WRITE_ITER) }
-    if constexpr (TConfig::SENSOR_ID) { SENSOR_ID_FIELDS(WRITE_ITER) }
+    if constexpr (TConfig::SPHERICAL) {
+      SPHERICAL_FIELDS(WRITE_ITER)
+    }
+    if constexpr (TConfig::INTENSITY) {
+      INTENSITY_FIELDS(WRITE_ITER)
+    }
+    if constexpr (types::HASRADAR<TConfig>) {
+      RADAR_FIELDS(WRITE_ITER)
+    }
+    if constexpr (TConfig::SENSOR_ID) {
+      SENSOR_ID_FIELDS(WRITE_ITER)
+    }
   }
   return cloud_msg;
 }

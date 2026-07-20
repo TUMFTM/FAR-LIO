@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Maximilian Leitenstern, Marcel Weinmann, Patrick Haft
+ * Copyright 2024 Maximilian Leitenstern, Marcel Weinmann
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,6 @@
 // https://github.com/PRBonn/kiss-icp/blob/main/cpp/kiss_icp/core/VoxelHashMap.hpp
 #pragma once
 
-#include <cmath>
-#include <cuco/static_map.cuh>
-#include <cuco/static_set.cuh>
 #include <cuda_runtime.h>
 #include <nvtx3/nvToolsExt.h>
 #include <thrust/device_vector.h>
@@ -31,7 +28,10 @@
 #include <algorithm>
 #include <atomic>
 #include <cfloat>
+#include <cmath>
 #include <cstddef>
+#include <cuco/static_map.cuh>
+#include <cuco/static_set.cuh>
 #include <cuda/std/atomic>
 #include <iostream>
 #include <limits>
@@ -42,8 +42,8 @@
 
 #include "map_handler/map_handler_base.hpp"
 #include "voxel_tools/voxel_tools.cuh"
-namespace tam::core::state::cuda
-{
+
+namespace tam::core::state::cuda {
 /**
  * @brief Kernel to find the closest neighbors between the scan and the map
  * @param [in] map_ref            Reference to the Hashmap
@@ -54,14 +54,12 @@ namespace tam::core::state::cuda
  * @param [in] num_points         Number of points in the input point cloud
  */
 template <typename TConfig, typename Map>
-__global__ void search_closest_neighbor_kernel(
-  Map map_ref, types::Point<TConfig> * __restrict__ points,
-  types::Correspondence<TConfig> * __restrict__ correspondences, const double voxel_size,
-  const int16_t adjacent_voxels, const size_t num_points)
+__global__ void search_closest_neighbor_kernel(Map map_ref, types::Point<TConfig>* __restrict__ points,
+  types::Correspondence<TConfig>* __restrict__ correspondences, const double voxel_size, const int16_t adjacent_voxels,
+  const size_t num_points)
 {
   auto tid = threadIdx.x + blockIdx.x * blockDim.x;
-  int16_t num_neighbors =
-    (2 * adjacent_voxels + 1) * (2 * adjacent_voxels + 1) * (2 * adjacent_voxels + 1);
+  int16_t num_neighbors = (2 * adjacent_voxels + 1) * (2 * adjacent_voxels + 1) * (2 * adjacent_voxels + 1);
 
   while (tid < num_points) {
     const auto query_point = points[tid];
@@ -78,7 +76,7 @@ __global__ void search_closest_neighbor_kernel(
       auto found = map_ref.find(local_neighbors[i]);
       if (found != map_ref.end()) {
         // Capture pointer to the content of the voxel
-        auto * voxel_data = found->second;
+        auto* voxel_data = found->second;
         for (int32_t j = 0; j < voxel_data->counter; ++j) {
           float distance_sq = (voxel_data->data[j].pos - query_point.pos).squaredNorm();
           if (distance_sq < closest_distance_sq) {
@@ -94,6 +92,7 @@ __global__ void search_closest_neighbor_kernel(
     tid += gridDim.x * blockDim.x;
   }
 }
+
 /**
  * @brief Kernel to find the closest neighbors between the scan and the map
  * @param [in] map_ref            Reference to the Hashmap
@@ -106,13 +105,11 @@ __global__ void search_closest_neighbor_kernel(
  * @note Function does not check whether num_neighbors exceeds TConfig::NUM_NEIGHBORS
  */
 template <typename TConfig, typename Map>
-__global__ void search_closest_neighbors_kernel(
-  Map map_ref, types::Neighbors<TConfig> * __restrict__ neighbors, const double voxel_size,
-  const int16_t adjacent_voxels, const int16_t num_neighbors, const size_t num_points)
+__global__ void search_closest_neighbors_kernel(Map map_ref, types::Neighbors<TConfig>* __restrict__ neighbors,
+  const double voxel_size, const int16_t adjacent_voxels, const int16_t num_neighbors, const size_t num_points)
 {
   auto tid = threadIdx.x + blockIdx.x * blockDim.x;
-  int16_t num_neighbor_voxels =
-    (2 * adjacent_voxels + 1) * (2 * adjacent_voxels + 1) * (2 * adjacent_voxels + 1);
+  int16_t num_neighbor_voxels = (2 * adjacent_voxels + 1) * (2 * adjacent_voxels + 1) * (2 * adjacent_voxels + 1);
 
   while (tid < num_points) {
     const auto query_point = *neighbors[tid].point;
@@ -125,14 +122,14 @@ __global__ void search_closest_neighbors_kernel(
 
     // Create local arrays to avoid repeated global memory writing
     float local_distances[TConfig::NUM_NEIGHBORS] = {};
-    types::Point<TConfig> * local_neighbor_ptrs[TConfig::NUM_NEIGHBORS] = {};
+    types::Point<TConfig>* local_neighbor_ptrs[TConfig::NUM_NEIGHBORS] = {};
     std::uint8_t current_neighbors = 0;
 
     for (int16_t i = 0; i < num_neighbor_voxels; ++i) {
       auto found = map_ref.find(local_neighbors[i]);
       if (found != map_ref.end()) {
         // Capture pointer to the content of the voxel
-        auto * voxel_data = found->second;
+        auto* voxel_data = found->second;
         for (int32_t j = 0; j < voxel_data->counter; ++j) {
           const float distance_sq = (voxel_data->data[j].pos - query_point.pos).squaredNorm();
           // check if map is already full
@@ -144,9 +141,7 @@ __global__ void search_closest_neighbors_kernel(
             for (int16_t neighbor_idx = 0; neighbor_idx < num_neighbors; ++neighbor_idx) {
               // if current distance is larger than maximal_distance_sq and distance
               // update
-              if (
-                maximal_distance_sq < local_distances[neighbor_idx] &&
-                distance_sq < local_distances[neighbor_idx]) {
+              if (maximal_distance_sq < local_distances[neighbor_idx] && distance_sq < local_distances[neighbor_idx]) {
                 maximal_distance_sq = local_distances[neighbor_idx];
                 largest_neighbor_index = neighbor_idx;
               }
@@ -174,6 +169,7 @@ __global__ void search_closest_neighbors_kernel(
     tid += gridDim.x * blockDim.x;
   }
 }
+
 /**
  * @brief Kernel to insert points into the voxel hashmap
  * @param [in] map_ref            Reference to the Hashmap
@@ -192,14 +188,11 @@ __global__ void search_closest_neighbors_kernel(
  * @param [in] origin_z           Origin (z) for the adaptive max points
  */
 template <typename TConfig, typename Map>
-__global__ void insert_values_kernel(
-  Map map_ref, const types::Point<types::Point_XYZ> * __restrict__ points,
-  types::Neighbors<TConfig> * __restrict__ neighbors, unsigned int * idx, const size_t num_points,
-  const double voxel_size, const double map_resolution,
-  const int16_t max_points = TConfig::MAX_POINTS_PER_VOXEL,
-  const int16_t min_points = TConfig::MAX_POINTS_PER_VOXEL, const float range = 0.0,
-  const float max_points_scale = 0.0, const float origin_x = 0.0f, const float origin_y = 0.0f,
-  const float origin_z = 0.0f)
+__global__ void insert_values_kernel(Map map_ref, const types::Point<types::Point_XYZ>* __restrict__ points,
+  types::Neighbors<TConfig>* __restrict__ neighbors, unsigned int* idx, const size_t num_points,
+  const double voxel_size, const double map_resolution, const int16_t max_points = TConfig::MAX_POINTS_PER_VOXEL,
+  const int16_t min_points = TConfig::MAX_POINTS_PER_VOXEL, const float range = 0.0, const float max_points_scale = 0.0,
+  const float origin_x = 0.0f, const float origin_y = 0.0f, const float origin_z = 0.0f)
 {
   auto tid = threadIdx.x + blockIdx.x * blockDim.x;
   Eigen::Vector3f origin(origin_x, origin_y, origin_z);
@@ -220,7 +213,7 @@ __global__ void insert_values_kernel(
           // clang-format on
         }
       }
-      int * lock = &found->second->lock;
+      int* lock = &found->second->lock;
 
       // Check if the voxel is already locked
       while (atomicCAS(lock, 0, 1) != 0) {
@@ -236,8 +229,7 @@ __global__ void insert_values_kernel(
       // Insert the point if the voxel is not full
       if (found->second->counter < max_points_per_voxel && insert) {
         int32_t current_count = found->second->counter;
-        found->second->data[found->second->counter] =
-          utils::convert_point<types::Point_XYZ, TConfig>(points[tid]);
+        found->second->data[found->second->counter] = utils::convert_point<types::Point_XYZ, TConfig>(points[tid]);
         ++found->second->counter;
         // Store pointer to the point in the map
         // Note: atomicAdd returns value before incrementing, so we can use it to get the index
@@ -249,6 +241,7 @@ __global__ void insert_values_kernel(
     tid += gridDim.x * blockDim.x;
   }
 }
+
 /**
  * @brief Kernel to copy values from the active to the inactive hashmap
  * @param [in] map_active         Reference to the active Hashmap
@@ -258,8 +251,7 @@ __global__ void insert_values_kernel(
  */
 template <typename TConfig, typename Map>
 __global__ void copy_values_kernel(
-  Map map_active, Map map_inactive, const custom_voxel_type * __restrict__ keys,
-  const size_t num_values)
+  Map map_active, Map map_inactive, const custom_voxel_type* __restrict__ keys, const size_t num_values)
 {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
   if (idx >= num_values) return;
@@ -272,8 +264,8 @@ __global__ void copy_values_kernel(
   if (src_entry == map_active.end() || dst_entry == map_inactive.end()) return;
   if (src_entry->second == nullptr || dst_entry->second == nullptr) return;
 
-  auto * src = src_entry->second;
-  auto * dst = dst_entry->second;
+  auto* src = src_entry->second;
+  auto* dst = dst_entry->second;
 
   // compute the number of bytes to copy (16-byte vector for coalesced access)
   using vec_t = uint4;
@@ -284,8 +276,8 @@ __global__ void copy_values_kernel(
   size_t n = bytes_to_copy / sizeof(vec_t);
   size_t r = bytes_to_copy % sizeof(vec_t);
 
-  auto * dst_vec = reinterpret_cast<vec_t *>(dst);
-  auto * src_vec = reinterpret_cast<const vec_t *>(src);
+  auto* dst_vec = reinterpret_cast<vec_t*>(dst);
+  auto* src_vec = reinterpret_cast<const vec_t*>(src);
 
 #pragma unroll
   for (size_t i = 0; i < n; ++i) {
@@ -293,21 +285,21 @@ __global__ void copy_values_kernel(
   }
 
   if (r > 0) {
-    auto * dst_bytes = reinterpret_cast<char *>(dst);
-    auto * src_bytes = reinterpret_cast<const char *>(src);
+    auto* dst_bytes = reinterpret_cast<char*>(dst);
+    auto* src_bytes = reinterpret_cast<const char*>(src);
 #pragma unroll
     for (size_t i = bytes_to_copy - r; i < bytes_to_copy; ++i) {
       dst_bytes[i] = src_bytes[i];
     }
   }
 }
+
 template <typename TConfig>
 class VoxelHashMap : public MapHandler<TConfig>
 {
 public:
   // Define map type
-  using StaticMapType = cuco::static_map<
-    custom_voxel_type, fixed_sized_points_array<TConfig> *,
+  using StaticMapType = cuco::static_map<custom_voxel_type, fixed_sized_points_array<TConfig>*,
     cuco::extent<std::size_t, types::MAX_MAP_SIZE>, ::cuda::thread_scope_device, custom_key_equal,
     cuco::linear_probing<1, custom_hash>>;
 
@@ -316,22 +308,23 @@ public:
    * @brief Constructor for param manager and logger
    */
   static std::unique_ptr<MapHandler<TConfig>> from_config(
-    tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
+    tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
   {
     std::unique_ptr<VoxelHashMap<TConfig>> mh =
       std::unique_ptr<VoxelHashMap<TConfig>>(new VoxelHashMap<TConfig>(pmg, logger));
     return mh;
   }
+
   /**
    * @brief Constructor for config and debug objects
    */
-  static std::unique_ptr<MapHandler<TConfig>> from_config(
-    const types::MapConfig & config, const types::MapDebug & debug)
+  static std::unique_ptr<MapHandler<TConfig>> from_config(const types::MapConfig& config, const types::MapDebug& debug)
   {
     std::unique_ptr<VoxelHashMap<TConfig>> mh =
       std::unique_ptr<VoxelHashMap<TConfig>>(new VoxelHashMap<TConfig>(config, debug));
     return mh;
   }
+
   /**
    * @brief Clear the map
    */
@@ -342,10 +335,12 @@ public:
     this->debug_.num_voxel = 0;
     this->debug_.num_points = 0;
   }
+
   /**
    * @brief Check if map is empty
    */
   __host__ bool empty() const override { return this->get_active_map().size() == 0; }
+
   /**
    * @brief Get the amount of points in the map
    * @return                        Number of points in the map
@@ -355,17 +350,17 @@ public:
     nvtxRangePush("num_points");
     unsigned int h_counter = 0;
     cudaMemset(this->counter_d_, 0, sizeof(unsigned int));
-    unsigned int * counter_ptr = this->counter_d_;
+    unsigned int* counter_ptr = this->counter_d_;
 
     this->get_active_map().for_each(
-      [counter_ptr] __device__(auto const & slot) { atomicAdd(counter_ptr, slot.second->counter); },
-      stream.get());
+      [counter_ptr] __device__(auto const& slot) { atomicAdd(counter_ptr, slot.second->counter); }, stream.get());
 
     stream.wait();
     cudaMemcpy(&h_counter, this->counter_d_, sizeof(unsigned int), cudaMemcpyDeviceToHost);
     nvtxRangePop();
     return static_cast<std::size_t>(h_counter);
   }
+
   /**
    * @brief search for closest neighbor of a point
    * @param [in] point                       Point/ Points to search for
@@ -373,27 +368,24 @@ public:
    * @param [in] adjacent_voxels             Number of adjacent voxels to search in
    * @param [in] stream                      Reference to the CUDA stream to use
    */
-  __host__ void search_closest_neighbor(
-    thrust::device_vector<types::Point<TConfig>> & points,
-    thrust::device_vector<types::Correspondence<TConfig>> & correspondences,
-    const int16_t adjacent_voxels = 1, ::cuda::stream_ref stream = {}) const override
+  __host__ void search_closest_neighbor(thrust::device_vector<types::Point<TConfig>>& points,
+    thrust::device_vector<types::Correspondence<TConfig>>& correspondences, const int16_t adjacent_voxels = 1,
+    ::cuda::stream_ref stream = {}) const override
   {
     nvtxRangePush("search_closest_neighbor");
     correspondences.resize(points.size());
-    auto grid_size =
-      std::min(4 * this->num_multiprocessors_, (points.size() + BLOCK_SIZE - 1) / BLOCK_SIZE);
+    auto grid_size = std::min(4 * this->num_multiprocessors_, (points.size() + BLOCK_SIZE - 1) / BLOCK_SIZE);
 
-    types::Point<TConfig> * raw_ptr_frame = thrust::raw_pointer_cast(points.data());
-    types::Correspondence<TConfig> * raw_ptr_correspondences =
-      thrust::raw_pointer_cast(correspondences.data());
+    types::Point<TConfig>* raw_ptr_frame = thrust::raw_pointer_cast(points.data());
+    types::Correspondence<TConfig>* raw_ptr_correspondences = thrust::raw_pointer_cast(correspondences.data());
 
-    search_closest_neighbor_kernel<<<grid_size, BLOCK_SIZE, 0, stream.get()>>>(
-      this->get_active_map().ref(cuco::find), raw_ptr_frame, raw_ptr_correspondences,
-      this->config_.voxel_size, adjacent_voxels, points.size());
+    search_closest_neighbor_kernel<<<grid_size, BLOCK_SIZE, 0, stream.get()>>>(this->get_active_map().ref(cuco::find),
+      raw_ptr_frame, raw_ptr_correspondences, this->config_.voxel_size, adjacent_voxels, points.size());
 
     stream.wait();
     nvtxRangePop();
   }
+
   /**
    * @brief Add points to the map
    * @param [in] points             Points to add
@@ -404,10 +396,8 @@ public:
    * @param [in] use_active_map     Flag to indicate if the active or inactive map should be used
    * @param [in] stream             Reference to the CUDA stream to use
    */
-  __host__ void add_points(
-    const std::vector<types::Point<types::Point_XYZ>> & points,
-    const std::variant<int16_t, types::AdaptiveMapDensity> & map_density =
-      TConfig::MAX_POINTS_PER_VOXEL,
+  __host__ void add_points(const std::vector<types::Point<types::Point_XYZ>>& points,
+    const std::variant<int16_t, types::AdaptiveMapDensity>& map_density = TConfig::MAX_POINTS_PER_VOXEL,
     const int16_t adjacent_voxels = 1, const int16_t num_neighbors = TConfig::NUM_NEIGHBORS,
     const bool use_active_map = true, ::cuda::stream_ref stream = {}) override
   {
@@ -416,8 +406,7 @@ public:
     this->points2insert_.resize(points.size());
     thrust::copy(points.begin(), points.end(), this->points2insert_.begin());
     // Call the device version of add_points
-    this->add_points_device(
-      this->points2insert_, map_density, adjacent_voxels, num_neighbors, use_active_map, stream);
+    this->add_points_device(this->points2insert_, map_density, adjacent_voxels, num_neighbors, use_active_map, stream);
 
     // Clear the member variable if its a global map
     if (!this->config_.frame_map) {
@@ -426,6 +415,7 @@ public:
       stream.wait();
     }
   }
+
   /**
    * @brief Add points to the map (points on device)
    * @param [in] points             Points to add
@@ -438,10 +428,8 @@ public:
    * @note Callers using use_active_map = false are expected to hold the base class's
    * map_async_update_mutex during the call to ensure that no concurrent operations intervene.
    */
-  __host__ void add_points_device(
-    const thrust::device_vector<types::Point<types::Point_XYZ>> & device_points,
-    const std::variant<int16_t, types::AdaptiveMapDensity> & map_density =
-      TConfig::MAX_POINTS_PER_VOXEL,
+  __host__ void add_points_device(const thrust::device_vector<types::Point<types::Point_XYZ>>& device_points,
+    const std::variant<int16_t, types::AdaptiveMapDensity>& map_density = TConfig::MAX_POINTS_PER_VOXEL,
     const int16_t adjacent_voxels = 1, const int16_t num_neighbors = TConfig::NUM_NEIGHBORS,
     const bool use_active_map = true, ::cuda::stream_ref stream = {}) override
   {
@@ -555,6 +543,7 @@ public:
     }
     nvtxRangePop();
   }
+
   /**
    * @brief Update the map with new points
    * @param [in] points             Points to update
@@ -565,10 +554,8 @@ public:
    * @param [in] num_neighbors      Number of neighbors to search for
    * @param [in] stream             Reference to the CUDA stream to use
    */
-  __host__ void update_points(
-    const thrust::device_vector<types::Point<TConfig>> & points, const Sophus::SE3f & pose,
-    const std::variant<int16_t, types::AdaptiveMapDensity> & map_density =
-      TConfig::MAX_POINTS_PER_VOXEL,
+  __host__ void update_points(const thrust::device_vector<types::Point<TConfig>>& points, const Sophus::SE3f& pose,
+    const std::variant<int16_t, types::AdaptiveMapDensity>& map_density = TConfig::MAX_POINTS_PER_VOXEL,
     const int16_t adjacent_voxels = 1, const int16_t num_neighbors = TConfig::NUM_NEIGHBORS,
     ::cuda::stream_ref stream = {})
   {
@@ -577,13 +564,10 @@ public:
 
     // Transform points to map frame and map point type
     thrust::device_vector<types::Point<types::Point_XYZ>> points_transformed(points.size());
-    thrust::transform(
-      thrust::cuda::par.on(stream.get()), points.begin(), points.end(), points_transformed.begin(),
-      [] __device__(const types::Point<TConfig> & src) {
-        return utils::convert_point<TConfig, types::Point_XYZ>(src);
-      });
+    thrust::transform(thrust::cuda::par.on(stream.get()), points.begin(), points.end(), points_transformed.begin(),
+      [] __device__(const types::Point<TConfig>& src) { return utils::convert_point<TConfig, types::Point_XYZ>(src); });
     utils::transform_points(pose, points_transformed, stream);
-    const Eigen::Vector3f & origin = pose.translation();
+    const Eigen::Vector3f& origin = pose.translation();
 
     // Insert points into the map
     this->insert_points(points_transformed, map_density, stream);
@@ -633,6 +617,7 @@ public:
     // Update debug information
     this->debug_.update_time = time;
   }
+
   /**
    * @brief Get the map density
    * @param [in] range_close          Range to consider as close
@@ -648,12 +633,12 @@ public:
     cudaMemset(this->counter_d_, 0, sizeof(unsigned int));
     cudaMemset(this->counter2_d_, 0, sizeof(unsigned int));
 
-    unsigned int * counter_voxels_ptr = this->counter_d_;
-    unsigned int * counter_points_ptr = this->counter2_d_;
+    unsigned int* counter_voxels_ptr = this->counter_d_;
+    unsigned int* counter_points_ptr = this->counter2_d_;
     double range2 = range * range;
 
     this->get_active_map().for_each(
-      [counter_voxels_ptr, counter_points_ptr, range2] __device__(auto const & slot) {
+      [counter_voxels_ptr, counter_points_ptr, range2] __device__(auto const& slot) {
         if ((slot.second->data[0].pos).squaredNorm() < range2) {
           atomicAdd(counter_voxels_ptr, 1);
           atomicAdd(counter_points_ptr, slot.second->counter);
@@ -675,23 +660,23 @@ public:
     // clang-format on
     return density;
   }
+
   /**
    * @brief Get the map as a point cloud
    * @return                        Point cloud of the map
    */
-  __host__ thrust::device_vector<types::Point<TConfig>> get_cloud(
-    ::cuda::stream_ref stream = {}) const override
+  __host__ thrust::device_vector<types::Point<TConfig>> get_cloud(::cuda::stream_ref stream = {}) const override
   {
     nvtxRangePush("get_cloud");
     thrust::device_vector<types::Point<TConfig>> device_points(this->num_points(stream));
-    types::Point<TConfig> * device_points_ptr = thrust::raw_pointer_cast(device_points.data());
+    types::Point<TConfig>* device_points_ptr = thrust::raw_pointer_cast(device_points.data());
 
     // Setup counter - we dont need to copy it afterwards though
     cudaMemset(this->counter_d_, 0, sizeof(unsigned int));
-    unsigned int * counter_ptr = this->counter_d_;
+    unsigned int* counter_ptr = this->counter_d_;
     // Collect keys to erase
     this->get_active_map().for_each(
-      [device_points_ptr, counter_ptr] __device__(auto const & slot) {
+      [device_points_ptr, counter_ptr] __device__(auto const& slot) {
         // Copy points to device points vector
         for (int16_t i = 0; i < slot.second->counter; ++i) {
           unsigned int index = atomicAdd(counter_ptr, 1);
@@ -703,6 +688,7 @@ public:
     nvtxRangePop();
     return device_points;
   }
+
   /**
    * @brief Get the vector holding the neighbors of the points in the map
    * @return                        Neighbors of the points in the map
@@ -713,6 +699,7 @@ public:
     // Return the neighbors vector
     return this->get_active_neighbors();
   }
+
   /**
    * @brief Switch the active map
    */
@@ -729,17 +716,18 @@ public:
 
 protected:
   // Inherit constructor from MapHandler for param manager and logger
-  VoxelHashMap(tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
-  : MapHandler<TConfig>(pmg, logger)
+  VoxelHashMap(tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
+      : MapHandler<TConfig>(pmg, logger)
   {
     this->setup_cuda_device();
   }
+
   // Inherit constructor from MapHandler for config and debug object
-  VoxelHashMap(const types::MapConfig & config, const types::MapDebug & debug)
-  : MapHandler<TConfig>(config, debug)
+  VoxelHashMap(const types::MapConfig& config, const types::MapDebug& debug) : MapHandler<TConfig>(config, debug)
   {
     this->setup_cuda_device();
   }
+
   /**
    * @brief Search for the closest neighbors of a point
    * @param [in] correspondences      vector to return the correspondences in
@@ -748,25 +736,21 @@ protected:
    * @param [in] use_active_map     Flag to indicate if the active or inactive map should be used
    * @param [in] stream               Reference to the CUDA stream to use
    */
-  __host__ void search_closest_neighbors(
-    thrust::device_vector<types::Neighbors<TConfig>> & neighbors, const int16_t adjacent_voxels,
-    const int16_t num_neighbors, const bool use_active_map = true,
+  __host__ void search_closest_neighbors(thrust::device_vector<types::Neighbors<TConfig>>& neighbors,
+    const int16_t adjacent_voxels, const int16_t num_neighbors, const bool use_active_map = true,
     ::cuda::stream_ref stream = {}) override
   {
     nvtxRangePush("search_closest_neighbors");
 
     // Get reference to the target map
-    const StaticMapType & target_map =
-      use_active_map ? this->get_active_map() : this->get_inactive_map();
+    const StaticMapType& target_map = use_active_map ? this->get_active_map() : this->get_inactive_map();
 
-    auto grid_size =
-      std::min(4 * this->num_multiprocessors_, (neighbors.size() + BLOCK_SIZE - 1) / BLOCK_SIZE);
+    auto grid_size = std::min(4 * this->num_multiprocessors_, (neighbors.size() + BLOCK_SIZE - 1) / BLOCK_SIZE);
 
-    types::Neighbors<TConfig> * raw_ptr_neighbors = thrust::raw_pointer_cast(neighbors.data());
+    types::Neighbors<TConfig>* raw_ptr_neighbors = thrust::raw_pointer_cast(neighbors.data());
 
-    search_closest_neighbors_kernel<<<grid_size, BLOCK_SIZE, 0, stream.get()>>>(
-      target_map.ref(cuco::find), raw_ptr_neighbors, this->config_.voxel_size, adjacent_voxels,
-      num_neighbors, neighbors.size());
+    search_closest_neighbors_kernel<<<grid_size, BLOCK_SIZE, 0, stream.get()>>>(target_map.ref(cuco::find),
+      raw_ptr_neighbors, this->config_.voxel_size, adjacent_voxels, num_neighbors, neighbors.size());
 
     stream.wait();
     nvtxRangePop();
@@ -782,12 +766,11 @@ public:
    * @param [out] struct_vector      Vector to hold the fixed sized points
    * @param [in] stream              Reference to the CUDA stream to use
    */
-  __host__ void setup_voxel_grid(
-    StaticMapType & map, const thrust::device_vector<types::Point<types::Point_XYZ>> & points,
-    thrust::device_vector<custom_voxel_type> & voxel_keys,
-    thrust::device_vector<fixed_sized_points_array<TConfig> *> & pointer_vector,
-    thrust::device_vector<fixed_sized_points_array<TConfig>> & struct_vector,
-    ::cuda::stream_ref stream = {})
+  __host__ void setup_voxel_grid(StaticMapType& map,
+    const thrust::device_vector<types::Point<types::Point_XYZ>>& points,
+    thrust::device_vector<custom_voxel_type>& voxel_keys,
+    thrust::device_vector<fixed_sized_points_array<TConfig>*>& pointer_vector,
+    thrust::device_vector<fixed_sized_points_array<TConfig>>& struct_vector, ::cuda::stream_ref stream = {})
   {
     nvtxRangePush("setup_voxel_grid");
     // Capture voxel keys
@@ -797,31 +780,27 @@ public:
     }
     voxel_keys.resize(points.size());
     double voxel_size = this->config_.voxel_size;
-    thrust::transform(
-      thrust::cuda::par.on(stream.get()), points.begin(), points.end(), voxel_keys.begin(),
-      [voxel_size] __device__(const auto & point) {
-        return PointToVoxel<types::Point_XYZ>(voxel_size)(point);
-      });
+    thrust::transform(thrust::cuda::par.on(stream.get()), points.begin(), points.end(), voxel_keys.begin(),
+      [voxel_size] __device__(const auto& point) { return PointToVoxel<types::Point_XYZ>(voxel_size)(point); });
     // Create struct and pointer vectors
     auto end_it_pointer_vector = pointer_vector.begin() + voxel_keys.size();
     auto end_it_struct_vector = struct_vector.begin() + voxel_keys.size();
 
-    thrust::for_each(
-      thrust::cuda::par.on(stream.get()),
+    thrust::for_each(thrust::cuda::par.on(stream.get()),
       thrust::make_zip_iterator(thrust::make_tuple(pointer_vector.begin(), struct_vector.begin())),
       thrust::make_zip_iterator(thrust::make_tuple(end_it_pointer_vector, end_it_struct_vector)),
       [] __device__(auto tuple) {
-        auto & voxel = thrust::get<1>(tuple);
+        auto& voxel = thrust::get<1>(tuple);
         thrust::get<0>(tuple) = &voxel;
         voxel.counter = 0;
       });
 
     // Create zip iterator to insert the points into the hashmap
-    auto zipped =
-      thrust::make_zip_iterator(thrust::make_tuple(voxel_keys.begin(), pointer_vector.begin()));
+    auto zipped = thrust::make_zip_iterator(thrust::make_tuple(voxel_keys.begin(), pointer_vector.begin()));
     map.insert(zipped, zipped + voxel_keys.size());
     nvtxRangePop();
   }
+
   /**
    * @brief Insert points into existing map
    * @param [in] device_points       Points to insert
@@ -829,47 +808,39 @@ public:
    * voxel or adaptive map density)
    * @param [in] stream              Reference to the CUDA stream to use
    */
-  void __host__ insert_points(
-    const thrust::device_vector<types::Point<types::Point_XYZ>> & device_points,
-    const std::variant<int16_t, types::AdaptiveMapDensity> & map_density =
-      TConfig::MAX_POINTS_PER_VOXEL,
+  void __host__ insert_points(const thrust::device_vector<types::Point<types::Point_XYZ>>& device_points,
+    const std::variant<int16_t, types::AdaptiveMapDensity>& map_density = TConfig::MAX_POINTS_PER_VOXEL,
     ::cuda::stream_ref stream = {})
   {
     nvtxRangePush("insert_points");
     // No downsampling executed as points already downsampled (although not same voxel size)
-    this->setup_voxel_grid(
-      this->get_active_map(), device_points, this->voxel_keys_inter_, this->pointer_vector_inter_,
+    this->setup_voxel_grid(this->get_active_map(), device_points, this->voxel_keys_inter_, this->pointer_vector_inter_,
       this->struct_vector_inter_, stream);
 
     // Insert values into hashmap
     nvtxRangePush("insert_values");
     this->get_active_neighbors().resize(voxel_keys_inter_.size() * TConfig::MAX_POINTS_PER_VOXEL);
-    const types::Point<types::Point_XYZ> * raw_ptr_points =
-      thrust::raw_pointer_cast(device_points.data());
-    types::Neighbors<TConfig> * raw_ptr_neighbors =
-      thrust::raw_pointer_cast(this->get_active_neighbors().data());
+    const types::Point<types::Point_XYZ>* raw_ptr_points = thrust::raw_pointer_cast(device_points.data());
+    types::Neighbors<TConfig>* raw_ptr_neighbors = thrust::raw_pointer_cast(this->get_active_neighbors().data());
     // Index to keep track of the number of points inserted
     // -> Needed to copy the pointers to the points in the map
     unsigned int h_counter = 0;
     cudaMemset(this->counter_d_, 0, sizeof(unsigned int));
 
     // Set new grid size for insert values kernel
-    auto grid_size = std::min(
-      4 * this->num_multiprocessors_, (device_points.size() + BLOCK_SIZE - 1) / BLOCK_SIZE);
+    auto grid_size = std::min(4 * this->num_multiprocessors_, (device_points.size() + BLOCK_SIZE - 1) / BLOCK_SIZE);
 
     // Launch the kernel based on the map density type
     if (std::holds_alternative<types::AdaptiveMapDensity>(map_density)) {
-      const types::AdaptiveMapDensity & density = std::get<types::AdaptiveMapDensity>(map_density);
-      insert_values_kernel<<<grid_size, BLOCK_SIZE, 0, stream.get()>>>(
-        this->get_active_map().ref(cuco::find), raw_ptr_points, raw_ptr_neighbors, this->counter_d_,
-        device_points.size(), this->config_.voxel_size, this->get_resolution(), density.max_points,
-        density.min_points, density.range, density.max_points_scale, density.origin.x(),
-        density.origin.y(), density.origin.z());
+      const types::AdaptiveMapDensity& density = std::get<types::AdaptiveMapDensity>(map_density);
+      insert_values_kernel<<<grid_size, BLOCK_SIZE, 0, stream.get()>>>(this->get_active_map().ref(cuco::find),
+        raw_ptr_points, raw_ptr_neighbors, this->counter_d_, device_points.size(), this->config_.voxel_size,
+        this->get_resolution(), density.max_points, density.min_points, density.range, density.max_points_scale,
+        density.origin.x(), density.origin.y(), density.origin.z());
     } else {
-      insert_values_kernel<<<grid_size, BLOCK_SIZE, 0, stream.get()>>>(
-        this->get_active_map().ref(cuco::find), raw_ptr_points, raw_ptr_neighbors, this->counter_d_,
-        device_points.size(), this->config_.voxel_size, this->get_resolution(),
-        std::get<int16_t>(map_density));
+      insert_values_kernel<<<grid_size, BLOCK_SIZE, 0, stream.get()>>>(this->get_active_map().ref(cuco::find),
+        raw_ptr_points, raw_ptr_neighbors, this->counter_d_, device_points.size(), this->config_.voxel_size,
+        this->get_resolution(), std::get<int16_t>(map_density));
     }
     stream.wait();
     cudaMemcpy(&h_counter, this->counter_d_, sizeof(unsigned int), cudaMemcpyDeviceToHost);
@@ -884,26 +855,27 @@ public:
     this->debug_.num_voxel = this->get_active_map_size();
     nvtxRangePop();
   }
+
   /**
    * @brief Remove points that are too far from the origin
    * @param [in] origin              current origin
    * @note The device lambda requires the function to be public within the class
    */
-  void __host__ remove_far_points(const Eigen::Vector3f & origin, ::cuda::stream_ref stream = {})
+  void __host__ remove_far_points(const Eigen::Vector3f& origin, ::cuda::stream_ref stream = {})
   {
     nvtxRangePush("remove_far_points");
     const double max_distance2 = this->config_.max_distance * this->config_.max_distance;
     this->keys2erase_.resize(this->get_active_map_size());
-    custom_voxel_type * keys2erase_ptr = thrust::raw_pointer_cast(this->keys2erase_.data());
+    custom_voxel_type* keys2erase_ptr = thrust::raw_pointer_cast(this->keys2erase_.data());
 
     // Setup counter for keys to erase
     nvtxRangePush("collect_keys");
     unsigned int h_counter = 0;
     cudaMemset(this->counter_d_, 0, sizeof(unsigned int));
-    unsigned int * counter_ptr = this->counter_d_;
+    unsigned int* counter_ptr = this->counter_d_;
     // Collect keys to erase
     this->get_active_map().for_each(
-      [origin, max_distance2, keys2erase_ptr, counter_ptr] __device__(auto const & slot) {
+      [origin, max_distance2, keys2erase_ptr, counter_ptr] __device__(auto const& slot) {
         // Check if first point in the voxel is too far from the origin
         if ((slot.second->data[0].pos - origin).squaredNorm() > max_distance2) {
           unsigned int index = atomicAdd(counter_ptr, 1);
@@ -931,6 +903,7 @@ public:
     this->debug_.num_points = num_points;
     nvtxRangePop();
   }
+
   /**
    * @brief Move points to inactive map instance and change map states to allow iterative updating
    */
@@ -965,11 +938,9 @@ public:
     auto end_it_pointer_vector = this->get_inactive_pointers().begin() + this->get_active_map_size();  // NOLINT
     auto end_it_struct_vector = this->get_inactive_structs().begin() + this->get_active_map_size();  // NOLINT
     // clang-format on
-    thrust::for_each(
-      thrust::cuda::par.on(stream.get()),
+    thrust::for_each(thrust::cuda::par.on(stream.get()),
       thrust::make_zip_iterator(
-        thrust::make_tuple(
-          this->get_inactive_pointers().begin(), this->get_inactive_structs().begin())),
+        thrust::make_tuple(this->get_inactive_pointers().begin(), this->get_inactive_structs().begin())),
       thrust::make_zip_iterator(thrust::make_tuple(end_it_pointer_vector, end_it_struct_vector)),
       [] __device__(auto tuple) { thrust::get<0>(tuple) = &thrust::get<1>(tuple); });
     stream.wait();
@@ -982,12 +953,11 @@ public:
 
     // Copy the values to the second map
     nvtxRangePush("copy_values");
-    const custom_voxel_type * keys_ptr = thrust::raw_pointer_cast(this->get_inactive_keys().data());
+    const custom_voxel_type* keys_ptr = thrust::raw_pointer_cast(this->get_inactive_keys().data());
     size_t num_voxels = this->get_active_map_size();
     int16_t grid_size = (num_voxels + BLOCK_SIZE - 1) / BLOCK_SIZE;
     copy_values_kernel<TConfig><<<grid_size, BLOCK_SIZE, 0, stream.get()>>>(
-      this->get_active_map().ref(cuco::find), this->get_inactive_map().ref(cuco::find), keys_ptr,
-      num_voxels);
+      this->get_active_map().ref(cuco::find), this->get_inactive_map().ref(cuco::find), keys_ptr, num_voxels);
     stream.wait();
 
     nvtxRangePop();
@@ -1019,7 +989,9 @@ private:
   __host__ thrust::device_vector<fixed_sized_points_array<TConfig>> & get_inactive_structs() { return this->map_a_active_.load() ? struct_vector_b_ : struct_vector_a_; }  // NOLINT
   __host__ thrust::device_vector<types::Neighbors<TConfig>> & get_inactive_neighbors() { return this->map_a_active_.load() ? neighbors_b_ : neighbors_a_; }  // NOLINT
   __host__ const thrust::device_vector<types::Neighbors<TConfig>> & get_inactive_neighbors() const { return this->map_a_active_.load() ? neighbors_b_ : neighbors_a_; }  // NOLINT
+
   // clang-format on
+
   /**
    * @brief Setup CUDA device
    * @param [in] device_id               Device ID to use
@@ -1038,13 +1010,13 @@ private:
     // Synchronize to ensure the context is initialized
     cudaDeviceSynchronize();
   }
+
   /**
    * @brief Allocate map switching vectors
    * @param [in] update_map          Whether the map is to be updated
    * @param [in] size                Size to allocate
    */
-  void allocate_memory(
-    [[maybe_unused]] const bool update_map, [[maybe_unused]] const size_t size) override
+  void allocate_memory([[maybe_unused]] const bool update_map, [[maybe_unused]] const size_t size) override
   {
     // Preallocate vectors on the GPU
     // Only allocate space if the map is a frame map
@@ -1067,6 +1039,7 @@ private:
       utils::allocate_vector(keys2erase_, size);
     }
   }
+
   /**
    * @brief Check load factor of hashmap
    */
@@ -1084,28 +1057,20 @@ private:
   // Number of multiprocessors on the device
   size_t num_multiprocessors_{0};
   // Counter variable
-  mutable unsigned int * counter_d_;
-  mutable unsigned int * counter2_d_;
-  mutable unsigned int * counter_d_async_;
+  mutable unsigned int* counter_d_;
+  mutable unsigned int* counter2_d_;
+  mutable unsigned int* counter_d_async_;
   // CUDA Hashmap
   custom_voxel_type const empty_key_sentinel = custom_voxel_type{-1};
   custom_voxel_type const erased_key_sentinel = custom_voxel_type{-2};
-  fixed_sized_points_array<TConfig> * empty_value_sentinel = nullptr;
+  fixed_sized_points_array<TConfig>* empty_value_sentinel = nullptr;
 
-  StaticMapType map_a_{
-    cuco::extent<std::size_t, types::MAX_MAP_SIZE>{},
-    cuco::empty_key{empty_key_sentinel},
-    cuco::empty_value{empty_value_sentinel},
-    cuco::erased_key{erased_key_sentinel},
-    custom_key_equal{},
+  StaticMapType map_a_{cuco::extent<std::size_t, types::MAX_MAP_SIZE>{}, cuco::empty_key{empty_key_sentinel},
+    cuco::empty_value{empty_value_sentinel}, cuco::erased_key{erased_key_sentinel}, custom_key_equal{},
     cuco::linear_probing<1, custom_hash>{}};
 
-  StaticMapType map_b_{
-    cuco::extent<std::size_t, types::MAX_MAP_SIZE>{},
-    cuco::empty_key{empty_key_sentinel},
-    cuco::empty_value{empty_value_sentinel},
-    cuco::erased_key{erased_key_sentinel},
-    custom_key_equal{},
+  StaticMapType map_b_{cuco::extent<std::size_t, types::MAX_MAP_SIZE>{}, cuco::empty_key{empty_key_sentinel},
+    cuco::empty_value{empty_value_sentinel}, cuco::erased_key{erased_key_sentinel}, custom_key_equal{},
     cuco::linear_probing<1, custom_hash>{}};
 
   // store the fixed_sized_points_arrays containing the points in the map as member
@@ -1113,19 +1078,19 @@ private:
   // map a instance
   size_t map_a_size_{0};
   thrust::device_vector<custom_voxel_type> voxel_keys_a_;
-  thrust::device_vector<fixed_sized_points_array<TConfig> *> pointer_vector_a_;
+  thrust::device_vector<fixed_sized_points_array<TConfig>*> pointer_vector_a_;
   thrust::device_vector<fixed_sized_points_array<TConfig>> struct_vector_a_;
   thrust::device_vector<types::Neighbors<TConfig>> neighbors_a_;
   // map b instance
   size_t map_b_size_{0};
   thrust::device_vector<custom_voxel_type> voxel_keys_b_;
-  thrust::device_vector<fixed_sized_points_array<TConfig> *> pointer_vector_b_;
+  thrust::device_vector<fixed_sized_points_array<TConfig>*> pointer_vector_b_;
   thrust::device_vector<fixed_sized_points_array<TConfig>> struct_vector_b_;
   thrust::device_vector<types::Neighbors<TConfig>> neighbors_b_;
   // Intermediate map inserting
-  thrust::device_vector<fixed_sized_points_array<TConfig> *> pointer_vector_swap_map_;
+  thrust::device_vector<fixed_sized_points_array<TConfig>*> pointer_vector_swap_map_;
   thrust::device_vector<custom_voxel_type> voxel_keys_inter_;
-  thrust::device_vector<fixed_sized_points_array<TConfig> *> pointer_vector_inter_;
+  thrust::device_vector<fixed_sized_points_array<TConfig>*> pointer_vector_inter_;
   thrust::device_vector<fixed_sized_points_array<TConfig>> struct_vector_inter_;
 
   // Member variables for point insertion for frame map and normal estimation

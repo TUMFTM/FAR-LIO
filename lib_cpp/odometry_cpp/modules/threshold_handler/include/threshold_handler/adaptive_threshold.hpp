@@ -21,8 +21,8 @@
 #include <sophus/se3.hpp>
 
 #include "threshold_handler/threshold_handler_base.hpp"
-namespace tam::core::state
-{
+
+namespace tam::core::state {
 template <typename TConfig>
 class AdaptiveThreshold : public ThresholdHandler<TConfig>
 {
@@ -31,28 +31,29 @@ public:
    * @brief Constructor for param manager and logger
    */
   static std::unique_ptr<ThresholdHandler<TConfig>> from_config(
-    tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
+    tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
   {
     std::unique_ptr<AdaptiveThreshold<TConfig>> ct =
       std::unique_ptr<AdaptiveThreshold<TConfig>>(new AdaptiveThreshold<TConfig>(pmg, logger));
     return ct;
   }
+
   /**
    * @brief Constructor for config and debug objects
    */
   static std::unique_ptr<ThresholdHandler<TConfig>> from_config(
-    const types::ThresholdConfig & config, const types::ThresholdDebug & debug)
+    const types::ThresholdConfig& config, const types::ThresholdDebug& debug)
   {
     std::unique_ptr<AdaptiveThreshold<TConfig>> ct =
       std::unique_ptr<AdaptiveThreshold<TConfig>>(new AdaptiveThreshold<TConfig>(config, debug));
     return ct;
   }
+
   /**
    * @brief Set the model deviation between initial guess and registration result
    */
   void set_model_deviation(
-    [[maybe_unused]] const Sophus::SE3f & init_guess,
-    [[maybe_unused]] const Sophus::SE3f & pose_registered) override
+    [[maybe_unused]] const Sophus::SE3f& init_guess, [[maybe_unused]] const Sophus::SE3f& pose_registered) override
   {
     if (!this->initialized_) {
       // If not initialized, just initialize the module and return without updating the model error
@@ -71,8 +72,7 @@ public:
     }();
     // Update the model error given the vehicle is actually moving translationally
     // and the model error is significant
-    if (
-      this->initialized_ &&
+    if (this->initialized_ &&
       (this->previous_init_guess_.inverse() * init_guess).translation().norm() >
         3 * this->config_.min_motion_threshold &&
       model_error > this->config_.min_motion_threshold) {
@@ -81,6 +81,7 @@ public:
       this->debug_.model_error = model_error;
     }
   }
+
   /**
    * @brief Return the current adaptive threshold
    */
@@ -90,25 +91,24 @@ public:
     this->debug_.current_threshold = std::min(this->debug_.internal_threshold, 10.0);
     return this->debug_.current_threshold;
   };
+
   /**
    * @brief Initialize member variables with params
    */
-  void init() override
-  {
-    model_sse_ = this->config_.initial_threshold * this->config_.initial_threshold;
-  }
+  void init() override { model_sse_ = this->config_.initial_threshold * this->config_.initial_threshold; }
 
 protected:
   // Inherit constructor from ModelHandler for param manager and logger
-  AdaptiveThreshold(tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
-  : ThresholdHandler<TConfig>(pmg, logger)
+  AdaptiveThreshold(tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
+      : ThresholdHandler<TConfig>(pmg, logger)
   {
     // Additional initialization
     num_samples_ = 1;
   }
+
   // Inherit constructor from ModelHandler for config and debug object
-  AdaptiveThreshold(const types::ThresholdConfig & config, const types::ThresholdDebug & debug)
-  : ThresholdHandler<TConfig>(config, debug)
+  AdaptiveThreshold(const types::ThresholdConfig& config, const types::ThresholdDebug& debug)
+      : ThresholdHandler<TConfig>(config, debug)
   {
     // Additional initialization
     num_samples_ = 1;

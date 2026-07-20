@@ -20,9 +20,9 @@
 #include <vector>
 
 #include "preprocessing_handler/preprocessing_handler_base.hpp"
+
 //
-namespace tam::core::state
-{
+namespace tam::core::state {
 /**
  * @brief Lidar preprocessing pipeline: spatial cropping → vehicle footprint filtering.
  */
@@ -34,23 +34,25 @@ public:
    * @brief Constructor for param manager and logger
    */
   static std::unique_ptr<PreprocessingHandler<TConfig>> from_config(
-    tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
+    tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
   {
     std::unique_ptr<LidarPreprocessing<TConfig>> ph =
       std::unique_ptr<LidarPreprocessing<TConfig>>(new LidarPreprocessing<TConfig>(pmg, logger));
     return ph;
   }
+
   /**
    * @brief Constructor for config and debug objects
    */
   static std::unique_ptr<LidarPreprocessing<TConfig>> from_config(
-    const types::PreprocessingConfig & config, const types::PreprocessingDebug & debug)
+    const types::PreprocessingConfig& config, const types::PreprocessingDebug& debug)
   {
     std::unique_ptr<LidarPreprocessing<TConfig>> ph =
       std::unique_ptr<LidarPreprocessing<TConfig>>(new LidarPreprocessing<TConfig>(config, debug));
     return ph;
   }
-  bool preprocess(std::vector<types::Point<TConfig>> & frame) override
+
+  bool preprocess(std::vector<types::Point<TConfig>>& frame) override
   {
     // Crop to range if configured
     if (this->config_.crop_range.size() == 2) {
@@ -63,6 +65,7 @@ public:
     }
     return frame.size() > 0;
   }
+
   /**
    * @brief  Init parameters
    */
@@ -73,14 +76,14 @@ public:
 
 protected:
   // Inherit constructor from ModelHandler for param manager and logger
-  LidarPreprocessing(tam::pmg::ParamReferenceManager * pmg, tam::tsl::ReferenceLogger * logger)
-  : PreprocessingHandler<TConfig>(pmg, logger)
+  LidarPreprocessing(tam::pmg::ParamReferenceManager* pmg, tam::tsl::ReferenceLogger* logger)
+      : PreprocessingHandler<TConfig>(pmg, logger)
   {
   }
+
   // Inherit constructor from ModelHandler for config and debug object
-  LidarPreprocessing(
-    const types::PreprocessingConfig & config, const types::PreprocessingDebug & debug)
-  : PreprocessingHandler<TConfig>(config, debug)
+  LidarPreprocessing(const types::PreprocessingConfig& config, const types::PreprocessingDebug& debug)
+      : PreprocessingHandler<TConfig>(config, debug)
   {
   }
 };

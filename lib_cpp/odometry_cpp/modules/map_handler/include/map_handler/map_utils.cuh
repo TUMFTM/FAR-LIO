@@ -27,8 +27,8 @@
 
 #include "odometry_types/map.hpp"
 #include "odometry_types/point_types.hpp"
-namespace tam::core::state::cuda::utils
-{
+
+namespace tam::core::state::cuda::utils {
 /**
  * @brief Kernel to set the normal and covariance of a point given its neighbors
  * @param [in] neighbors          Raw pointer to the neighbors vector
@@ -37,8 +37,7 @@ namespace tam::core::state::cuda::utils
  * @param [in] num_neighbors      Number of neighbors per point
  */
 template <typename TConfig>
-__global__ void set_normal_covariance_kernel(
-  types::Neighbors<TConfig> * neighbors, const size_t num_points,
+__global__ void set_normal_covariance_kernel(types::Neighbors<TConfig>* neighbors, const size_t num_points,
   const types::CovRegularizationType cov_regularization, const int16_t num_neighbors)
 {
   auto tid = threadIdx.x + blockIdx.x * blockDim.x;
