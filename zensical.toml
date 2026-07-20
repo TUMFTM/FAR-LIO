@@ -12,6 +12,10 @@
 
 [project]
 site_name = "FAR-LIO"
+# Emit explicit *.html links instead of pretty directory URLs, so navigation
+# works when the site is opened directly (file://) or served without automatic
+# index.html resolution.
+use_directory_urls = false
 site_description = "A highly efficient, CUDA-accelerated framework for Fast, Accurate, and Robust LiDAR-Inertial Odometry."
 site_author = "TUM Autonomous Motorsport"
 site_url = "https://tumftm.github.io/FAR-LIO/"
@@ -81,15 +85,16 @@ features = [
   "search.highlight",
 ]
 
-[[project.theme.palette]]
-scheme = "default"
-toggle.icon = "lucide/sun"
-toggle.name = "Switch to dark mode"
-
+# The first palette is the default on load -> slate (dark) is the default.
 [[project.theme.palette]]
 scheme = "slate"
 toggle.icon = "lucide/moon"
 toggle.name = "Switch to light mode"
+
+[[project.theme.palette]]
+scheme = "default"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to dark mode"
 
 # -----------------------------------------------------------------------------
 [project.markdown_extensions.abbr]
