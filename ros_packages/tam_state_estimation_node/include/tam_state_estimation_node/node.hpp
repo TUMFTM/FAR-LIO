@@ -59,7 +59,6 @@
 #include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
 #include "tum_msgs/msg/tum_float64_per_wheel.hpp"
 #include "tum_msgs/msg/tum_float64_per_wheel_stamped.hpp"
-#include "tum_msgs/msg/tum_state_estimation_report.hpp"
 
 // state estimation
 #include "state_estimation_base/state_estimation_base.hpp"
