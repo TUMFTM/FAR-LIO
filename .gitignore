@@ -1,0 +1,13 @@
+# Documentation build artifacts
+/site/
+/docs/docs_cpp/
+
+# colcon / ROS build artifacts
+/build/
+/install/
+/log/
+
+# Python
+__pycache__/
+*.pyc
+.venv/

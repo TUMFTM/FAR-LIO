@@ -28,14 +28,6 @@
           linear_velocity: 250
           imu: 50
 
-      # track handler parameter
-      track_handler:
-        max_s_global_z_matching_distance: 100.0
-        d_track_matching_margin: 2.0
-        orientation:
-          R_init: [0.002, 0.003, 1.0e+9]
-          outlier_bounds: [0.3, 0.3, 0.3]
-        overwrite_acceleration_z: false
 
       # reference orientation based on IMU inputs
       reference_angles:
@@ -184,4 +176,4 @@
         min_motion_threshold: 0.25
         max_correspondence_range: 100.0
       # Velocity
-      velocity: {}
+      # velocity:
