@@ -9,9 +9,6 @@
   <buildtool_depend>ament_cmake</buildtool_depend>
 
   <depend>rclcpp</depend>
-  <depend>param_manager_cpp</depend>
-  <depend>ros_param_helpers_cpp</depend>
-  <depend>ros_debug_helpers_cpp</depend>
   <depend>param_management_cpp</depend>
   <depend>tsl_logger_cpp</depend>
   <depend>tsl_ros2_publisher_cpp</depend>
