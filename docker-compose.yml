@@ -1,14 +1,19 @@
 # =============================================================================
 # FAR-LIO docker compose
 #
-# Two services, each behind a profile so they can be started independently:
-#   * far-lio-core  (profile "far-lio")  – runs the LiDAR odometry (CUDA GICP)
-#                                          and 3D-EKF state estimation nodes.
-#   * rosbag        (profile "bag")      – plays a ROS 2 bag to feed the stack.
+# Two services, each behind a profile:
+#   * far-lio-core (profile "far-lio") – LiDAR odometry (CUDA GICP) + 3D-EKF
+#                                        state estimation. Requires a GPU.
+#   * rosbag       (profile "bag")     – plays a ROS 2 bag to feed the stack.
 #
-# Run the stack and replay a bag together:
-#   docker compose --profile far-lio --profile bag up
+# Run FAR-LIO on its own (e.g. with live sensors):
+#   docker compose --profile far-lio up
 #
+# Run FAR-LIO together with a bag: use the helper script, which mounts the bag
+# and starts both services:
+#   ./run.sh /path/to/rosbag
+#
+# ROS_DOMAIN_ID is taken from the environment if set, otherwise defaults to 0.
 # =============================================================================
 
 services:
@@ -16,7 +21,7 @@ services:
   # FAR-LIO: LiDAR odometry + state estimation
   # ---------------------------------------------------------------------------
   far-lio-core:
-    image: ${FARLIO_IMAGE:-ghcr.io/tumftm/far-lio:latest}
+    image: ghcr.io/tumftm/far-lio:latest
     container_name: far-lio-core
     init: true
     network_mode: "host"
@@ -34,7 +39,7 @@ services:
       /dev_ws/install/tam_state_estimation_node/lib/tam_state_estimation_node/tam_state_estimation_node_ekf_3d_nh
       --ros-args -r __ns:=/core/state -r __node:=StateEstimation --params-file /config/far-lio.yml &
       wait"
-    cpuset: "${CPU_CORES:-0-3}"
+    cpuset: "0-3"
     profiles: ["far-lio"]
     deploy:
       resources:
@@ -45,10 +50,10 @@ services:
               capabilities: [gpu]
 
   # ---------------------------------------------------------------------------
-  # ROS 2 bag player
+  # ROS 2 bag player (launch via ./run.sh, which sets BAG_PATH / BAG_NAME)
   # ---------------------------------------------------------------------------
   rosbag:
-    image: ${FARLIO_IMAGE:-ghcr.io/tumftm/far-lio:latest}
+    image: ghcr.io/tumftm/far-lio:latest
     container_name: far-lio-rosbag
     init: true
     network_mode: "host"
@@ -57,7 +62,7 @@ services:
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
     volumes:
       - ./config/middleware/cyclonedds_udp.xml:/dev_ws/config/middleware/cyclonedds_udp.xml
-      - ${BAG_PATH:-./bags}:/bags:ro
+      - ${BAG_PATH:-/dev/null}:/bags/${BAG_NAME:-bag}:ro
       - /tmp:/tmp
-    command: bash -c "ros2 bag play /bags/${BAG_NAME:-recording} --clock"
+    command: bash -c "ros2 bag play /bags/${BAG_NAME:-bag} --clock"
     profiles: ["bag"]

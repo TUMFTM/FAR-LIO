@@ -53,12 +53,12 @@ docker build -f docker/Dockerfile \
     The image is based on `nvidia/cuda:*-devel` and includes ROS 2, PCL and the CUDA
     toolkit, so it is large (~19 GB). Make sure you have enough disk space.
 
-## What's inside
+## Docker Architecture
 
 The image is built in two stages (see `docker/Dockerfile`):
 
 - **`deps`** — CUDA devel base + ROS 2 `ros-base` + all system/ROS dependencies, installed
-  explicitly (no `rosdep`) so every package is visible in the Dockerfile.
+  explicitly so every package is visible in the Dockerfile.
 - **`build`** — compiles only `tam_odometry` and `tam_state_estimation_node` and their
   in-workspace dependencies (`colcon build --packages-up-to …`) and installs them to
   `/dev_ws/install`.

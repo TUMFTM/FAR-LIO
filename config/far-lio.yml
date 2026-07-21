@@ -98,9 +98,9 @@
       node:
         odom_frame: "local_cartesian"
         child_frame: "base_link"
-        cloud_frame: ""
+        cloud_frame: "base_link"
         wait_tf: false
-        input_pointcloud: "" # Namespace set globally
+        input_pointcloud: "/vehicle/sensor/lidar" # Namespace set globally
         input_pointcloud_status: ""
         output_odom: "lidar_odometry" # Namespace set globally
         input_map: "" # Path to folder containing "map.pcd" and "origin.yml"

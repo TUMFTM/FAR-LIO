@@ -37,16 +37,20 @@ See the [installation guide](https://tumftm.github.io/FAR-LIO/installation.html)
 
 ## Usage
 
-Configure the environment and launch the stack with Docker Compose:
+Run FAR-LIO on its own (e.g. with live sensors — needs a GPU):
 
 ```bash
-cp .env.example .env                                  # set BAG_PATH, BAG_NAME, ROS_DOMAIN_ID, ...
-docker compose --profile far-lio up                   # FAR-LIO nodes (needs a GPU)
-docker compose --profile bag up                       # replay a ROS 2 bag
-docker compose --profile far-lio --profile bag up     # both together
+docker compose --profile far-lio up
 ```
 
-See the [usage guide](https://tumftm.github.io/FAR-LIO/usage.html) for the full configuration reference.
+Or replay a ROS 2 bag through it — the helper script mounts the bag and starts both services:
+
+```bash
+./run.sh /path/to/rosbag        # bag directory (metadata.yaml) or an .mcap file
+```
+
+`ROS_DOMAIN_ID` is taken from your environment if set, otherwise `0`. See the
+[usage guide](https://tumftm.github.io/FAR-LIO/usage.html) for details.
 
 ## Racetrack Deployment (A2RL)
 
