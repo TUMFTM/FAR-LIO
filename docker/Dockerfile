@@ -87,9 +87,19 @@ RUN . /opt/ros/${ROS_DISTRO}/setup.sh && \
       --event-handlers console_direct+ && \
     rm -rf build log
 
-# Source ROS + the FAR-LIO overlay for every interactive/`docker run` shell.
+# Source ROS + the FAR-LIO overlay for interactive shells (e.g. `docker exec`).
 RUN echo '. /opt/ros/'"${ROS_DISTRO}"'/setup.bash' >> /etc/bash.bashrc && \
     echo '. /dev_ws/install/setup.bash'            >> /etc/bash.bashrc && \
     ldconfig
 
+# Setup entrypoint
+RUN printf '%s\n' \
+      '#!/bin/bash' \
+      'set -e' \
+      'source "/opt/ros/${ROS_DISTRO}/setup.bash"' \
+      'if [ -f /dev_ws/install/setup.bash ]; then source /dev_ws/install/setup.bash; fi' \
+      'exec "$@"' \
+      > /ros_entrypoint.sh && \
+    chmod +x /ros_entrypoint.sh
+ENTRYPOINT ["/ros_entrypoint.sh"]
 CMD ["bash"]
