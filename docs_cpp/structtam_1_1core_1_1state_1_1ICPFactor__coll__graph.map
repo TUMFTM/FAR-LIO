@@ -1,0 +1,5 @@
+<map id="tam::core::state::ICPFactor&lt; TConfig &gt;" name="tam::core::state::ICPFactor&lt; TConfig &gt;">
+<area shape="rect" id="Node000001" title="Build the linear system for the ICP algorithm." alt="" coords="5,93,199,133"/>
+<area shape="rect" id="Node000002" href="$structtam_1_1core_1_1state_1_1FactorBase.html" title="Base functor for building the linear system for the registration algorithm." alt="" coords="16,5,188,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="105,59,105,93,99,93,99,59"/>
+</map>

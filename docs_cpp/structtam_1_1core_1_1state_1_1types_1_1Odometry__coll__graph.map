@@ -1,0 +1,9 @@
+<map id="tam::core::state::types::Odometry" name="tam::core::state::types::Odometry">
+<area shape="rect" id="Node000001" title="Odometry output (matches nav_msgs::msg::Odometry layout)" alt="" coords="292,69,461,109"/>
+<area shape="rect" id="Node000002" href="$structtam_1_1core_1_1state_1_1types_1_1PoseWithCovariance.html" title="Pose with covariance (matches geometry_msgs::msg::PoseWithCovariance layout)" alt="" coords="13,5,182,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="196,45,292,67,291,73,195,50"/>
+<area shape="rect" id="Node000003" href="$structtam_1_1core_1_1state_1_1types_1_1TangentWithCovariance.html" title="Tangent with covariance (matches geometry_msgs::msg::TwistWithCovariance layout)" alt="" coords="5,69,189,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="203,87,292,87,292,92,203,92"/>
+<area shape="rect" id="Node000004" href="$structtam_1_1core_1_1state_1_1types_1_1DiagnosticStatus.html" title="Diagnostic status with level, message and key&#45;value pairs." alt="" coords="13,133,182,173"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="195,128,291,106,292,111,196,134"/>
+</map>

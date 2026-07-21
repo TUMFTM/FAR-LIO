@@ -1,0 +1,11 @@
+<map id="tam::core::state::ConstantVelocity&lt; TConfig &gt;" name="tam::core::state::ConstantVelocity&lt; TConfig &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="91,301,281,341"/>
+<area shape="rect" id="Node000002" href="$classtam_1_1core_1_1state_1_1ModelHandler.html" title=" " alt="" coords="74,212,298,252"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="189,266,189,301,183,301,183,266"/>
+<area shape="rect" id="Node000003" href="$classtam_1_1core_1_1state_1_1OdometryBase.html" title=" " alt="" coords="59,108,313,163"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="189,177,189,211,183,211,183,177"/>
+<area shape="rect" id="Node000004" href="$structtam_1_1core_1_1state_1_1types_1_1ModelConfig.html" title="Configuration for the model handler." alt="" coords="5,5,175,45"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="118,54,165,106,161,110,114,57"/>
+<area shape="rect" id="Node000005" href="$structtam_1_1core_1_1state_1_1types_1_1ModelDebug.html" title="Debug signals for the model handler." alt="" coords="199,5,368,45"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="259,57,212,110,208,106,255,54"/>
+</map>

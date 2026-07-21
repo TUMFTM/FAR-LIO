@@ -1,0 +1,9 @@
+<map id="tam::core::state::RegistrationHandler&lt; TConfig &gt;" name="tam::core::state::RegistrationHandler&lt; TConfig &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="304,37,516,77"/>
+<area shape="rect" id="Node000003" href="$classtam_1_1core_1_1state_1_1GICP.html" title=" " alt="" coords="564,5,728,45"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="529,38,563,34,564,39,530,44"/>
+<area shape="rect" id="Node000004" href="$classtam_1_1core_1_1state_1_1ICP.html" title=" " alt="" coords="569,69,723,109"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="530,71,569,76,568,82,529,76"/>
+<area shape="rect" id="Node000002" href="$classtam_1_1core_1_1state_1_1OdometryBase.html" title=" " alt="" coords="5,30,256,85"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="270,55,304,55,304,60,270,60"/>
+</map>

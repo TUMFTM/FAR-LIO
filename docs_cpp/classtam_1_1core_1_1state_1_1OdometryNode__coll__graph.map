@@ -1,0 +1,9 @@
+<map id="tam::core::state::OdometryNode&lt; TConfig &gt;" name="tam::core::state::OdometryNode&lt; TConfig &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="581,30,780,70"/>
+<area shape="rect" id="Node000002" href="$classtam_1_1core_1_1state_1_1NodeBase.html" title=" " alt="" coords="252,23,533,77"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="547,47,581,47,581,53,547,53"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="53,5,156,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="170,22,252,32,251,37,169,28"/>
+<area shape="rect" id="Node000004" href="$classtam_1_1core_1_1state_1_1OdometryBase.html" title=" " alt="" coords="5,55,204,109"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="217,67,251,63,252,68,218,72"/>
+</map>

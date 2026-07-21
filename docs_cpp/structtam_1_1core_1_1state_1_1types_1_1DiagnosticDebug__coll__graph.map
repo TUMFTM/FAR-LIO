@@ -1,0 +1,9 @@
+<map id="tam::core::state::types::DiagnosticDebug" name="tam::core::state::types::DiagnosticDebug">
+<area shape="rect" id="Node000001" title="Debug signals for the diagnostics." alt="" coords="357,69,527,109"/>
+<area shape="rect" id="Node000002" href="$structtam_1_1core_1_1state_1_1types_1_1DiagnosticDebug_1_1registration.html" title=" " alt="" coords="5,5,229,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="233,45,358,70,357,75,232,51"/>
+<area shape="rect" id="Node000003" href="$structtam_1_1core_1_1state_1_1types_1_1DiagnosticDebug_1_1input.html" title=" " alt="" coords="26,69,209,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="223,87,357,87,357,92,223,92"/>
+<area shape="rect" id="Node000004" href="$structtam_1_1core_1_1state_1_1types_1_1DiagnosticDebug_1_1pose.html" title=" " alt="" coords="27,133,207,173"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="220,130,357,103,358,109,221,136"/>
+</map>

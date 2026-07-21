@@ -1,0 +1,13 @@
+<map id="tam::core::state::Derivative&lt; TConfig &gt;" name="tam::core::state::Derivative&lt; TConfig &gt;">
+<area shape="rect" id="Node000001" title="Pose&#45;derivative velocity handler." alt="" coords="1025,47,1227,87"/>
+<area shape="rect" id="Node000002" href="$classtam_1_1core_1_1state_1_1VelocityHandler.html" title="Base class for velocity (twist) estimation modules." alt="" coords="791,47,976,87"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="990,64,1025,64,1025,69,990,69"/>
+<area shape="rect" id="Node000003" href="$classtam_1_1core_1_1state_1_1OdometryBase.html" title=" " alt="" coords="517,39,741,94"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="755,64,790,64,790,69,755,69"/>
+<area shape="rect" id="Node000004" href="$structtam_1_1core_1_1state_1_1types_1_1VelocityConfig.html" title="Configuration for the velocity handler." alt="" coords="248,5,417,45"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="431,36,517,48,516,54,430,42"/>
+<area shape="rect" id="Node000005" href="$structtam_1_1core_1_1state_1_1types_1_1DCRConfig.html" title="DCR (Doppler Consensus Reconstruction) tunables." alt="" coords="5,5,175,45"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="188,23,248,23,248,28,188,28"/>
+<area shape="rect" id="Node000006" href="$structtam_1_1core_1_1state_1_1types_1_1VelocityDebug.html" title="Debug signals for the velocity handler." alt="" coords="248,69,417,109"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="431,81,493,76,517,74,517,79,494,81,431,86"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="tam::core::state::GICPError&lt; TConfig &gt;" name="tam::core::state::GICPError&lt; TConfig &gt;">
+<area shape="rect" id="Node000001" title="Compute the error of a correspondence for a given transformation." alt="" coords="6,93,201,133"/>
+<area shape="rect" id="Node000002" href="$structtam_1_1core_1_1state_1_1ErrorBase.html" title="Base functor for computing the error of a correspondence for a given transformation." alt="" coords="5,5,201,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="106,59,106,93,101,93,101,59"/>
+</map>

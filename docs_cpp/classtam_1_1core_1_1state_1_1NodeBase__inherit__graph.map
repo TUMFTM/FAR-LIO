@@ -1,0 +1,26 @@
+<map id="tam::core::state::NodeBase&lt; TConfig, TNodeConfig, TNodeDebug &gt;" name="tam::core::state::NodeBase&lt; TConfig, TNodeConfig, TNodeDebug &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="265,124,464,179"/>
+<area shape="rect" id="Node000004" href="$classtam_1_1core_1_1state_1_1OdometryNode.html" title=" " alt="" coords="512,5,711,60"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="423,115,511,69,536,58,538,63,513,74,426,120"/>
+<area shape="rect" id="Node000006" href="$classtam_1_1core_1_1state_1_1OdometryNode.html" title=" " alt="" coords="512,84,711,139"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="477,130,511,125,512,130,478,136"/>
+<area shape="rect" id="Node000008" href="$classtam_1_1core_1_1state_1_1OdometryNode.html" title=" " alt="" coords="512,163,711,217"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="478,166,512,172,511,177,477,172"/>
+<area shape="rect" id="Node000010" href="$classtam_1_1core_1_1state_1_1OdometryNode.html" title=" " alt="" coords="512,241,711,296"/>
+<area shape="poly" id="edge12_Node000001_Node000010" title=" " alt="" coords="427,183,513,228,538,239,536,244,511,232,425,188"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="60,107,163,132"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="177,125,265,136,265,141,176,130"/>
+<area shape="rect" id="Node000003" href="$classtam_1_1core_1_1state_1_1OdometryBase.html" title=" " alt="" coords="5,156,217,211"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="231,166,265,161,266,166,231,171"/>
+<area shape="rect" id="Node000005" href="$structtam__odometry_1_1GICP__EXT.html" title=" " alt="" coords="759,20,947,45"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="724,39,759,39,759,44,724,44"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="724,21,759,21,759,27,724,26"/>
+<area shape="rect" id="Node000007" href="$structtam__odometry_1_1ICP__CV.html" title=" " alt="" coords="767,99,938,124"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="724,118,767,117,767,123,725,123"/>
+<area shape="poly" id="edge8_Node000006_Node000007" title=" " alt="" coords="725,100,767,100,767,105,724,105"/>
+<area shape="rect" id="Node000009" href="$structtam__odometry_1_1ICP__EXT.html" title=" " alt="" coords="763,177,942,203"/>
+<area shape="poly" id="edge10_Node000008_Node000009" title=" " alt="" coords="724,196,763,196,763,201,724,202"/>
+<area shape="poly" id="edge11_Node000008_Node000009" title=" " alt="" coords="724,178,763,179,763,184,724,184"/>
+<area shape="rect" id="Node000011" href="$structtam__odometry_1_1RADAR__ICP__EXT.html" title=" " alt="" coords="767,249,938,289"/>
+<area shape="poly" id="edge13_Node000010_Node000011" title=" " alt="" coords="725,266,767,266,767,271,725,271"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="tam::core::state::types::VelocityConfig" name="tam::core::state::types::VelocityConfig">
+<area shape="rect" id="Node000001" title="Configuration for the velocity handler." alt="" coords="5,108,175,148"/>
+<area shape="rect" id="Node000002" href="$structtam_1_1core_1_1state_1_1types_1_1DCRConfig.html" title="DCR (Doppler Consensus Reconstruction) tunables." alt="" coords="5,5,175,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="93,59,93,108,87,108,87,59"/>
+</map>

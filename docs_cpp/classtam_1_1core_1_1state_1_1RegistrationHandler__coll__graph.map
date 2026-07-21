@@ -1,0 +1,9 @@
+<map id="tam::core::state::RegistrationHandler&lt; TConfig &gt;" name="tam::core::state::RegistrationHandler&lt; TConfig &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="575,37,787,77"/>
+<area shape="rect" id="Node000002" href="$classtam_1_1core_1_1state_1_1OdometryBase.html" title=" " alt="" coords="275,30,525,85"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="539,55,575,55,575,60,539,60"/>
+<area shape="rect" id="Node000003" href="$structtam_1_1core_1_1state_1_1types_1_1RegistrationConfig.html" title="Configuration for the registration handler." alt="" coords="5,5,175,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="189,33,274,42,274,47,188,38"/>
+<area shape="rect" id="Node000004" href="$structtam_1_1core_1_1state_1_1types_1_1RegistrationDebug.html" title="Debug signals for the registration handler." alt="" coords="5,69,175,109"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="188,77,274,68,274,73,189,82"/>
+</map>

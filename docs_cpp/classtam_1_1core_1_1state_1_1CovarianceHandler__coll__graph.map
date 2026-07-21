@@ -1,0 +1,9 @@
+<map id="tam::core::state::CovarianceHandler&lt; TConfig &gt;" name="tam::core::state::CovarianceHandler&lt; TConfig &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="569,37,776,77"/>
+<area shape="rect" id="Node000002" href="$classtam_1_1core_1_1state_1_1OdometryBase.html" title=" " alt="" coords="275,30,520,85"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="534,55,569,55,569,60,534,60"/>
+<area shape="rect" id="Node000003" href="$structtam_1_1core_1_1state_1_1types_1_1CovarianceConfig.html" title="Configuration for the covariance handler." alt="" coords="5,5,175,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="189,33,275,42,274,47,188,38"/>
+<area shape="rect" id="Node000004" href="$structtam_1_1core_1_1state_1_1types_1_1CovarianceDebug.html" title="Debug signals for the covariance handler." alt="" coords="5,69,175,109"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="188,76,274,67,275,73,189,82"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="tam::core::state::LidarPreprocessing&lt; TConfig &gt;" name="tam::core::state::LidarPreprocessing&lt; TConfig &gt;">
+<area shape="rect" id="Node000001" title="Lidar preprocessing pipeline: spatial cropping → vehicle footprint filtering." alt="" coords="588,13,844,53"/>
+<area shape="rect" id="Node000002" href="$classtam_1_1core_1_1state_1_1PreprocessingHandler.html" title="Base class for preprocessing handlers." alt="" coords="316,13,540,53"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="554,30,588,30,588,35,554,35"/>
+<area shape="rect" id="Node000003" href="$classtam_1_1core_1_1state_1_1OdometryBase.html" title=" " alt="" coords="5,5,268,60"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="282,30,316,30,316,35,282,35"/>
+</map>

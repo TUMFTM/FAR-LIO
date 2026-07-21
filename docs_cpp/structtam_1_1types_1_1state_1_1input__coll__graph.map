@@ -1,0 +1,7 @@
+<map id="tam::types::state::input" name="tam::types::state::input">
+<area shape="rect" id="Node000001" title="struct buffering the input config and received status" alt="" coords="9,211,150,251"/>
+<area shape="rect" id="Node000002" href="$structtam_1_1types_1_1state_1_1config_1_1input.html" title="Struct containing the input configuration of the state estimation." alt="" coords="9,108,150,148"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="82,162,82,211,77,211,77,162"/>
+<area shape="rect" id="Node000003" href="$structtam_1_1types_1_1state_1_1config_1_1subscription.html" title="Struct containing configuration of a subscription." alt="" coords="5,5,153,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="82,59,82,108,77,108,77,59"/>
+</map>

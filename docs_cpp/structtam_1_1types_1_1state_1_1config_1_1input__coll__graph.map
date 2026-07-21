@@ -1,0 +1,5 @@
+<map id="tam::types::state::config::input" name="tam::types::state::config::input">
+<area shape="rect" id="Node000001" title="Struct containing the input configuration of the state estimation." alt="" coords="9,108,150,148"/>
+<area shape="rect" id="Node000002" href="$structtam_1_1types_1_1state_1_1config_1_1subscription.html" title="Struct containing configuration of a subscription." alt="" coords="5,5,153,45"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="82,59,82,108,77,108,77,59"/>
+</map>

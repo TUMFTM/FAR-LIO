@@ -1,0 +1,11 @@
+<map id="tam::core::state::FixedThreshold&lt; TConfig &gt;" name="tam::core::state::FixedThreshold&lt; TConfig &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="807,37,1037,77"/>
+<area shape="rect" id="Node000002" href="$classtam_1_1core_1_1state_1_1ThresholdHandler.html" title=" " alt="" coords="560,37,757,77"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="771,55,807,55,807,60,771,60"/>
+<area shape="rect" id="Node000003" href="$classtam_1_1core_1_1state_1_1OdometryBase.html" title=" " alt="" coords="275,30,511,85"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="524,55,560,55,560,60,524,60"/>
+<area shape="rect" id="Node000004" href="$structtam_1_1core_1_1state_1_1types_1_1ThresholdConfig.html" title="Configuration for the threshold handler." alt="" coords="5,5,175,45"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="188,33,275,42,274,48,188,38"/>
+<area shape="rect" id="Node000005" href="$structtam_1_1core_1_1state_1_1types_1_1ThresholdDebug.html" title="Debug signals for the threshold handler." alt="" coords="5,69,175,109"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="188,76,274,67,275,72,188,82"/>
+</map>

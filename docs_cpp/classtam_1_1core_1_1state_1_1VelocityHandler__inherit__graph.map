@@ -1,0 +1,7 @@
+<map id="tam::core::state::VelocityHandler&lt; TConfig &gt;" name="tam::core::state::VelocityHandler&lt; TConfig &gt;">
+<area shape="rect" id="Node000001" title="Base class for velocity (twist) estimation modules." alt="" coords="277,13,463,53"/>
+<area shape="rect" id="Node000003" href="$classtam_1_1core_1_1state_1_1Derivative.html" title="Pose&#45;derivative velocity handler." alt="" coords="511,13,712,53"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="477,30,510,30,510,35,477,35"/>
+<area shape="rect" id="Node000002" href="$classtam_1_1core_1_1state_1_1OdometryBase.html" title=" " alt="" coords="5,5,229,60"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="243,30,277,30,277,35,243,35"/>
+</map>
