@@ -22,9 +22,9 @@
 
 ## Demo
 
-<!-- Upload each clip to a GitHub release (or drag it into this file in the
-     GitHub web editor) and paste the resulting https://github.com/.../*.mp4 URL
-     on its own line below; GitHub renders it as an inline player. -->
+<img width="320" height="180" alt="onboard_small" src="https://github.com/user-attachments/assets/76415cfc-4ba3-4187-afee-672ece0ad899" />
+<img width="320" height="218" alt="yas_ego_small" src="https://github.com/user-attachments/assets/6504064d-b9d0-4411-96c4-ed91ed6b8f72" />
+
 <img height="250" alt="yas_top_clip" src="https://github.com/user-attachments/assets/997075fc-6fa3-468a-a3f3-858f60df583e" />
 <img height="250" alt="kitti_top_clip" src="https://github.com/user-attachments/assets/ff0ecc2b-989e-4b38-82a9-e1e3f18be207" />
 
