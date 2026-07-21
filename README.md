@@ -25,8 +25,10 @@
 <!-- Upload each clip to a GitHub release (or drag it into this file in the
      GitHub web editor) and paste the resulting https://github.com/.../*.mp4 URL
      on its own line below; GitHub renders it as an inline player. -->
+<img height="250" alt="yas_top_clip" src="https://github.com/user-attachments/assets/997075fc-6fa3-468a-a3f3-858f60df583e" />
+<img height="250" alt="kitti_top_clip" src="https://github.com/user-attachments/assets/ff0ecc2b-989e-4b38-82a9-e1e3f18be207" />
 
-_Demo videos coming soon._
+
 
 ## Citation
 
