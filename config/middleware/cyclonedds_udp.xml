@@ -6,18 +6,7 @@
                 <NetworkInterface name="docker0" priority="0" multicast="default" />
                 <NetworkInterface name="lo" priority="1" multicast="default" />
             </Interfaces>
-            <AllowMulticast>spdp</AllowMulticast>
-            <MaxMessageSize>65500B</MaxMessageSize>
-            <FragmentSize>64000B</FragmentSize>
         </General>
-        <Internal>
-            <Watermarks>
-                <WhcHigh>500kB</WhcHigh>
-            </Watermarks>
-            <SocketReceiveBufferSize min="10MB"/>
-        </Internal>
-        <Tracing>
-            <OutputFile>stdout</OutputFile>
-        </Tracing>
     </Domain>
 </CycloneDDS>
+
