@@ -29,6 +29,7 @@ nav = [
   { "Installation" = "installation.md" },
   { "Usage" = "usage.md" },
   { "Configuration" = "configuration.md" },
+  { "Analysis" = "analysis.md" },
   { "Applications" = "applications.md" },
   { "Detailed Documentation" = [
     { "C++ Libraries" = [
