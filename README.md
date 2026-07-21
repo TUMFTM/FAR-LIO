@@ -97,4 +97,4 @@ Institute of Automotive Technology, School of Engineering and Design, Technical 
 
 ### Acknowledgements
 
-We thank Patrick Haft and Tobias Lasser (NVIDIA Corporation) for their assistance during the CUDA development.
+We thank Patrick Haft and Tobias Lasser ([NVIDIA Corporation](https://www.nvidia.com/)) for their assistance during the CUDA development.

@@ -33,6 +33,23 @@ An excerpt of FAR-LIO running on an autonomous race car on a racetrack as part o
   </span>
 </div>
 
+## Architecture
+
+FAR-LIO has two main components: a **LiDAR Scan Pipeline** that registers each incoming scan
+against a local map on the GPU, and a **Sensor Fusion** backend that fuses the registered poses
+with high-frequency IMU data. Green modules are GPU-accelerated (CUDA); blue modules run on the CPU.
+
+<p align="center">
+  <img src="assets/architecture.svg" alt="FAR-LIO architecture" width="820">
+</p>
+
+- **LiDAR Scan Pipeline (GPU)** — CUDA-accelerated preprocessing and undistortion, followed by a
+  sparsity-aware Generalized ICP on a novel CUDA voxel hashmap (`cuVoxelMap`), registering each scan
+  against an adaptive local submap.
+- **Sensor Fusion (CPU)** — a 100 Hz kinematic Extended Kalman Filter fuses the registered LiDAR
+  poses with the IMU stream, with delay compensation for smooth, low-latency output. Its estimate is
+  fed back to the scan pipeline as the initial guess and for undistortion.
+
 ## References
 
 If you use FAR-LIO in your research, please cite our paper:
@@ -57,4 +74,4 @@ Institute of Automotive Technology, School of Engineering and Design, Technical 
 
 ### Acknowledgements
 
-We thank Patrick Haft and Tobias Lasser (NVIDIA Corporation) for their assistance during the CUDA development.
+We thank Patrick Haft and Tobias Lasser ([NVIDIA Corporation](https://www.nvidia.com/)) for their assistance during the CUDA development.
