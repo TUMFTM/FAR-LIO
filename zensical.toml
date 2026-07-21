@@ -26,6 +26,10 @@ Copyright &copy; 2026 TUM Autonomous Motorsport
 # Doxygen-generated C++ API, which is served at the site root (docs_cpp/).
 nav = [
   { "Home" = "index.md" },
+  { "Installation" = "installation.md" },
+  { "Usage" = "usage.md" },
+  { "Architecture" = "architecture.md" },
+  { "Applications" = "applications.md" },
   { "C++ Libraries" = [
     { "Odometry (odometry_cpp)" = [
       "lib_cpp/odometry_cpp.md",

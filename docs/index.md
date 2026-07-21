@@ -2,26 +2,54 @@
   <img src="assets/farlio-banner.png" alt="FAR-LIO" width="660">
 </p>
 
-# TAM State Estimation
+<p align="center">
+  A highly efficient, CUDA-accelerated framework for Fast, Accurate, and Robust LiDAR-Inertial Odometry.
+</p>
 
-Welcome to the TAM State Estimation documentation.  
-This repository is responsible for estimating the vehicle position and orientation with respect to
-the local cartesian frame (ENU), as well as the vehicle state (linear/angular velocity and linear
-acceleration) in the vehicle coordinate frame.
-![High level state estimation concept](images/repository_structure.png)
+<p align="center">
+  <a href="https://arxiv.org/abs/2606.26010"><img alt="arXiv" src="https://img.shields.io/badge/arXiv-2606.26010-b31b1b?logo=arxiv&logoColor=white"></a>
+  <a href="https://tumftm.github.io/FAR-LIO/"><img alt="Project page" src="https://img.shields.io/badge/project-page-1f6feb"></a>
+  <a href="https://github.com/TUMFTM/FAR-LIO/actions/workflows/docker.yml"><img alt="Docker build" src="https://github.com/TUMFTM/FAR-LIO/actions/workflows/docker.yml/badge.svg"></a>
+  <a href="https://github.com/TUMFTM/FAR-LIO/actions/workflows/docs.yml"><img alt="Docs build" src="https://github.com/TUMFTM/FAR-LIO/actions/workflows/docs.yml/badge.svg"></a>
+  <br />
+  <img alt="Docker" src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white">
+  <img alt="ROS 2 Jazzy" src="https://img.shields.io/badge/ROS%202-Jazzy-22314E?logo=ros&logoColor=white">
+  <img alt="C++20" src="https://img.shields.io/badge/C%2B%2B-20-00599C?logo=cplusplus&logoColor=white">
+</p>
 
-- the state estimation provides a versatile and modular interface for N localization inputs
-  (GNSS or SLAM), N velocity inputs (wheelspeed sensors, slip angle sensor) and N IMUs
-- all classes are templated with configurations using structs
-  ([state_estimation_constants](lib_cpp/state_estimation_constants.md)), which enables the
-  utilization of various Kalman filters (such as 2D EKF, 3D EKF or UKF) within the same
-  [node](ros_packages/tam_state_estimation_node.md)
-- in addition to the state estimation, this repository contains a dedicated side slip angle
-  estimation ([ssa_estimation_cpp](lib_cpp/ssa_estimation_cpp.md)) and tf2 state publishers
-  providing static transformations within the software stack
+## Racetrack Deployment (A2RL)
 
-## Acknowledgements
+An excerpt of FAR-LIO running on an autonomous race car on a racetrack as part of the
+[Abu Dhabi Autonomous Racing League (A2RL)](https://a2rl.io/).
 
-The implementations are mainly based on the following paper:
+<div style="text-align:center;white-space:nowrap;overflow-x:auto">
+  <span style="display:inline-block;white-space:normal;vertical-align:top;margin:0 0.5rem">
+    <img src="https://github.com/user-attachments/assets/76415cfc-4ba3-4187-afee-672ece0ad899" alt="A2RL onboard footage" style="height:240px!important;width:auto!important;max-width:none!important" />
+    <br /><sub>Onboard camera footage</sub>
+  </span>
+  <span style="display:inline-block;white-space:normal;vertical-align:top;margin:0 0.5rem">
+    <img src="https://github.com/user-attachments/assets/6504064d-b9d0-4411-96c4-ed91ed6b8f72" alt="A2RL FAR-LIO ego view" style="height:240px!important;width:auto!important;max-width:none!important" />
+    <br /><sub>FAR-LIO's odometry</sub>
+  </span>
+</div>
 
-- [Vehicle Dynamics State Estimation and Localization for High Performance Race Cars](https://www.sciencedirect.com/science/article/pii/S2405896319303957)
+## Citation
+
+If you use FAR-LIO in your research, please cite our paper:
+
+```bibtex
+@misc{2026far-lio,
+      title={FAR-LIO: Enabling High-Speed Autonomy through Fast, Accurate, and Robust LiDAR-Inertial Odometry}, 
+      author={Maximilian Leitenstern and Marcel Weinmann and Patrick Haft and Tobias Lasser and Dominik Kulmer and Markus Lienkamp},
+      year={2026},
+      eprint={2606.26010},
+      archivePrefix={arXiv},
+      primaryClass={cs.RO},
+      url={https://arxiv.org/abs/2606.26010},
+}
+```
+
+## Contact
+
+- Maximilian Leitenstern — [maxi.leitenstern@tum.de](mailto:maxi.leitenstern@tum.de)
+- Marcel Weinmann — [marcel.weinmann@tum.de](mailto:marcel.weinmann@tum.de)

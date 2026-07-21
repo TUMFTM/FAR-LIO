@@ -7,28 +7,67 @@
 </p>
 
 <p align="center">
-  <a href="https://arxiv.org/abs/ARXIV_ID">Paper</a> &nbsp;·&nbsp;
-  <a href="https://tumftm.github.io/FAR-LIO/">Documentation</a>
+  <a href="https://arxiv.org/abs/2606.26010"><img alt="arXiv" src="https://img.shields.io/badge/arXiv-2606.26010-b31b1b?logo=arxiv&logoColor=white"></a>
+  <a href="https://tumftm.github.io/FAR-LIO/"><img alt="Project page" src="https://img.shields.io/badge/project-page-1f6feb"></a>
+  <a href="https://github.com/TUMFTM/FAR-LIO/actions/workflows/docker.yml"><img alt="Docker build" src="https://github.com/TUMFTM/FAR-LIO/actions/workflows/docker.yml/badge.svg"></a>
+  <a href="https://github.com/TUMFTM/FAR-LIO/actions/workflows/docs.yml"><img alt="Docs build" src="https://github.com/TUMFTM/FAR-LIO/actions/workflows/docs.yml/badge.svg"></a>
+  <br />
+  <img alt="Docker" src="https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white">
+  <img alt="ROS 2 Jazzy" src="https://img.shields.io/badge/ROS%202-Jazzy-22314E?logo=ros&logoColor=white">
+  <img alt="C++20" src="https://img.shields.io/badge/C%2B%2B-20-00599C?logo=cplusplus&logoColor=white">
 </p>
 
-## Architecture
+## Installation
 
-<p align="center">
-  <img src="docs/assets/architecture.svg" alt="FAR-LIO architecture" width="820">
-</p>
+Pull the pre-built CUDA image from the GitHub Container Registry:
 
-<!-- Export the TikZ figure from the paper to SVG and place it at the path above.
-     See the README section in the repo history / project docs for how. -->
+```bash
+docker pull ghcr.io/tumftm/far-lio:latest
+```
 
-## Demo
+Or build it yourself:
 
-<img width="320" height="180" alt="onboard_small" src="https://github.com/user-attachments/assets/76415cfc-4ba3-4187-afee-672ece0ad899" />
-<img width="320" height="218" alt="yas_ego_small" src="https://github.com/user-attachments/assets/6504064d-b9d0-4411-96c4-ed91ed6b8f72" />
+```bash
+git clone --recursive https://github.com/TUMFTM/FAR-LIO.git
+cd FAR-LIO
+docker build -f docker/Dockerfile -t ghcr.io/tumftm/far-lio:latest .
+```
 
-<img height="250" alt="yas_top_clip" src="https://github.com/user-attachments/assets/997075fc-6fa3-468a-a3f3-858f60df583e" />
-<img height="250" alt="kitti_top_clip" src="https://github.com/user-attachments/assets/ff0ecc2b-989e-4b38-82a9-e1e3f18be207" />
+See the [installation guide](https://tumftm.github.io/FAR-LIO/installation.html) for prerequisites and options.
 
+## Usage
 
+Configure the environment and launch the stack with Docker Compose:
+
+```bash
+cp .env.example .env                                  # set BAG_PATH, BAG_NAME, ROS_DOMAIN_ID, ...
+docker compose --profile far-lio up                   # FAR-LIO nodes (needs a GPU)
+docker compose --profile bag up                       # replay a ROS 2 bag
+docker compose --profile far-lio --profile bag up     # both together
+```
+
+See the [usage guide](https://tumftm.github.io/FAR-LIO/usage.html) for the full configuration reference.
+
+## Racetrack Deployment (A2RL)
+
+An excerpt of FAR-LIO running on an autonomous race car on a racetrack as part of the
+[Abu Dhabi Autonomous Racing League (A2RL)](https://a2rl.io/).
+
+<table align="center">
+  <tr>
+    <td align="center" width="50%">
+      <img height="240" alt="A2RL onboard footage" src="https://github.com/user-attachments/assets/76415cfc-4ba3-4187-afee-672ece0ad899" />
+      <br /><sub>Onboard camera footage</sub>
+    </td>
+    <td align="center" width="50%">
+      <img height="240" alt="A2RL FAR-LIO ego view" src="https://github.com/user-attachments/assets/6504064d-b9d0-4411-96c4-ed91ed6b8f72" />
+      <br /><sub>FAR-LIO's odometry</sub>
+    </td>
+  </tr>
+</table>
+
+See the [documentation](https://tumftm.github.io/FAR-LIO/) for the architecture and further
+application domains.
 
 ## Citation
 
