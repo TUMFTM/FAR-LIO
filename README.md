@@ -69,7 +69,7 @@ An excerpt of FAR-LIO running on an autonomous race car on a racetrack as part o
 See the [documentation](https://tumftm.github.io/FAR-LIO/) for the architecture and further
 application domains.
 
-## Citation
+## References
 
 If you use FAR-LIO in your research, please cite our paper:
 
@@ -85,8 +85,12 @@ If you use FAR-LIO in your research, please cite our paper:
 }
 ```
 
-## Contact
+### Core Developers
 
 [Marcel Weinmann](mailto:marcel.weinmann@tum.de)  
 [Maximilian Leitenstern](mailto:maxi.leitenstern@tum.de)  
 Institute of Automotive Technology, School of Engineering and Design, Technical University of Munich, 85748 Garching, Germany
+
+### Acknowledgements
+
+We thank Patrick Haft and Tobias Lasser (NVIDIA Corporation) for their assistance during the CUDA development.
