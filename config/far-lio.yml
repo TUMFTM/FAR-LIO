@@ -104,6 +104,7 @@
         input_pointcloud_status: ""
         output_odom: "lidar_odometry" # Namespace set globally
         input_map: "" # Path to folder containing "map.pcd" and "origin.yml"
+        update_map_srv: "" # Service to trigger map update (disabled if empty)
       # Pipeline
       pipeline:
         update_map: true
@@ -115,12 +116,22 @@
         num_threads: 1
       # Covariance
       covariance:
-        min_cov_x: 0.01
-        min_cov_y: 0.01
-        min_cov_z: 0.01
-        min_cov_roll: 0.02
-        min_cov_pitch: 0.02
-        min_cov_yaw: 0.0001
+        min_cov_translation:
+        - 0.01
+        - 0.01
+        - 0.02
+        min_cov_orientation:
+        - 0.02
+        - 0.02
+        - 0.0001
+        min_cov_linear_twist:
+        - 0.1
+        - 0.1
+        - 0.1
+        min_cov_angular_twist:
+        - 0.01
+        - 0.01
+        - 0.01
       # Diagnostic
       diagnostic:
         check_input_status: false
@@ -136,7 +147,7 @@
         check_vel: true
         vel_motion_threshold: 0.0 # [m]
       distortion:
-        max_time_diff: 50.0
+        max_time_diff: 30.0
         vel_threshold: 3.0
       # Map
       map:
