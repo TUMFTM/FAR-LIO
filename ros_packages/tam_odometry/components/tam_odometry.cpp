@@ -34,13 +34,6 @@ struct ICP_CV : public tam::core::state::OdometryNode<tam::core::state::types::I
   }
 };
 
-struct RADAR_ICP_EXT : public tam::core::state::OdometryNode<tam::core::state::types::RADAR_ICP_EXT> {
-  explicit RADAR_ICP_EXT(const rclcpp::NodeOptions& options)
-      : tam::core::state::OdometryNode<tam::core::state::types::RADAR_ICP_EXT>(options)
-  {
-  }
-};
-
 struct GICP_EXT : public tam::core::state::OdometryNode<tam::core::state::types::GICP_EXT> {
   explicit GICP_EXT(const rclcpp::NodeOptions& options)
       : tam::core::state::OdometryNode<tam::core::state::types::GICP_EXT>(options)
@@ -68,7 +61,6 @@ struct CUDA_GICP_EXT : public tam::core::state::OdometryNode<tam::core::state::t
 
 RCLCPP_COMPONENTS_REGISTER_NODE(tam_odometry::ICP_EXT)          // NOLINT
 RCLCPP_COMPONENTS_REGISTER_NODE(tam_odometry::ICP_CV)           // NOLINT
-RCLCPP_COMPONENTS_REGISTER_NODE(tam_odometry::RADAR_ICP_EXT)    // NOLINT
 RCLCPP_COMPONENTS_REGISTER_NODE(tam_odometry::GICP_EXT)         // NOLINT
 #ifdef BUILD_CUDA
 RCLCPP_COMPONENTS_REGISTER_NODE(tam_odometry::CUDA_ICP_EXT)          // NOLINT
