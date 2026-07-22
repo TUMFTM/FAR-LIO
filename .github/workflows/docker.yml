@@ -71,20 +71,22 @@ jobs:
           cache-to: type=gha,mode=max,scope=deps
           provenance: false
 
-      # Final image: compiled workspace. Pushed on main (:latest) and on
-      # releases (:<tag>); only built on pull requests.
+      # Final image: slim runtime stage (compiled workspace copied onto a CUDA
+      # runtime base). Pushed on main (:latest) and on releases (:<tag>); only
+      # built on pull requests. Built for the Ada/Blackwell CUDA
+      # architectures (89;120).
       - name: Build (and push) the final image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: docker/Dockerfile
-          target: build
+          target: runtime
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             BUILD_CUDA=ON
-            CUDA_ARCHITECTURES=80
+            CUDA_ARCHITECTURES=89;120
           cache-from: |
             type=gha,scope=deps
             type=gha,scope=build

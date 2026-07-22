@@ -50,8 +50,9 @@ docker build -f docker/Dockerfile \
 ```
 
 !!! note
-    The image is based on `nvidia/cuda:*-devel` and includes ROS 2, PCL and the CUDA
-    toolkit, so it is large (~19 GB). Make sure you have enough disk space.
+    The published image is slim (~7 GB): it uses a CUDA *runtime* base and ships only the
+    compiled workspace and the runtime libraries. The build itself is heavier — the `devel`
+    toolchain stage is ~19 GB — so make sure you have enough free disk space while building.
 
 ## Option C — build from source (without Docker)
 
@@ -91,13 +92,14 @@ always-up-to-date list of every dependency — install the same packages it does
 
 ## Docker Architecture
 
-The image is built in two stages (see `docker/Dockerfile`):
+The image is built in three stages (see `docker/Dockerfile`):
 
-- **`deps`** — CUDA devel base + ROS 2 `ros-base` + all system/ROS dependencies, installed
+- **`deps`** — CUDA *devel* base + ROS 2 `ros-base` + all build dependencies, installed
   explicitly so every package is visible in the Dockerfile.
 - **`build`** — compiles only `tam_odometry` and `tam_state_estimation_node` and their
-  in-workspace dependencies (`colcon build --packages-up-to …`) and installs them to
-  `/dev_ws/install`.
+  in-workspace dependencies and installs them to `/dev_ws/install`.
+- **`runtime`** — the published image: a slim CUDA *runtime* base with only the runtime
+  libraries the nodes link against, plus the compiled `install/` copied from the build stage.
 
 The entrypoint sources ROS 2 and the FAR-LIO overlay automatically, so any `docker run`
 or Compose `command` works without sourcing anything first.
