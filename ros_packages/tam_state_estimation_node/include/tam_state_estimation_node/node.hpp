@@ -38,7 +38,6 @@
 // type definitions
 #include "tam_state_estimation_node/helper.hpp"
 #include "tum_helpers_cpp/containers.hpp"
-#include "tum_types_cpp/coordinate_frames.hpp"
 #include "types.hpp"
 
 // 3d to 2d helper functions
@@ -289,6 +288,8 @@ private:
   {
     // define node specific parameters
     // clang-format off
+    state_estimation_node_params_.odom_frame_id = param_manager_->declare_and_get_value("node.odom_frame_id", std::string("local_cartesian"), tam::pmg::ParameterType::STRING, "Frame of the odometry output").as_string(); // NOLINT
+    state_estimation_node_params_.child_frame_id = param_manager_->declare_and_get_value("node.child_frame_id", std::string("base_link"), tam::pmg::ParameterType::STRING, "Child frame of the odometry output").as_string(); // NOLINT
     state_estimation_node_params_.virtual_covariance_scale = param_manager_->declare_and_get_value("kalman_filter.covariance_adaption.virtual_scale", 10.0, tam::pmg::ParameterType::DOUBLE, "Scaling Factor for the covariance of delayed measurements").as_double(); // NOLINT
     state_estimation_node_params_.average_input_delay_ms = param_manager_->declare_and_get_value("inputs.average_delay_ms", 0, tam::pmg::ParameterType::INTEGER, "Average expected delay on the IMU measurements").as_int(); // NOLINT
     previous_param_state_hash_ = param_manager_->get_state_hash();
@@ -449,8 +450,8 @@ private:
 
     // construct message header
     odometry_msg.header.stamp = time_pub;
-    odometry_msg.header.frame_id = "local_cartesian";
-    odometry_msg.child_frame_id = "vehicle_cg";
+    odometry_msg.header.frame_id = state_estimation_node_params_.odom_frame_id;
+    odometry_msg.child_frame_id = state_estimation_node_params_.child_frame_id;
 
     pub_odometry_->publish(odometry_msg);
   }
@@ -483,8 +484,8 @@ private:
     // local_cartesian to base_link
     geometry_msgs::msg::TransformStamped transform_local_cartesian;
     transform_local_cartesian.header.stamp = time_pub;
-    transform_local_cartesian.header.frame_id = "local_cartesian";
-    transform_local_cartesian.child_frame_id = "base_link";
+    transform_local_cartesian.header.frame_id = state_estimation_node_params_.odom_frame_id;
+    transform_local_cartesian.child_frame_id = state_estimation_node_params_.child_frame_id;
 
     // translation between current cog and 0, 0, 0
     transform_local_cartesian.transform.translation.x = odometry_output_.position_m.x;
@@ -581,7 +582,7 @@ private:
         // Try to look up the transform until the first successful lookup
         if (!measurement.static_translation_valid) {
           geometry_msgs::msg::TransformStamped transform = tf_buffer_->lookupTransform(
-            msg->child_frame_id, CoordinateFrames::vehicle_cg.data(), tf2::TimePointZero);
+            msg->child_frame_id, state_estimation_node_params_.child_frame_id, tf2::TimePointZero);
           measurement.static_translation = tf2::Vector3(transform.transform.translation.x,
             transform.transform.translation.y, transform.transform.translation.z);
           measurement.static_translation_valid = true;

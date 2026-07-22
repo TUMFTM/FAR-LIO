@@ -32,6 +32,8 @@ namespace tam::types::state::config
    */
   struct node
   {
+    std::string odom_frame_id{};
+    std::string child_frame_id{};
     double virtual_covariance_scale{};
     int32_t average_input_delay_ms{};
   };
