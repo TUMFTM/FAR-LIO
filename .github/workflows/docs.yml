@@ -1,9 +1,9 @@
 name: docs
 
 # Build the FAR-LIO documentation (Zensical site + Doxygen C++ API) and deploy
-# it to the `github-pages` branch.
+# it to the `gh-pages` branch.
 #
-#   * push to main -> build + deploy to the github-pages branch
+#   * push to main -> build + deploy to the gh-pages branch
 #   * pull request -> build only, so doc/config changes are verified before merge
 #
 # The workflow runs whenever the documentation sources or their build
@@ -32,7 +32,7 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     permissions:
-      contents: write        # push the built site to the github-pages branch
+      contents: write        # push the built site to the gh-pages branch
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -55,10 +55,10 @@ jobs:
       - name: Build site (Zensical)
         run: zensical build --clean
 
-      - name: Deploy to github-pages branch
+      - name: Deploy to gh-pages branch
         if: github.event_name == 'push'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./site
-          publish_branch: github-pages
+          publish_branch: gh-pages

@@ -1,6 +1,7 @@
 # Documentation build artifacts
 /site/
 /docs/docs_cpp/
+/.cache/
 
 # colcon / ROS build artifacts
 /build/

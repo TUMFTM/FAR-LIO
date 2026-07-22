@@ -20,4 +20,4 @@ possible.
 - [GoogleTest](https://github.com/google/googletest) — unit testing.
 - [rerun](https://github.com/rerun-io/rerun) — optional visualization.
 - [tsl](https://github.com/TUMFTM/tsl) — time-series logging and the debug messages FAR-LIO emits.
-- [TAM__param_management](https://github.com/TUMFTM/TAM__param_management) - parameter management.
+- [TAM__param_management](https://github.com/TUMFTM/TAM__param_management) — parameter management.

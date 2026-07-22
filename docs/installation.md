@@ -38,7 +38,7 @@ docker build -f docker/Dockerfile -t ghcr.io/tumftm/far-lio:latest .
 | Arg | Default | Description |
 |-----|---------|-------------|
 | `BUILD_CUDA` | `ON` | Build the CUDA nodes (`tam_cuda_icp_ext`, `tam_cuda_gicp_ext`). |
-| `CUDA_ARCHITECTURES` | `80` | Target GPU architecture(s). Set to match your GPU — e.g. `86` (RTX 30xx), `89` (RTX 40xx / Ada), `75` (RTX 20xx). A `;`-separated list is allowed. |
+| `CUDA_ARCHITECTURES` | `89` | Target GPU architecture(s). Set to match your GPU — e.g. `86` (RTX 30xx), `89` (RTX 40xx / Ada), `120` (RTX 50xx / Blackwell), `75` (RTX 20xx). A `;`-separated list is allowed (the published image builds `89;120`). |
 | `ROS_DISTRO` | `jazzy` | ROS 2 distribution. |
 | `CUDA_VERSION` / `UBUNTU_VERSION` | `12.8.1` / `24.04` | Base image versions. |
 
@@ -75,9 +75,9 @@ always-up-to-date list of every dependency — install the same packages it does
    dependencies:
 
     ```bash
-    cd src
+    mkdir -p far_lio_ws/src && cd far_lio_ws/src
     git clone --recursive https://github.com/TUMFTM/FAR-LIO.git
-    cd ros_ws
+    cd ..            # back to the workspace root (far_lio_ws)
 
     source /opt/ros/jazzy/setup.bash
     colcon build --packages-up-to tam_odometry tam_state_estimation_node \

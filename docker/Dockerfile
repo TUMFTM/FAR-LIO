@@ -139,6 +139,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy the compiled workspace from the build stage and the runtime configuration
 # from the build context.
 COPY --from=build /dev_ws/install /dev_ws/install
+COPY config/ /dev_ws/config/
 
 WORKDIR /dev_ws
 
