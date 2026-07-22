@@ -756,7 +756,7 @@ private:
    * @brief model update callback
    */
   rclcpp::TimerBase::SharedPtr model_update_timer_{};
-  rclcpp::Time time_pub_{};
+  rclcpp::Time time_pub_{0, 0, RCL_ROS_TIME};
 
   /**
    * @brief topic watchdog
@@ -792,7 +792,7 @@ private:
   /**
    * @brief Time of the previous model update callback
    */
-  rclcpp::Time last_callback_time_{};
+  rclcpp::Time last_callback_time_{0, 0, RCL_ROS_TIME};
 
   // state estimation output
   /**
