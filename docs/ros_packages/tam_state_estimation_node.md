@@ -1,6 +1,6 @@
 # tam_state_estimation_node
 
-ROS 2 wrapper around the pure-C++ [tam_state_estimation](../lib_cpp/tam_state_estimation.md) library. It subscribes to
+ROS 2 wrapper around the pure-C++ [tam_state_estimation](../lib_cpp/state_estimation_cpp/tam_state_estimation.md) library. It subscribes to
 the sensor streams published by the
 [vehicle interface](https://gitlab.lrz.de/iac/mod_vehicle_interface/-/tree/develop/sensor_interfaces?ref_type=heads),
 delay-compensates and converts them, feeds them into the (ROS-free) estimator, and republishes the fused vehicle state

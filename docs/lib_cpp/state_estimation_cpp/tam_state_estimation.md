@@ -14,7 +14,7 @@ number of localization, linear-velocity and IMU sources into a consistent vehicl
 - **Robust** — per-sensor validity tracking / graceful degradation via a state machine, adaptive measurement covariance,
   and outlier rejection (box or Mahalanobis).
 - **ROS-agnostic** — the ROS 2 wrapper is a thin layer in
-  [tam_state_estimation_node](../ros_packages/tam_state_estimation_node.md).
+  [tam_state_estimation_node](../../ros_packages/tam_state_estimation_node.md).
 
 ## Design
 
