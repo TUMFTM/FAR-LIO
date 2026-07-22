@@ -8,7 +8,7 @@
 
 <p align="center">
   <a href="https://arxiv.org/abs/2606.26010"><img alt="arXiv" src="https://img.shields.io/badge/arXiv-2606.26010-b31b1b?logo=arxiv&logoColor=white"></a>
-  <a href="https://tumftm.github.io/FAR-LIO/"><img alt="Project page" src="https://img.shields.io/badge/project-page-1f6feb"></a>
+  <a href="https://github.com/TUMFTM/FAR-LIO/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-Apache%202.0-blue"></a>
   <a href="https://github.com/TUMFTM/FAR-LIO/actions/workflows/docker.yml"><img alt="Docker build" src="https://github.com/TUMFTM/FAR-LIO/actions/workflows/docker.yml/badge.svg"></a>
   <a href="https://github.com/TUMFTM/FAR-LIO/actions/workflows/docs.yml"><img alt="Docs build" src="https://github.com/TUMFTM/FAR-LIO/actions/workflows/docs.yml/badge.svg"></a>
   <br />
@@ -16,6 +16,8 @@
   <img alt="ROS 2 Jazzy" src="https://img.shields.io/badge/ROS%202-Jazzy-22314E?logo=ros&logoColor=white">
   <img alt="C++20" src="https://img.shields.io/badge/C%2B%2B-20-00599C?logo=cplusplus&logoColor=white">
 </p>
+
+<h2 align="center"><a href="https://tumftm.github.io/FAR-LIO">📖 Documentation</a></h2>
 
 ## Installation
 

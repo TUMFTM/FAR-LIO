@@ -53,6 +53,42 @@ docker build -f docker/Dockerfile \
     The image is based on `nvidia/cuda:*-devel` and includes ROS 2, PCL and the CUDA
     toolkit, so it is large (~19 GB). Make sure you have enough disk space.
 
+## Option C — build from source (without Docker)
+
+If you prefer a native ROS 2 workspace, you can build FAR-LIO directly on the host. The
+[`docker/Dockerfile`](https://github.com/TUMFTM/FAR-LIO/blob/main/docker/Dockerfile) is the
+always-up-to-date list of every dependency — install the same packages it does.
+
+1. **ROS 2 Jazzy** on Ubuntu 24.04 (`ros-jazzy-ros-base`), plus the **CUDA toolkit** (12.8) if you
+   want the CUDA nodes.
+2. **System / ROS dependencies** (exactly as installed in the Dockerfile):
+   `build-essential`, `cmake`, `git`, `python3-colcon-common-extensions`, `libeigen3-dev`,
+   `libpcl-dev`, `ros-jazzy-pcl-conversions`, `ros-jazzy-geographic-msgs`,
+   `ros-jazzy-rmw-cyclonedds-cpp`.
+
+    !!! note
+        Sophus, oneTBB, robin-map, GoogleTest and optionally cuCollections are fetched automatically at configure time via
+        CMake `FetchContent`, so a network connection is required for the first build.
+
+3. **Clone with submodules into a workspace and build** the two packages and their in-workspace
+   dependencies:
+
+    ```bash
+    cd src
+    git clone --recursive https://github.com/TUMFTM/FAR-LIO.git
+    cd ros_ws
+
+    source /opt/ros/jazzy/setup.bash
+    colcon build --packages-up-to tam_odometry tam_state_estimation_node \
+      --cmake-args -DCMAKE_BUILD_TYPE=Release \
+                   -DBUILD_CUDA=ON -DCUDA_ARCHITECTURES=89 \
+                   -DBUILD_ODOMETRY_EXAMPLES=OFF -DBUILD_TESTING=OFF
+    source install/setup.bash
+    ```
+
+    Set `-DBUILD_CUDA=OFF` for the CPU-only nodes, and `CUDA_ARCHITECTURES` to match your GPU.
+    See the [docker-compose.yml](https://github.com/TUMFTM/FAR-LIO/blob/main/docker-compose.yml) for running the resulting executables or the individual documentation of the node-packages [tam_odometry](./ros_packages/tam_odometry.md) and [tam_state_estimation_node](./ros_packages/tam_state_estimation_node.md).
+
 ## Docker Architecture
 
 The image is built in two stages (see `docker/Dockerfile`):

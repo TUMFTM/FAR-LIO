@@ -31,6 +31,7 @@ nav = [
   { "Configuration" = "configuration.md" },
   { "Analysis" = "analysis.md" },
   { "Applications" = "applications.md" },
+  { "Acknowledgements" = "acknowledgement.md" },
   { "Detailed Documentation" = [
     { "C++ Libraries" = [
       { "Odometry (odometry_cpp)" = [
