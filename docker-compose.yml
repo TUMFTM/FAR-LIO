@@ -64,5 +64,5 @@ services:
       - ./config/middleware/cyclonedds_udp.xml:/dev_ws/config/middleware/cyclonedds_udp.xml
       - ${BAG_PATH:-/dev/null}:/bags/${BAG_NAME:-bag}:ro
       - /tmp:/tmp
-    command: bash -c "ros2 bag play /bags/${BAG_NAME:-bag} --read-ahead-queue-size 100 --delay 5 --clock"
+    command: bash -c "ros2 bag play /bags/${BAG_NAME:-bag} --read-ahead-queue-size 100 --delay 5 --clock 1000.0"
     profiles: ["bag"]
