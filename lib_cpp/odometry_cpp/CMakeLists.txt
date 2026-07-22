@@ -117,7 +117,7 @@ function(set_cuda_architecture target)
     if(NOT DEFINED CUDA_ARCHITECTURES)
       message(FATAL_ERROR "CUDA_ARCHITECTURES is not defined. Please set it: -DCUDA_ARCHITECTURES=80")
     endif()
-    set_target_properties(${target} PROPERTIES CUDA_ARCHITECTURES ${CUDA_ARCHITECTURES})
+    set_target_properties(${target} PROPERTIES CUDA_ARCHITECTURES "${CUDA_ARCHITECTURES}")
   endif()
 endfunction()
 

@@ -75,6 +75,7 @@ ctest --test-dir path/to/build_folder
   via Cmake with a specific tag)
 - the library support CUDA implementations for the following modules right now:
   - `PolynomUndistortion` ([DistortionHandler](odometry_cpp/distortion_handler.md))
+  - `LidarPreprocessing` ([PreprocessingHandler](odometry_cpp/preprocessing_handler.md))
   - `VoxelHashMap` ([MapHandler](odometry_cpp/map_handler.md))
   - `ICP`, `GICP` ([RegistrationHandler](odometry_cpp/registration_handler.md))
   - `voxel_downsampling` ([VoxelTools](odometry_cpp/voxel_tools.md))

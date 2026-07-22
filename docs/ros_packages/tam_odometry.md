@@ -36,10 +36,8 @@ Furthermore, you can use each executable without ("odometry-mode", usage for map
 | `tam_icp_cv` | (CPU-based ICP with constant-velocity model) |
 | `tam_radar_icp_ext` | (CPU-based ICP leverage radar-specific information and an external initial guess - from `/tf`) |
 | `tam_gicp_ext` | (CPU-based GICP with external initial guess - from `/tf`) |
-| `tam_initializer_icp` | (CPU-based ICP for initialization within offline map) |
 | `tam_cuda_icp_ext` | (GPU-based ICP with external initial guess - from `/tf`) |
 | `tam_cuda_gicp_ext` | (GPU-based ICP with external initial guess - from `/tf`) |
-| `tam_initializer_cuda_icp` | (GPU-based ICP for initialization within offline map) |
 
 ## Interfaces
 
@@ -60,8 +58,7 @@ Note: Apart from `tf_static` and `/tf`, all topics are configurable via the conf
 | `/tf_static` (`geometry_msgs/msg/TransformStamped`) | Static transforms to transform the incoming pointcloud to the configured `child_frame` which the output odometry shall be in |
 | `/vehicle/sensor/lidar` (`sensor_msgs/msg/Pointcloud2`) | Input pointcloud topic |
 | [[OPTIONAL]] `/core/orchestration/lidar_status` (`diagnostic_msgs/msg/DiagnosticStatus`) | Only if input status check enabled (`diagnostic.check_input_status`). Corresponding status to pointcloud topic as is e.g. from [tam_odometry](tam_odometry.md) |
-| [[OPTIONAL]] `/tf` (`geometry_msgs/msg/TransformStamped`) | Only required if using an external prediction model (executable contains `EXT`). Contains the transformation of the robot (`child_frame`) in the environment (`odom_frame`), used as initial guess for the registration. |
-| [[OPTIONAL]] `/core/state/Odometry` (`nav_msgs/msg/Odometry`) | Only required if distortion correction is enabled (`pipeline.undistort`). Odometry topic with velocities of the robot (`child_frame`) in the environment (`odom_frame`), used for distortion correction |
+| [[OPTIONAL]] `/tf` (`geometry_msgs/msg/TransformStamped`) | Only required if using an external prediction model (executable contains `EXT`) or undistortion. Contains the transformation of the robot (`child_frame`) in the environment (`odom_frame`), used as initial guess for the registration or for twist interpolation. |
 | [[OPTIONAL]] `/core/map/get_pointcloud_map` (`tum_map_msgs/srv/GetPointCloudMap`) | Use to request an initial prior pointcloud map within the software stack. Only applied if `node.input_map` does not point to a `.pcd`-file and `pipeline.update_map = false`. |
 <!-- markdownlint-enable MD013 -->
 
