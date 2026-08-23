@@ -5,6 +5,10 @@
   StateEstimation:
     ros__parameters:
       use_sim_time: true
+      # Node
+      node:
+        odom_frame_id: local_cartesian
+        child_frame_id: base_link
       # Enable parameters
       enable:
         measurement_covariance_adaptation: true
