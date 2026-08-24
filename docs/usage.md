@@ -7,6 +7,7 @@ services, each behind a [profile](https://docs.docker.com/compose/profiles/):
 |---------|---------|---------|
 | `far-lio-core` | `far-lio` | Runs the LiDAR odometry (CUDA GICP) and 3D-EKF state-estimation nodes. Requires a GPU. |
 | `rosbag` | `bag` | Plays a ROS 2 bag to feed the stack (`ros2 bag play … --clock`). |
+| `robot-state-publisher` | `rsp` | Publishes the sensor extrinsics from a URDF onto `/tf_static`. Optional — use when your bag does not already provide `/tf_static` (see [Configuration](configuration.md)). |
 
 Both services use host networking and CycloneDDS, so they communicate with each other —
 and anything else on the host — over `ROS_DOMAIN_ID`.
@@ -58,3 +59,26 @@ To use a specific `ROS_DOMAIN_ID`, export it first:
 ```bash
 ROS_DOMAIN_ID=7 ./run.sh /path/to/rosbag
 ```
+
+## Publishing extrinsics from a URDF
+
+If your bag does not already carry the sensor extrinsics on `/tf_static`, the optional
+`robot-state-publisher` service can publish them from a URDF. Drop the URDF into
+`config/urdf/` (an example, `config/urdf/KITTI.xml`, is included) and either add the profile
+to a manual run or set `WITH_RSP=1` when using the helper script:
+
+```bash
+# with the helper script (KITTI.xml by default)
+./run.sh --rsp /path/to/rosbag
+
+# pick a different URDF from config/urdf/
+URDF_NAME=my_robot.xml ./run.sh --rsp /path/to/rosbag
+
+# or standalone
+URDF_NAME=KITTI.xml docker compose --profile rsp up
+```
+
+The URDF must define the sensor frames as fixed joints relative to `base_link` (see the
+bundled `KITTI.xml`); `robot_state_publisher` then latches those transforms on `/tf_static`.
+Only the static extrinsics are published, so this does **not** conflict with the note above
+about dynamic `/tf`.
