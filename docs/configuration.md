@@ -65,9 +65,8 @@ The state estimation operates in the vehicle's center of gravity, so `child_fram
     FAR-LIO needs the static transform from `cloud_frame` to `base_link` (on `/tf_static`) to
     place the LiDAR relative to the vehicle, so **your bag must contain it**. Find a cloud's
     frame with `ros2 topic echo --field header.frame_id <pointcloud_topic>`. If the bag has no
-    suitable `/tf_static`, you can publish it from a URDF with the bundled
-    `robot-state-publisher` service (`./run.sh --rsp …`, see [Usage](usage.md)), or inject
-    one into the bag itself — e.g. with [kappe](https://github.com/sensmore/kappe).
+    suitable `/tf_static`, you can inject one — e.g. with
+    [kappe](https://github.com/sensmore/kappe).
 
 ## Odometry vs. localization mode
 

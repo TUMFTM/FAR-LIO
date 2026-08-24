@@ -1,13 +1,10 @@
 # =============================================================================
 # FAR-LIO docker compose
 #
-# Services, each behind a profile:
+# Two services, each behind a profile:
 #   * far-lio-core (profile "far-lio") – LiDAR odometry (CUDA GICP) + 3D-EKF
 #                                        state estimation. Requires a GPU.
 #   * rosbag       (profile "bag")     – plays a ROS 2 bag to feed the stack.
-#   * robot-state-publisher (profile "rsp") – publishes the sensor extrinsics
-#                                        from a URDF onto /tf_static (optional;
-#                                        use it when the bag has no /tf_static).
 #
 # Run FAR-LIO on its own (e.g. with live sensors):
 #   docker compose --profile far-lio up
@@ -15,10 +12,6 @@
 # Run FAR-LIO together with a bag: use the helper script, which mounts the bag
 # and starts both services:
 #   ./run.sh /path/to/rosbag
-#   ./run.sh --rsp /path/to/rosbag             # also publish /tf_static from a URDF
-#
-# Publish the extrinsics of a specific URDF (in config/urdf/):
-#   URDF_NAME=KITTI.xml docker compose --profile rsp up
 #
 # ROS_DOMAIN_ID is taken from the environment if set, otherwise defaults to 0.
 # =============================================================================
@@ -55,28 +48,6 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
-
-  # ---------------------------------------------------------------------------
-  # robot_state_publisher: publish the sensor extrinsics from a URDF onto
-  # /tf_static. Use this when your bag does not already provide /tf_static.
-  # URDF_NAME selects a file in config/urdf/ (default KITTI.xml).
-  # ---------------------------------------------------------------------------
-  robot-state-publisher:
-    image: ghcr.io/tumftm/far-lio:latest
-    container_name: far-lio-rsp
-    init: true
-    network_mode: "host"
-    environment:
-      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
-      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-    volumes:
-      - ./config/middleware/cyclonedds_udp.xml:/dev_ws/config/middleware/cyclonedds_udp.xml
-      - ./config:/config
-    command: >-
-      bash -c "ros2 run robot_state_publisher robot_state_publisher
-      --ros-args -p use_sim_time:=true
-      -p robot_description:=\"$$(cat /config/urdf/${URDF_NAME:-KITTI.xml})\""
-    profiles: ["rsp"]
 
   # ---------------------------------------------------------------------------
   # ROS 2 bag player (launch via ./run.sh, which sets BAG_PATH / BAG_NAME)
