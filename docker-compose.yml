@@ -62,7 +62,8 @@ services:
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
     volumes:
       - ./config/middleware/cyclonedds_udp.xml:/dev_ws/config/middleware/cyclonedds_udp.xml
+      - ./config:/config
       - ${BAG_PATH:-/dev/null}:/bags/${BAG_NAME:-bag}:ro
       - /tmp:/tmp
-    command: bash -c "ros2 bag play /bags/${BAG_NAME:-bag} --read-ahead-queue-size 100 --delay 5 --clock 1000.0"
+    command: bash -c "ros2 bag play /bags/${BAG_NAME:-bag} --read-ahead-queue-size 100 --delay 5 --clock 1000.0 --qos-profile-overrides-path /config/qos_overrides.yaml"
     profiles: ["bag"]
