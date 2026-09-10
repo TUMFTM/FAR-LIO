@@ -1663,7 +1663,7 @@ It is available as an asset and can be downloaded from the respective release us
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>curl<span class="w"> </span>-fL<span class="w"> </span>-O<span class="w"> </span>https://github.com/TUMFTM/FAR-LIO/releases/download/test-data-kitti-seq04/test-data-kitti-seq04.zip<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>unzip<span class="w"> </span>test-data-kitti-seq04.zip
 </span></code></pre></div>
 <p>The default configuration in <code>far-lio.yml</code> already points at the correct inputs for the test data. To run <code>FAR-LIO</code>, use:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>./run.sh<span class="w"> </span>./test-data-kitti-seq04
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>./run.sh<span class="w"> </span>./test-data-kitti-seq04/kitti_20110930_seq_04
 </span></code></pre></div>
 <p>For visualization/inspection, run <a href="https://github.com/facontidavide/PlotJuggler">PlotJuggler</a> and subscribe to the respective topics, or open RVIZ2 with the provided config:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>rviz2<span class="w"> </span>-d<span class="w"> </span>config/far-lio.rviz
