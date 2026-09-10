@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="./assets/farlio-favicon.svg">
-      <meta name="generator" content="zensical-0.0.57">
+      <meta name="generator" content="zensical-0.0.60">
     
     
       
@@ -36,7 +36,7 @@
       
         
       
-      <link rel="stylesheet" href="./assets/stylesheets/modern/main.5da3a30f.min.css">
+      <link rel="stylesheet" href="./assets/stylesheets/modern/main.ce62732f.min.css">
       
         
           
@@ -375,6 +375,17 @@
     <span class="md-ellipsis">
       <span class="md-typeset">
         Run FAR-LIO with a bag
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Test Data
       </span>
     </span>
   </a>
@@ -1557,6 +1568,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#test-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      <span class="md-typeset">
+        Test Data
+      </span>
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1634,6 +1656,19 @@ both mcap and sqlite3 storage are supported.</p>
 <p>To use a specific <code>ROS_DOMAIN_ID</code>, export it first:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nv">ROS_DOMAIN_ID</span><span class="o">=</span><span class="m">7</span><span class="w"> </span>./run.sh<span class="w"> </span>/path/to/rosbag
 </span></code></pre></div>
+<h2 id="test-data">Test Data<a class="headerlink" href="#test-data" title="Permanent link">&para;</a></h2>
+<p>We provide a short example dataset of <code>KITTI Odometry (sequence 04)</code> in the respective ROS2 format for FAR-LIO to check system functionality.
+It is available as an asset and can be downloaded from the respective release using:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nb">cd</span><span class="w"> </span>/path/to/far-lio
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>curl<span class="w"> </span>-fL<span class="w"> </span>-O<span class="w"> </span>https://github.com/TUMFTM/FAR-LIO/releases/download/test-data-kitti-seq04/test-data-kitti-seq04.zip<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>unzip<span class="w"> </span>test-data-kitti-seq04.zip
+</span></code></pre></div>
+<p>The default configuration in <code>far-lio.yml</code> already points at the correct inputs for the test data. To run <code>FAR-LIO</code>, use:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>./run.sh<span class="w"> </span>./test-data-kitti-seq04
+</span></code></pre></div>
+<p>For visualization/inspection, run <a href="https://github.com/facontidavide/PlotJuggler">PlotJuggler</a> and subscribe to the respective topics, or open RVIZ2 with the provided config:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>rviz2<span class="w"> </span>-d<span class="w"> </span>config/far-lio.rviz
+</span></code></pre></div>
+<p>For further details, see <a href="analysis.html">Analysis</a>.</p>
 
 
 
@@ -1739,7 +1774,7 @@ both mcap and sqlite3 storage are supported.</p>
       <script id="__config" type="application/json">{"annotate":null,"base":".","features":["content.code.copy","content.tooltips","navigation.footer","navigation.indexes","navigation.instant","navigation.sections","navigation.top","navigation.tracking","search.highlight"],"search":"./assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="./assets/javascripts/bundle.49251538.min.js"></script>
+      <script src="./assets/javascripts/bundle.88ee1349.min.js"></script>
       
         <script src="./javascripts/mathjax.js"></script>
       

@@ -1,7 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
 <area shape="rect" id="Node000000" href="$structtam_1_1core_1_1state_1_1ErrorBase.html" title="Base functor for computing the error of a correspondence for a given transformation." alt="" coords="5,37,201,77"/>
 <area shape="rect" id="Node000001" href="$structtam_1_1core_1_1state_1_1GICPError.html" title="Compute the error of a correspondence for a given transformation." alt="" coords="249,5,444,45"/>
-<area shape="poly" id="edge33_Node000000_Node000001" title=" " alt="" coords="214,40,249,35,249,41,215,45"/>
+<area shape="poly" id="edge29_Node000000_Node000001" title=" " alt="" coords="214,40,249,35,249,41,215,45"/>
 <area shape="rect" id="Node000002" href="$structtam_1_1core_1_1state_1_1ICPError.html" title="Compute the error of a correspondence for a given transformation." alt="" coords="254,69,439,109"/>
-<area shape="poly" id="edge34_Node000000_Node000002" title=" " alt="" coords="215,69,254,75,253,80,215,75"/>
+<area shape="poly" id="edge30_Node000000_Node000002" title=" " alt="" coords="215,69,254,75,253,80,215,75"/>
 </map>

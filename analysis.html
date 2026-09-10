@@ -25,7 +25,7 @@
       
       
       <link rel="icon" href="./assets/farlio-favicon.svg">
-      <meta name="generator" content="zensical-0.0.57">
+      <meta name="generator" content="zensical-0.0.60">
     
     
       
@@ -36,7 +36,7 @@
       
         
       
-      <link rel="stylesheet" href="./assets/stylesheets/modern/main.5da3a30f.min.css">
+      <link rel="stylesheet" href="./assets/stylesheets/modern/main.ce62732f.min.css">
       
         
           
@@ -1579,22 +1579,6 @@ With it enabled, <code>LidarOdometry</code> publishes:</p>
 <li>the current local submap.</li>
 </ul>
 <p>Both can be displayed in <strong>RViz2</strong>, for example to check alignment quality and map consistency.</p>
-<p>A ready-made RViz2 configuration is provided at
-<a href="https://github.com/TUMFTM/FAR-LIO/blob/main/config/far-lio.rviz"><code>config/far-lio.rviz</code></a>. It sets
-the fixed frame to <code>base_link</code> and shows the registration cloud
-(<code>/core/state/frame_registration</code>), the local submap (<code>/core/state/map</code>) and the odometry
-(<code>/core/state/odometry</code>, <code>/core/state/lidar_odometry</code>). Launch it from the repository root:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>rviz2<span class="w"> </span>-d<span class="w"> </span>config/far-lio.rviz
-</span></code></pre></div>
-<p>Run RViz2 on the host (with ROS 2 installed) using the <strong>same <code>ROS_DOMAIN_ID</code></strong> as the
-containers — because the stack uses host networking, a host-native RViz2 sees the topics
-directly, no display forwarding into Docker required.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The configuration also includes the raw LiDAR cloud, pointed at the example bag's topic
-(<code>/kitti/velo/pointcloud</code>). Change that display's topic to your own <code>input_pointcloud</code> if you
-want to see the unregistered scan.</p>
-</div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Publishing the whole local submap is expensive. Enabling <code>debug_mode</code> can noticeably increase
@@ -1705,7 +1689,7 @@ computation times, so use it for analysis rather than during performance-critica
       <script id="__config" type="application/json">{"annotate":null,"base":".","features":["content.code.copy","content.tooltips","navigation.footer","navigation.indexes","navigation.instant","navigation.sections","navigation.top","navigation.tracking","search.highlight"],"search":"./assets/javascripts/workers/search.7d14d953.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
     
     
-      <script src="./assets/javascripts/bundle.49251538.min.js"></script>
+      <script src="./assets/javascripts/bundle.88ee1349.min.js"></script>
       
         <script src="./javascripts/mathjax.js"></script>
       

@@ -1,5 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classtam_1_1core_1_1state_1_1OdometryBase.html" title=" " alt="" coords="5,5,247,60"/>
-<area shape="rect" id="Node000001" href="$classtam_1_1core_1_1state_1_1DiagnosticHandler.html" title=" " alt="" coords="295,13,497,53"/>
-<area shape="poly" id="edge42_Node000000_Node000001" title=" " alt="" coords="260,30,294,30,294,35,260,35"/>
+<area shape="rect" id="Node000000" href="$classtam_1_1core_1_1state_1_1OdometryBase.html" title=" " alt="" coords="5,5,241,60"/>
+<area shape="rect" id="Node000001" href="$classtam_1_1core_1_1state_1_1DistortionHandler.html" title=" " alt="" coords="289,13,487,53"/>
+<area shape="poly" id="edge39_Node000000_Node000001" title=" " alt="" coords="255,30,289,30,289,35,255,35"/>
+<area shape="rect" id="Node000002" href="$classtam_1_1core_1_1state_1_1PolynomUndistortion.html" title=" " alt="" coords="535,13,725,53"/>
+<area shape="poly" id="edge40_Node000001_Node000002" title=" " alt="" coords="500,30,535,30,535,35,500,35"/>
 </map>

@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['radar_5ficp_5fext_0',['radar_icp_ext',['../structtam_1_1core_1_1state_1_1types_1_1RADAR__ICP__EXT.html',1,'tam::core::state::types::RADAR_ICP_EXT'],['../structtam__odometry_1_1RADAR__ICP__EXT.html',1,'tam_odometry::RADAR_ICP_EXT']]],
+  ['radar_5ficp_5fext_0',['RADAR_ICP_EXT',['../structtam_1_1core_1_1state_1_1types_1_1RADAR__ICP__EXT.html',1,'tam::core::state::types']]],
   ['radarpreprocessingconfig_1',['RadarPreprocessingConfig',['../structtam_1_1core_1_1state_1_1types_1_1RadarPreprocessingConfig.html',1,'tam::core::state::types']]],
   ['ref_5forientation_5fhandler_2',['ref_orientation_handler',['../structtam_1_1types_1_1state_1_1config_1_1ref__orientation__handler.html',1,'tam::types::state::config']]],
   ['reforientationhandler_3',['RefOrientationHandler',['../classtam_1_1core_1_1state_1_1RefOrientationHandler.html',1,'tam::core::state']]],

@@ -1,7 +1,9 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classtam_1_1core_1_1state_1_1OdometryBase.html" title=" " alt="" coords="5,5,248,60"/>
-<area shape="rect" id="Node000001" href="$classtam_1_1core_1_1state_1_1MapHandler.html" title="Base class for map handling." alt="" coords="296,13,508,53"/>
-<area shape="poly" id="edge45_Node000000_Node000001" title=" " alt="" coords="262,30,296,30,296,35,262,35"/>
-<area shape="rect" id="Node000002" href="$classtam_1_1core_1_1state_1_1VoxelHashMap.html" title=" " alt="" coords="556,13,757,53"/>
-<area shape="poly" id="edge46_Node000001_Node000002" title=" " alt="" coords="521,30,556,30,556,35,521,35"/>
+<area shape="rect" id="Node000000" href="$classtam_1_1core_1_1state_1_1OdometryBase.html" title=" " alt="" coords="5,30,260,85"/>
+<area shape="rect" id="Node000001" href="$classtam_1_1core_1_1state_1_1ModelHandler.html" title=" " alt="" coords="308,37,532,77"/>
+<area shape="poly" id="edge43_Node000000_Node000001" title=" " alt="" coords="274,55,308,55,308,60,274,60"/>
+<area shape="rect" id="Node000002" href="$classtam_1_1core_1_1state_1_1ConstantVelocity.html" title=" " alt="" coords="580,5,771,45"/>
+<area shape="poly" id="edge44_Node000001_Node000002" title=" " alt="" coords="545,39,580,35,580,40,546,44"/>
+<area shape="rect" id="Node000003" href="$classtam_1_1core_1_1state_1_1ExternalGuess.html" title=" " alt="" coords="582,69,769,109"/>
+<area shape="poly" id="edge45_Node000001_Node000003" title=" " alt="" coords="546,70,582,75,581,80,545,76"/>
 </map>

@@ -1,63 +1,56 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" title=" " alt="" coords="60,519,163,545"/>
-<area shape="rect" id="Node000001" href="$classstateEstimationNode.html" title=" " alt="" coords="307,5,513,75"/>
-<area shape="poly" id="edge1_Node000000_Node000001" title=" " alt="" coords="111,505,120,425,143,312,162,251,188,191,222,135,263,85,283,69,305,58,308,63,286,74,267,89,226,138,193,193,167,253,148,314,125,426,116,506"/>
-<area shape="rect" id="Node000003" href="$classstateEstimationNode.html" title=" " alt="" coords="292,99,528,168"/>
-<area shape="poly" id="edge3_Node000000_Node000003" title=" " alt="" coords="114,505,128,440,155,352,175,305,199,259,228,216,264,178,290,159,293,164,267,182,233,219,203,262,179,307,160,354,133,441,119,506"/>
-<area shape="rect" id="Node000005" href="$classstateEstimationNode.html" title=" " alt="" coords="307,192,513,261"/>
-<area shape="poly" id="edge5_Node000000_Node000005" title=" " alt="" coords="118,505,137,456,168,393,210,328,235,298,264,271,305,247,308,252,267,275,239,301,214,331,172,396,142,458,123,507"/>
-<area shape="rect" id="Node000007" href="$classstateEstimationNode.html" title=" " alt="" coords="292,285,528,355"/>
-<area shape="poly" id="edge7_Node000000_Node000007" title=" " alt="" coords="127,506,182,436,221,398,264,364,290,350,293,355,267,369,224,402,186,440,131,510"/>
-<area shape="rect" id="Node000009" href="$classstateEstimationNode.html" title=" " alt="" coords="303,379,517,448"/>
-<area shape="poly" id="edge9_Node000000_Node000009" title=" " alt="" coords="148,511,264,458,302,444,303,449,266,462,150,516"/>
-<area shape="rect" id="Node000011" href="$classtam_1_1core_1_1state_1_1NodeBase.html" title=" " alt="" coords="269,723,551,778"/>
-<area shape="poly" id="edge11_Node000000_Node000011" title=" " alt="" coords="129,555,152,590,183,631,222,673,267,708,290,721,288,726,264,713,219,677,179,635,148,593,125,558"/>
-<area shape="rect" id="Node000014" href="$classtam_1_1core_1_1state_1_1NodeBase.html" title=" " alt="" coords="265,803,555,872"/>
-<area shape="poly" id="edge13_Node000000_Node000014" title=" " alt="" coords="129,555,267,788,286,800,283,805,263,791,125,558"/>
-<area shape="rect" id="Node000015" href="$classtam_1_1core_1_1state_1_1NodeBase.html" title=" " alt="" coords="274,896,546,965"/>
-<area shape="poly" id="edge14_Node000000_Node000015" title=" " alt="" coords="132,555,175,623,220,710,229,736,233,760,235,803,241,842,251,862,267,882,281,894,277,898,263,886,246,864,236,844,230,804,228,761,223,738,215,712,170,625,127,558"/>
-<area shape="rect" id="Node000016" href="$classtam_1_1core_1_1state_1_1NodeBase.html" title=" " alt="" coords="271,536,549,605"/>
-<area shape="poly" id="edge15_Node000000_Node000016" title=" " alt="" coords="177,538,270,550,270,555,176,543"/>
-<area shape="rect" id="Node000017" href="$classtam_1_1core_1_1state_1_1NodeBase.html" title=" " alt="" coords="267,629,553,699"/>
-<area shape="poly" id="edge16_Node000000_Node000017" title=" " alt="" coords="146,550,201,582,266,615,296,627,294,632,264,620,199,587,143,554"/>
-<area shape="rect" id="Node000018" href="$classstateEstimationNode.html" title=" " alt="" coords="331,472,489,512"/>
-<area shape="poly" id="edge17_Node000000_Node000018" title=" " alt="" coords="176,521,330,500,331,505,177,526"/>
-<area shape="rect" id="Node000019" href="$classtam_1_1core_1_1state_1_1NodeBase.html" title=" " alt="" coords="311,990,509,1045"/>
-<area shape="poly" id="edge18_Node000000_Node000019" title=" " alt="" coords="133,555,177,622,200,665,220,710,231,750,234,787,229,853,228,883,232,913,244,944,267,975,287,992,312,1003,309,1008,285,996,263,979,239,946,227,915,223,884,224,853,228,787,225,751,215,712,195,667,172,625,128,558"/>
-<area shape="rect" id="Node000002" href="$structtam__state__estimation__node_1_1StateEstimation2DEKFKin.html" title=" " alt="" coords="605,20,842,60"/>
-<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="527,37,604,37,604,43,527,43"/>
-<area shape="rect" id="Node000004" href="$structtam__state__estimation__node_1_1StateEstimation2DEKFNh.html" title=" " alt="" coords="606,113,841,153"/>
-<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="542,131,606,131,606,136,542,136"/>
-<area shape="rect" id="Node000006" href="$structtam__state__estimation__node_1_1StateEstimation3DEKFKin.html" title=" " alt="" coords="605,207,842,247"/>
-<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="527,224,604,224,604,229,527,229"/>
-<area shape="rect" id="Node000008" href="$structtam__state__estimation__node_1_1StateEstimation3DEKFNh.html" title=" " alt="" coords="606,300,841,340"/>
-<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="542,317,606,317,606,323,542,323"/>
-<area shape="rect" id="Node000010" href="$structtam__state__estimation__node_1_1StateEstimation3DEKFStm.html" title=" " alt="" coords="603,393,844,433"/>
-<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="531,411,603,411,603,416,531,416"/>
-<area shape="rect" id="Node000012" href="$classtam_1_1core_1_1state_1_1OdometryNode.html" title=" " alt="" coords="624,731,823,771"/>
-<area shape="poly" id="edge12_Node000011_Node000012" title=" " alt="" coords="564,748,624,748,624,753,564,753"/>
-<area shape="rect" id="Node000020" href="$classtam_1_1core_1_1state_1_1OdometryNode.html" title=" " alt="" coords="624,1029,823,1083"/>
-<area shape="poly" id="edge19_Node000019_Node000020" title=" " alt="" coords="523,1029,624,1041,623,1046,523,1034"/>
-<area shape="rect" id="Node000022" href="$classtam_1_1core_1_1state_1_1OdometryNode.html" title=" " alt="" coords="624,1107,823,1162"/>
-<area shape="poly" id="edge21_Node000019_Node000022" title=" " alt="" coords="488,1048,604,1094,635,1105,634,1110,602,1098,486,1053"/>
-<area shape="rect" id="Node000024" href="$classtam_1_1core_1_1state_1_1OdometryNode.html" title=" " alt="" coords="624,871,823,926"/>
-<area shape="poly" id="edge23_Node000019_Node000024" title=" " alt="" coords="521,989,553,975,577,956,601,936,628,924,631,928,604,941,580,960,556,980,523,994"/>
-<area shape="rect" id="Node000026" href="$classtam_1_1core_1_1state_1_1OdometryNode.html" title=" " alt="" coords="624,950,823,1005"/>
-<area shape="poly" id="edge25_Node000019_Node000026" title=" " alt="" coords="523,1000,623,987,624,993,523,1006"/>
-<area shape="rect" id="Node000021" href="$structtam__odometry_1_1GICP__EXT.html" title=" " alt="" coords="892,1043,1080,1069"/>
-<area shape="poly" id="edge20_Node000020_Node000021" title=" " alt="" coords="836,1053,892,1053,892,1059,836,1059"/>
-<area shape="rect" id="Node000023" href="$structtam__odometry_1_1ICP__CV.html" title=" " alt="" coords="901,1122,1071,1147"/>
-<area shape="poly" id="edge22_Node000022_Node000023" title=" " alt="" coords="837,1132,900,1132,900,1137,837,1137"/>
-<area shape="rect" id="Node000025" href="$structtam__odometry_1_1ICP__EXT.html" title=" " alt="" coords="897,886,1075,911"/>
-<area shape="poly" id="edge24_Node000024_Node000025" title=" " alt="" coords="837,896,896,896,896,901,837,901"/>
-<area shape="rect" id="Node000027" href="$structtam__odometry_1_1RADAR__ICP__EXT.html" title=" " alt="" coords="901,957,1071,997"/>
-<area shape="poly" id="edge26_Node000026_Node000027" title=" " alt="" coords="837,975,900,975,900,980,837,980"/>
-<area shape="rect" id="Node000013" href="$classtam_1_1core_1_1state_1_1OdometryBase.html" title=" " alt="" coords="12,723,211,778"/>
-<area shape="poly" id="edge27_Node000013_Node000011" title=" " alt="" coords="225,748,269,748,269,753,225,753"/>
-<area shape="poly" id="edge28_Node000013_Node000014" title=" " alt="" coords="220,779,291,800,289,805,219,785"/>
-<area shape="poly" id="edge29_Node000013_Node000015" title=" " alt="" coords="149,786,202,836,267,882,291,894,288,898,264,886,199,840,145,790"/>
-<area shape="poly" id="edge30_Node000013_Node000016" title=" " alt="" coords="145,711,199,662,264,615,288,603,291,608,267,620,202,666,149,715"/>
-<area shape="poly" id="edge31_Node000013_Node000017" title=" " alt="" coords="219,717,289,696,291,701,220,722"/>
-<area shape="rect" id="Node000028" href="$classtam_1_1core_1_1state_1_1OdometryBase.html" title=" " alt="" coords="5,990,217,1045"/>
-<area shape="poly" id="edge32_Node000028_Node000019" title=" " alt="" coords="231,1015,310,1015,310,1020,231,1020"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="60,465,163,490"/>
+<area shape="rect" id="Node000001" href="$classstateEstimationNode.html" title=" " alt="" coords="307,256,513,325"/>
+<area shape="poly" id="edge1_Node000000_Node000001" title=" " alt="" coords="130,453,186,394,224,363,264,335,305,316,308,320,267,340,227,367,190,398,134,456"/>
+<area shape="rect" id="Node000003" href="$classstateEstimationNode.html" title=" " alt="" coords="292,349,528,419"/>
+<area shape="poly" id="edge3_Node000000_Node000003" title=" " alt="" coords="165,458,298,416,299,421,167,463"/>
+<area shape="rect" id="Node000005" href="$classstateEstimationNode.html" title=" " alt="" coords="307,443,513,512"/>
+<area shape="poly" id="edge5_Node000000_Node000005" title=" " alt="" coords="176,475,307,475,307,480,176,480"/>
+<area shape="rect" id="Node000007" href="$classstateEstimationNode.html" title=" " alt="" coords="292,5,528,75"/>
+<area shape="poly" id="edge7_Node000000_Node000007" title=" " alt="" coords="113,451,124,379,150,281,169,228,195,176,226,128,264,85,290,66,293,70,267,89,230,131,199,179,174,230,155,282,129,380,118,451"/>
+<area shape="rect" id="Node000009" href="$classstateEstimationNode.html" title=" " alt="" coords="303,99,517,168"/>
+<area shape="poly" id="edge9_Node000000_Node000009" title=" " alt="" coords="116,451,133,394,162,321,205,245,232,209,264,178,301,155,304,159,267,182,236,213,210,247,167,323,138,396,121,452"/>
+<area shape="rect" id="Node000011" href="$classtam_1_1core_1_1state_1_1NodeBase.html" title=" " alt="" coords="269,817,551,871"/>
+<area shape="poly" id="edge11_Node000000_Node000011" title=" " alt="" coords="130,500,172,575,220,670,232,709,236,742,244,772,253,787,267,802,284,815,280,819,264,806,249,790,240,774,231,743,227,710,215,672,168,578,125,503"/>
+<area shape="rect" id="Node000014" href="$classtam_1_1core_1_1state_1_1NodeBase.html" title=" " alt="" coords="265,536,555,605"/>
+<area shape="poly" id="edge13_Node000000_Node000014" title=" " alt="" coords="167,492,299,533,298,538,165,497"/>
+<area shape="rect" id="Node000015" href="$classtam_1_1core_1_1state_1_1NodeBase.html" title=" " alt="" coords="274,629,546,699"/>
+<area shape="poly" id="edge14_Node000000_Node000015" title=" " alt="" coords="134,498,190,556,227,588,267,615,290,627,287,632,264,620,224,592,186,560,130,502"/>
+<area shape="rect" id="Node000016" href="$classtam_1_1core_1_1state_1_1NodeBase.html" title=" " alt="" coords="271,723,549,792"/>
+<area shape="poly" id="edge15_Node000000_Node000016" title=" " alt="" coords="125,501,145,546,176,602,217,659,241,685,267,709,285,720,282,725,264,713,237,689,212,663,171,605,140,548,120,504"/>
+<area shape="rect" id="Node000017" href="$classstateEstimationNode.html" title=" " alt="" coords="331,192,489,232"/>
+<area shape="poly" id="edge16_Node000000_Node000017" title=" " alt="" coords="119,450,139,405,170,348,211,290,236,264,264,242,296,225,330,216,331,221,298,230,267,246,240,268,215,294,174,351,144,407,124,453"/>
+<area shape="rect" id="Node000018" href="$classtam_1_1core_1_1state_1_1NodeBase.html" title=" " alt="" coords="311,913,509,967"/>
+<area shape="poly" id="edge17_Node000000_Node000018" title=" " alt="" coords="131,501,175,574,199,621,220,670,229,702,233,731,233,783,234,807,239,830,249,855,267,881,288,899,312,913,309,918,285,904,263,884,244,857,234,832,229,807,228,783,228,732,224,703,215,672,194,623,170,577,127,503"/>
+<area shape="rect" id="Node000002" href="$structtam__state__estimation__node_1_1StateEstimation2DEKFKin.html" title=" " alt="" coords="605,271,842,311"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="527,288,604,288,604,293,527,293"/>
+<area shape="rect" id="Node000004" href="$structtam__state__estimation__node_1_1StateEstimation2DEKFNh.html" title=" " alt="" coords="606,364,841,404"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="542,381,606,381,606,387,542,387"/>
+<area shape="rect" id="Node000006" href="$structtam__state__estimation__node_1_1StateEstimation3DEKFKin.html" title=" " alt="" coords="605,457,842,497"/>
+<area shape="poly" id="edge6_Node000005_Node000006" title=" " alt="" coords="527,475,604,475,604,480,527,480"/>
+<area shape="rect" id="Node000008" href="$structtam__state__estimation__node_1_1StateEstimation3DEKFNh.html" title=" " alt="" coords="606,20,841,60"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="542,37,606,37,606,43,542,43"/>
+<area shape="rect" id="Node000010" href="$structtam__state__estimation__node_1_1StateEstimation3DEKFStm.html" title=" " alt="" coords="603,113,844,153"/>
+<area shape="poly" id="edge10_Node000009_Node000010" title=" " alt="" coords="531,131,603,131,603,136,531,136"/>
+<area shape="rect" id="Node000012" href="$classtam_1_1core_1_1state_1_1OdometryNode.html" title=" " alt="" coords="624,805,823,845"/>
+<area shape="poly" id="edge12_Node000011_Node000012" title=" " alt="" coords="564,832,624,829,624,834,564,837"/>
+<area shape="rect" id="Node000019" href="$classtam_1_1core_1_1state_1_1OdometryNode.html" title=" " alt="" coords="624,870,823,925"/>
+<area shape="poly" id="edge18_Node000018_Node000019" title=" " alt="" coords="523,922,623,908,624,913,523,927"/>
+<area shape="rect" id="Node000021" href="$classtam_1_1core_1_1state_1_1OdometryNode.html" title=" " alt="" coords="624,949,823,1003"/>
+<area shape="poly" id="edge20_Node000018_Node000021" title=" " alt="" coords="523,950,624,962,624,967,523,956"/>
+<area shape="rect" id="Node000023" href="$classtam_1_1core_1_1state_1_1OdometryNode.html" title=" " alt="" coords="624,1027,823,1082"/>
+<area shape="poly" id="edge22_Node000018_Node000023" title=" " alt="" coords="491,970,604,1013,636,1025,634,1030,602,1019,489,975"/>
+<area shape="rect" id="Node000020" href="$structtam__odometry_1_1GICP__EXT.html" title=" " alt="" coords="892,885,1080,910"/>
+<area shape="poly" id="edge19_Node000019_Node000020" title=" " alt="" coords="836,895,892,895,892,900,836,900"/>
+<area shape="rect" id="Node000022" href="$structtam__odometry_1_1ICP__CV.html" title=" " alt="" coords="901,963,1071,989"/>
+<area shape="poly" id="edge21_Node000021_Node000022" title=" " alt="" coords="837,973,900,973,900,979,837,979"/>
+<area shape="rect" id="Node000024" href="$structtam__odometry_1_1ICP__EXT.html" title=" " alt="" coords="897,1042,1075,1067"/>
+<area shape="poly" id="edge23_Node000023_Node000024" title=" " alt="" coords="837,1052,896,1052,896,1057,837,1057"/>
+<area shape="rect" id="Node000013" href="$classtam_1_1core_1_1state_1_1OdometryBase.html" title=" " alt="" coords="12,683,211,738"/>
+<area shape="poly" id="edge24_Node000013_Node000011" title=" " alt="" coords="164,744,213,774,266,802,299,814,297,819,264,806,210,779,161,748"/>
+<area shape="poly" id="edge25_Node000013_Node000014" title=" " alt="" coords="162,673,211,643,264,615,293,603,295,608,266,620,213,648,165,678"/>
+<area shape="poly" id="edge26_Node000013_Node000015" title=" " alt="" coords="224,690,273,683,274,688,225,696"/>
+<area shape="poly" id="edge27_Node000013_Node000016" title=" " alt="" coords="224,726,271,733,270,738,224,731"/>
+<area shape="rect" id="Node000025" href="$classtam_1_1core_1_1state_1_1OdometryBase.html" title=" " alt="" coords="5,913,217,967"/>
+<area shape="poly" id="edge28_Node000025_Node000018" title=" " alt="" coords="231,937,310,937,310,943,231,943"/>
 </map>
