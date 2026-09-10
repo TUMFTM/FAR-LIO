@@ -34,6 +34,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
     LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8
 
+RUN rm -f /etc/apt/sources.list.d/cuda*.list /etc/apt/sources.list.d/nvidia-ml.list
+
 # --- Locale + ROS 2 apt repository ------------------------------------------
 RUN apt-get update && apt-get install -y --no-install-recommends \
       ca-certificates curl gnupg locales && \
@@ -108,6 +110,8 @@ ENV DEBIAN_FRONTEND=noninteractive \
     LC_ALL=en_US.UTF-8 \
     RMW_IMPLEMENTATION=rmw_cyclonedds_cpp \
     CYCLONEDDS_URI=/dev_ws/config/middleware/cyclonedds_udp.xml
+
+RUN rm -f /etc/apt/sources.list.d/cuda*.list /etc/apt/sources.list.d/nvidia-ml.list
 
 # --- Locale + ROS 2 apt repository (same setup as the deps stage) -----------
 RUN apt-get update && apt-get install -y --no-install-recommends \
