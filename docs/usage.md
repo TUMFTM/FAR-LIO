@@ -72,7 +72,7 @@ curl -fL -O https://github.com/TUMFTM/FAR-LIO/releases/download/test-data-kitti-
 The default configuration in `far-lio.yml` already points at the correct inputs for the test data. To run `FAR-LIO`, use:
 
 ```bash
-./run.sh ./test-data-kitti-seq04
+./run.sh ./test-data-kitti-seq04/kitti_20110930_seq_04
 ```
 
 For visualization/inspection, run [PlotJuggler](https://github.com/facontidavide/PlotJuggler) and subscribe to the respective topics, or open RVIZ2 with the provided config:
