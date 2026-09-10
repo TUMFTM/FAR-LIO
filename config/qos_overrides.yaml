@@ -1,0 +1,10 @@
+# QoS profile overrides for `ros2 bag play` (see docker-compose.yml, rosbag service).
+#
+# Some bags record /tf_static with a QoS that late-joining subscribers (like the tf
+# listeners in FAR-LIO) cannot match, so the static transforms never arrive. Republish
+# it as transient-local/reliable with a deep history so every subscriber gets it.
+/tf_static:
+  history: keep_last
+  depth: 1000
+  reliability: reliable
+  durability: transient_local

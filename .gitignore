@@ -1,0 +1,18 @@
+# Documentation build artifacts
+/site/
+/docs/docs_cpp/
+/.cache/
+
+# colcon / ROS build artifacts
+/build/
+/install/
+/log/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# General
+.zip
+test-data-kitti-seq04/

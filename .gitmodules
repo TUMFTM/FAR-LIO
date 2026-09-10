@@ -1,0 +1,3 @@
+[submodule "submodules/TAM__common"]
+	path = submodules/TAM__common
+	url = https://github.com/TUMFTM/TAM__common.git
