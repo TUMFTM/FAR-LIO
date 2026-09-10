@@ -12,3 +12,7 @@
 __pycache__/
 *.pyc
 .venv/
+
+# General
+.zip
+test-data-kitti-seq04/

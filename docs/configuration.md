@@ -40,14 +40,14 @@ match your sensor setup.
 
 ### Frames
 
-The state estimation operates in the vehicle's center of gravity, so `child_frame` and
+The state estimation operates in the robots base link, so `child_frame` and
 `odom_frame` are assumed fixed — **leave them at their defaults**. You only need to set
 `cloud_frame` to match your sensor.
 
 | Parameter | Meaning |
 |-----------|---------|
 | `node.cloud_frame` | **Set this** to the `frame_id` of your LiDAR `PointCloud2`. The node blocks until the static transform `cloud_frame → child_frame` is available on `/tf_static` and transforms each incoming cloud before registration. |
-| `node.child_frame` | Vehicle body / center-of-gravity frame the estimator works in (`base_link`). **Do not change.** |
+| `node.child_frame` | Base frame the estimator works in (`base_link`). **Do not change.** |
 | `node.odom_frame` | Fixed world/odometry frame the pose is published in (`local_cartesian`). **Do not change.** |
 
 ```yaml

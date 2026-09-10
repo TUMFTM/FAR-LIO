@@ -58,3 +58,27 @@ To use a specific `ROS_DOMAIN_ID`, export it first:
 ```bash
 ROS_DOMAIN_ID=7 ./run.sh /path/to/rosbag
 ```
+
+## Test Data
+
+We provide a short example dataset of `KITTI Odometry (sequence 04)` in the respective ROS2 format for FAR-LIO to check system functionality.
+It is available as an asset and can be downloaded from the respective release using:
+
+```bash
+cd /path/to/far-lio
+curl -fL -O https://github.com/TUMFTM/FAR-LIO/releases/download/test-data-kitti-seq04/test-data-kitti-seq04.zip && unzip test-data-kitti-seq04.zip
+```
+
+The default configuration in `far-lio.yml` already points at the correct inputs for the test data. To run `FAR-LIO`, use:
+
+```bash
+./run.sh ./test-data-kitti-seq04
+```
+
+For visualization/inspection, run [PlotJuggler](https://github.com/facontidavide/PlotJuggler) and subscribe to the respective topics, or open RVIZ2 with the provided config:
+
+```bash
+rviz2 -d config/far-lio.rviz
+```
+
+For further details, see [Analysis](analysis.md).
