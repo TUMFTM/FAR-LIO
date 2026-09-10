@@ -66,7 +66,7 @@
         imus:
           primary:
             message:
-              topic: /vehicle/sensor/imu
+              topic: /kitti/oxts/imu
               type: sensor_msgs/msg/Imu
               timeout_ms: 500
             filter_coefficients: [0.07722183762197628, 0.24522338986219644, 0.34256086202951863, 0.24522338986219644, 0.07722183762197628]
@@ -102,9 +102,9 @@
       node:
         odom_frame: "local_cartesian"
         child_frame: "base_link"
-        cloud_frame: "base_link"
+        cloud_frame: "velo_link"
         wait_tf: false
-        input_pointcloud: "/vehicle/sensor/lidar" # Namespace set globally
+        input_pointcloud: "/kitti/velo/pointcloud" # Namespace set globally
         input_pointcloud_status: ""
         output_odom: "lidar_odometry" # Namespace set globally
         input_map: "" # Path to folder containing "map.pcd" and "origin.yml"
@@ -116,7 +116,7 @@
         preprocess: true
         downsample: false
         buffer_z: false
-        debug_mode: false
+        debug_mode: true
         num_threads: 1
       # Covariance
       covariance:
