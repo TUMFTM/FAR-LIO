@@ -47,7 +47,7 @@
             topic: /core/state/lidar_odometry
             type: nav_msgs/msg/Odometry
             timeout_ms: 500
-            additional_dealy_ms: 0
+            additional_delay_ms: 0
           status:
             topic: /core/state/lidar_odometry_status
             timeout_ms: 500
@@ -94,7 +94,6 @@
 # =======================================================================================
 # Odometry Node
 # =======================================================================================
-/core/state:
   LidarOdometry:
     ros__parameters:
       use_sim_time: true
